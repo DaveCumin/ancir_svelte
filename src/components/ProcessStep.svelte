@@ -106,6 +106,7 @@
         if (typeof processFunction === "function") {
           // Check if the function exists in the processMap
           result = processFunction(result, processObj.parameters, "do"); //CALL THE FUNCTION WITH PARAMS
+          console.log(result);
         } else {
           // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
           console.error(`Function '${processName}' does not exist.`);

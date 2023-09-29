@@ -1,6 +1,5 @@
 <script>
   import { dataIDsforTables, activeTableTab, data } from "../store";
-  import { derived } from "svelte/store";
 
   export function changeActiveNav(ind) {
     $activeTableTab = ind;
@@ -20,7 +19,7 @@
   }
 
   //Function nto make a table from the active data
-  function makeTableData(dataIN) {
+  function makeTableData(dataIN, d) {
     let out = [];
     for (const key in dataIN) {
       if (dataIN[key].processedData.length > 0) {
@@ -34,12 +33,13 @@
   }
 
   //Get headinngs for the table
-  function makeTableHeadings(dataIN) {
+  function makeTableHeadings(dataIN, d) {
     if ($dataIDsforTables.length > 0) {
-      var outheadings = Object.keys(dataIN);
+      var outheadings = [];
       var outprocessed = [];
       for (const key in dataIN) {
         outprocessed.push(dataIN[key].processedData.length);
+        outheadings.push(dataIN[key].name);
       }
       return { headings: outheadings, processed: outprocessed };
     } else {
@@ -47,8 +47,11 @@
     }
   }
 
-  $: tableData = makeTableData(getActiveData($activeTableTab).data);
-  $: tableHeadings = makeTableHeadings(getActiveData($activeTableTab).data);
+  $: tableData = makeTableData(getActiveData($activeTableTab).data, $data);
+  $: tableHeadings = makeTableHeadings(
+    getActiveData($activeTableTab).data,
+    $data
+  );
 </script>
 
 {#if $activeTableTab < 0}
