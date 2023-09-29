@@ -1,7 +1,5 @@
 <script context="module">
   // @ts-nocheck
-
-  import Modal from "./Modal.svelte";
   import AddProcessModal, { add } from "../processes/AddProcessModel.svelte";
 
   import { limit } from "../processes/limit.js";
@@ -17,7 +15,9 @@
   // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the js file and add to the map.
   //---------------------------------------------------------------------
 
-  let dataProcessed = [1, 2, 3];
+  let WHEREP = "";
+  let ID = 0;
+  let FIELDNAME = "";
   let selectedSettings = null;
 
   function closeModal() {
@@ -28,6 +28,30 @@
     // Update your data array with the result
     selectedSettings = event.detail;
     console.log(selectedSettings);
+    console.log(WHEREP);
+    console.log(ID);
+    console.log(FIELDNAME);
+
+    modalActive.set(true);
+
+    if (WHEREP === "data") {
+      data.update((currentData) => {
+        // Find the data entry with the specified ID
+        const newData = [...currentData];
+        const datum = newData.find((entry) => entry.id === ID);
+
+        // Check if the data entry and key exist
+        if (datum && datum.data[FIELDNAME]) {
+          // Add a new process step to the selected key
+          datum.data[FIELDNAME].processSteps.push(selectedSettings);
+        }
+        return newData;
+      });
+
+      //Add for graph here.
+      doProcessSteps(WHEREP, ID, FIELDNAME);
+    }
+
     // Close the modal
     closeModal();
   }
@@ -38,28 +62,11 @@
   }
 
   // Function to add a process step to a field in any object
-  export async function addProcessStep(where, ID, fieldName) {
-    const processStepResult = await getProcess();
-    console.log(processStepResult);
-    if (processStepResult === "OK") {
-      if (where === "data") {
-        data.update((currentData) => {
-          // Find the data entry with the specified ID
-          const newData = [...currentData];
-          const datum = newData.find((entry) => entry.id === ID);
-
-          // Check if the data entry and key exist
-          if (datum && datum.data[fieldName]) {
-            // Add a new process step to the selected key
-            datum.data[fieldName].processSteps.push(getProcess());
-          }
-          return newData;
-        });
-
-        //Add for graph here.
-        doProcessSteps(where, ID, fieldName);
-      }
-    }
+  export function addProcessStep(where, id, fieldName) {
+    WHEREP = where;
+    ID = id;
+    FIELDNAME = fieldName;
+    modalActive.set(true);
   }
 
   // Function to remove a process step to a field in any object
@@ -80,15 +87,6 @@
       });
       doProcessSteps(where, ID, fieldName);
     }
-  }
-
-  // Deal with the process of getting the input for a function
-  // TODO: MAKE THIS A MODAL WITH SETTINGS FROM THE FUNCTION
-  async function getProcess() {
-    modalActive.set(true);
-    console.log(dataProcessed);
-
-    return "testing";
   }
 
   // Deal with the process of updating the processedData for a given field

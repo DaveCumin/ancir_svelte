@@ -1,21 +1,13 @@
 <script context="module">
   // Define the functions
-  export function add(
-    startVals = [1, 2, 3],
-    params = { val: 0 },
-    processMode = "do"
-  ) {
+  export function add(startVals = [1, 2, 3], params = { val: 0 }) {
     //ADDS A SET VALUE TO EACH OF THE ARRAY VALUES
-
-    //IF THE DATA ARE VALUES
-    if (processMode == "do") {
-      var arr = [...startVals];
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = arr[i] + params.val;
-      }
-
-      return arr;
+    var arr = [...startVals];
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = arr[i] + params.val;
     }
+
+    return arr;
   }
 </script>
 
@@ -23,21 +15,15 @@
   import { createEventDispatcher } from "svelte";
 
   let params = { val: 0 };
-  let preview = [1, 2, 3]; // Initial preview with default values
   const dispatch = createEventDispatcher();
 
-  function updatePreview() {
-    // Call the add function to update the preview
-    preview = add(preview, params, "do");
-  }
-
   function confirm() {
-    // Call the add function one more time to update the store
-    const result = add(preview, params, "do");
-
     // Emit an event to notify the parent component (where you opened the modal)
     // about the confirmation and pass the result
-    dispatch("confirmAdd", params);
+    dispatch("confirmAdd", {
+      process: "add",
+      parameters: params,
+    });
   }
 </script>
 
@@ -46,19 +32,8 @@
   <div class="modal-content">
     <h1>Add Process</h1>
     <label for="val">Value:</label>
-    <input
-      type="number"
-      id="val"
-      bind:value={params.val}
-      on:input={updatePreview}
-    />
-
-    <h2>Preview:</h2>
-    <ul>
-      {#each preview as value}
-        <li>{value}</li>
-      {/each}
-    </ul>
+    <input type="number" id="val" bind:value={params.val} />
+    <input type="range" id="val" bind:value={params.val} />
 
     <div class="modal-buttons">
       <button on:click={confirm}>Confirm</button>
