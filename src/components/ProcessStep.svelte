@@ -17,7 +17,7 @@
   // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the js file and add to the map.
   //---------------------------------------------------------------------
 
-  let activeModal = false;
+  modalActive.set(false);
 
   // Function to add a process step to a field in any object
   export function addProcessStep(object, fieldName) {
@@ -41,7 +41,7 @@
   // TODO: MAKE THIS A MODAL WITH SETTINGS FROM THE FUNCTION
   function getProcess() {
     console.log("hello from here");
-    activeModal = true;
+    modalActive.set(true);
     //return prompt(`Add a process step}`);
     let test = Math.round(Math.abs(Math.random()) * 100);
     return {
@@ -84,4 +84,9 @@
   }
 </script>
 
-<Modal modalActive={activeModal}>hello world</Modal>
+<script>
+  import { modalActive } from "../store.js";
+  import { get } from "svelte/store";
+</script>
+
+<Modal>hello world</Modal>

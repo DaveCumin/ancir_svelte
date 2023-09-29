@@ -1,15 +1,15 @@
 <!-- Modal.svelte -->
 <script context="module">
-  export let modalActive;
+  import { modalActive } from "../store.js";
 </script>
 
-{#if modalActive}
+{#if $modalActive}
   <div class="modal">
     <div class="modal-content">
       <slot />
       <button
         on:click={() => {
-          modalActive = false;
+          $modalActive = false;
         }}>Close</button
       >
     </div>
