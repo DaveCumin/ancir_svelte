@@ -2,10 +2,9 @@
   // @ts-nocheck
 
   import Modal from "./Modal.svelte";
-  import AddProcessModal from "./AddProcessModel.svelte";
+  import AddProcessModal, { add } from "../processes/AddProcessModel.svelte";
 
   import { limit } from "../processes/limit.js";
-  import { add } from "../processes/add.js";
 
   // Import functions here as needed and add to the map below
 
