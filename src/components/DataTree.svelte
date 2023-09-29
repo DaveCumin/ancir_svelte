@@ -1,8 +1,6 @@
 <script>
-  import App from "../App.svelte";
   import { data, dataIDsforTables, activeTableTab } from "../store";
   import { addProcessStep, removeProcessStep } from "./ProcessStep.svelte";
-  import changeActiveNav from "./TableTabs.svelte";
 
   //show the data in tables
   export function showDataTable(ID) {

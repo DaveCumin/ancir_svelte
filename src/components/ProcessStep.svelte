@@ -2,6 +2,7 @@
   // @ts-nocheck
 
   import Modal from "./Modal.svelte";
+  import AddProcessModal from "./AddProcessModel.svelte";
 
   import { limit } from "../processes/limit.js";
   import { add } from "../processes/add.js";
@@ -17,31 +18,48 @@
   // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the js file and add to the map.
   //---------------------------------------------------------------------
 
-  let processData;
+  let dataProcessed = [1, 2, 3];
+  let selectedSettings = null;
+
+  function closeModal() {
+    modalActive.set(false);
+  }
+
+  function handleConfirmAddProcess(event) {
+    // Update your data array with the result
+    selectedSettings = event.detail;
+    console.log(selectedSettings);
+    // Close the modal
+    closeModal();
+  }
+
+  function handleCancelAddProcess() {
+    // Close the modal without making changes
+    closeModal();
+  }
 
   // Function to add a process step to a field in any object
   export async function addProcessStep(where, ID, fieldName) {
-    processData = await getProcess();
+    const processStepResult = await getProcess();
+    console.log(processStepResult);
+    if (processStepResult === "OK") {
+      if (where === "data") {
+        data.update((currentData) => {
+          // Find the data entry with the specified ID
+          const newData = [...currentData];
+          const datum = newData.find((entry) => entry.id === ID);
 
-    console.log("RESULT: ");
-    console.log("done3");
+          // Check if the data entry and key exist
+          if (datum && datum.data[fieldName]) {
+            // Add a new process step to the selected key
+            datum.data[fieldName].processSteps.push(getProcess());
+          }
+          return newData;
+        });
 
-    if (where === "data") {
-      data.update((currentData) => {
-        // Find the data entry with the specified ID
-        const newData = [...currentData];
-        const datum = newData.find((entry) => entry.id === ID);
-
-        // Check if the data entry and key exist
-        if (datum && datum.data[fieldName]) {
-          // Add a new process step to the selected key
-          datum.data[fieldName].processSteps.push(getProcess());
-        }
-        return newData;
-      });
-
-      //Add for graph here.
-      doProcessSteps(where, ID, fieldName);
+        //Add for graph here.
+        doProcessSteps(where, ID, fieldName);
+      }
     }
   }
 
@@ -68,47 +86,10 @@
   // Deal with the process of getting the input for a function
   // TODO: MAKE THIS A MODAL WITH SETTINGS FROM THE FUNCTION
   async function getProcess() {
-    let modalPromise; // Declare modalPromise here
+    modalActive.set(true);
+    console.log(dataProcessed);
 
-    return new Promise((resolve) => {
-      modalPromise = resolve;
-      // Display the modal with appropriate content
-      makeContents(add([1, 2, 3, 4], { val: 5 }, "show"));
-      modalActive.set(true);
-    }).then((result) => {
-      processData = result; // Assign the value of processData when the modal resolves
-      return result;
-    });
-  }
-
-  function makeContents(processParts) {
-    if (!processParts || processParts.length < 1) return ""; // Handle the case when processParts is not defined
-
-    let contents = "";
-
-    processParts.forEach((part) => {
-      if (part.type === "slider") {
-        contents += `
-        <label for="${part.label}">${part.label}:</label>
-        <span id="${part.label}Value">${part.value}</span>
-        <input type="range" id="${part.label}" min="${
-          part.range[0] || 0
-        }" max="${part.range[1] || 100}" value="${part.value}" on:input={e => ${
-          part.label
-        }Value.textContent = e.target.value}>
-        <br>
-      `;
-      } else if (part.type === "checkbox") {
-        contents += `
-        <label for="${part.label}">${part.label}:</label>
-        <input type="checkbox" id="${part.label}" bind:checked={${part.label}Value}>
-        <br>
-      `;
-      }
-    });
-
-    modalContent.set(contents);
-    console.log(get(modalContent));
+    return "testing";
   }
 
   // Deal with the process of updating the processedData for a given field
@@ -156,4 +137,9 @@
   import { get } from "svelte/store";
 </script>
 
-<Modal />
+{#if $modalActive}
+  <AddProcessModal
+    on:confirmAdd={handleConfirmAddProcess}
+    on:cancelAdd={handleCancelAddProcess}
+  />
+{/if}

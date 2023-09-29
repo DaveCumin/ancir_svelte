@@ -15,15 +15,4 @@ export function add(
 
     return arr;
   }
-
-  if (processMode == "show") {
-    return [
-      {
-        label: "Value",
-        value: 0,
-        type: "slider",
-        range: [Infinity, Infinity],
-      },
-    ];
-  }
 }
