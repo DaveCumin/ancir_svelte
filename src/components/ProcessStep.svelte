@@ -1,11 +1,14 @@
 <script context="module">
   // @ts-nocheck
-  import AddProcessModal, { add } from "../processes/AddProcessModel.svelte";
+  import ChooseProcess from "../processes/ChooseProcess.svelte";
+  import { tick } from "svelte";
 
-  import { limit } from "../processes/limit.js";
+  //---------------------------------------------------------------------
+  // ----- ADD NEW PROCESSING FUNCTIONS BELOW
+  import Add, { add } from "../processes/Add.svelte";
+  import Limit, { limit } from "../processes/Limit.svelte";
 
   // Import functions here as needed and add to the map below
-
   const processMap = {
     add,
     limit,
@@ -18,21 +21,20 @@
   let WHEREP = "";
   let ID = 0;
   let FIELDNAME = "";
+  let WHICHPROCESS = "";
   let selectedSettings = null;
 
   function closeModal() {
     modalActive.set(false);
   }
+  function openModal() {
+    modalActive.set(true);
+  }
 
   function handleConfirmAddProcess(event) {
     // Update your data array with the result
+    console.log(event);
     selectedSettings = event.detail;
-    console.log(selectedSettings);
-    console.log(WHEREP);
-    console.log(ID);
-    console.log(FIELDNAME);
-
-    modalActive.set(true);
 
     if (WHEREP === "data") {
       data.update((currentData) => {
@@ -57,8 +59,15 @@
   }
 
   function handleCancelAddProcess() {
-    // Close the modal without making changes
+    WHICHPROCESS = "";
     closeModal();
+  }
+
+  async function choseProcess(event) {
+    WHICHPROCESS = event.detail.selectedProcess;
+    closeModal();
+    await tick();
+    openModal();
   }
 
   // Function to add a process step to a field in any object
@@ -66,7 +75,7 @@
     WHEREP = where;
     ID = id;
     FIELDNAME = fieldName;
-    modalActive.set(true);
+    openModal();
   }
 
   // Function to remove a process step to a field in any object
@@ -136,8 +145,25 @@
 </script>
 
 {#if $modalActive}
-  <AddProcessModal
-    on:confirmAdd={handleConfirmAddProcess}
-    on:cancelAdd={handleCancelAddProcess}
-  />
+  {#if WHICHPROCESS === ""}
+    <ChooseProcess
+      processes={Object.keys(processMap)}
+      on:confirmAdd={choseProcess}
+      on:cancelAdd={handleCancelAddProcess}
+    />
+  {:else if WHICHPROCESS === "add"}
+    <Add
+      on:confirmAdd={() => {
+        handleConfirmAddProcess();
+      }}
+      on:cancelAdd={handleCancelAddProcess}
+    />
+  {:else if WHICHPROCESS === "limit"}
+    <Limit
+      on:confirmAdd={() => {
+        handleConfirmAddProcess();
+      }}
+      on:cancelAdd={handleCancelAddProcess}
+    />
+  {/if}
 {/if}
