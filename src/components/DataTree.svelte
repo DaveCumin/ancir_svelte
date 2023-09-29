@@ -33,7 +33,7 @@
     {#each Object.keys(datum.data) as key}
       <div class="field">
         {datum.data[key].name}
-        <button on:click={() => (datum.data = addProcessStep(datum.data, key))}
+        <button on:click={() => addProcessStep("data", datum.id, key)}
           >Add Process Step</button
         >
 
@@ -46,8 +46,7 @@
                 {i}
               </div>
               <button
-                on:click={() =>
-                  (datum.data = removeProcessStep(datum.data, key, index))}
+                on:click={() => removeProcessStep("data", datum.id, key, index)}
                 >[-]</button
               >
             {/each}

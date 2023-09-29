@@ -1,17 +1,33 @@
 <!-- Modal.svelte -->
-<script context="module">
-  import { modalActive } from "../store.js";
+<script>
+  import { modalActive, modalContent } from "../store.js";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+
+  function closeModal() {
+    modalActive.set(false);
+  }
+
+  function completeModalAction(result) {
+    closeModal();
+    dispatch("modalCompleted", result);
+  }
+
+  function cancelModal() {
+    closeModal();
+    dispatch("modalCancelled");
+  }
 </script>
 
 {#if $modalActive}
   <div class="modal">
     <div class="modal-content">
-      <slot />
-      <button
-        on:click={() => {
-          $modalActive = false;
-        }}>Close</button
-      >
+      {@html $modalContent}
+      <div class="modal-buttons">
+        <button on:click={cancelModal}>Cancel</button>
+        <button on:click={completeModalAction}>OK</button>
+      </div>
     </div>
   </div>
 {/if}

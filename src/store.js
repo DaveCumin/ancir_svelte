@@ -35,7 +35,7 @@ export var data = writable([
         processSteps: [
           {
             process: "limit",
-            parameters: { highlow: "high", limit: 12 },
+            parameters: { min: NaN, max: 12 },
           },
         ],
         processedData: [10, 11, 12],
@@ -66,7 +66,7 @@ export var data = writable([
         processSteps: [
           {
             process: "limit",
-            parameters: { highlow: "high", limit: 10 },
+            parameters: { min: NaN, max: 10 },
           },
         ],
         processedData: [10, 10, 10],
@@ -93,3 +93,4 @@ export var dataIDsforTables = writable([0]);
 export var activeTableTab = writable(0);
 
 export var modalActive = writable(false);
+export var modalContent = writable();
