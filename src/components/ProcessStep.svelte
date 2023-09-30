@@ -54,7 +54,8 @@
       doProcessSteps(WHEREP, ID, FIELDNAME);
     }
 
-    // Close the modal
+    // Reset
+    WHICHPROCESS = "";
     closeModal();
   }
 
@@ -153,16 +154,12 @@
     />
   {:else if WHICHPROCESS === "add"}
     <Add
-      on:confirmAdd={() => {
-        handleConfirmAddProcess();
-      }}
+      on:confirmAdd={handleConfirmAddProcess}
       on:cancelAdd={handleCancelAddProcess}
     />
   {:else if WHICHPROCESS === "limit"}
     <Limit
-      on:confirmAdd={() => {
-        handleConfirmAddProcess();
-      }}
+      on:confirmAdd={handleConfirmAddProcess}
       on:cancelAdd={handleCancelAddProcess}
     />
   {/if}

@@ -19,14 +19,14 @@
 <script>
   import { createEventDispatcher } from "svelte";
 
-  let params = { val: 0 };
+  let params = { min: 0, max: 0 };
   const dispatch = createEventDispatcher();
 
   function confirm() {
     // Emit an event to notify the parent component (where you opened the modal)
     // about the confirmation and pass the result
     dispatch("confirmAdd", {
-      process: "add",
+      process: "limit",
       parameters: params,
     });
   }
