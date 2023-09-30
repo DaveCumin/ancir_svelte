@@ -22,9 +22,13 @@
   let ID = 0;
   let FIELDNAME = "";
   let WHICHPROCESS = "";
+  let PROCESSINDEX = 0;
+  let EDITING = false;
+
   let selectedSettings = null;
 
   function closeModal() {
+    EDITING = false;
     modalActive.set(false);
   }
   function openModal() {
@@ -33,9 +37,7 @@
 
   function handleConfirmAddProcess(event) {
     // Update your data array with the result
-    console.log(event);
     selectedSettings = event.detail;
-
     if (WHEREP === "data") {
       data.update((currentData) => {
         // Find the data entry with the specified ID
@@ -44,8 +46,17 @@
 
         // Check if the data entry and key exist
         if (datum && datum.data[FIELDNAME]) {
-          // Add a new process step to the selected key
-          datum.data[FIELDNAME].processSteps.push(selectedSettings);
+          console.log("EDITING: " + EDITING);
+          if (EDITING) {
+            // Add a new process step to the selected key
+            datum.data[FIELDNAME].processSteps.splice(
+              PROCESSINDEX,
+              1,
+              selectedSettings
+            );
+          } else {
+            datum.data[FIELDNAME].processSteps.push(selectedSettings);
+          }
         }
         return newData;
       });
@@ -99,6 +110,22 @@
     }
   }
 
+  export async function editProcessStep(where, id, fieldName, index) {
+    WHEREP = where;
+    ID = id;
+    FIELDNAME = fieldName;
+    PROCESSINDEX = index;
+    EDITING = true;
+    WHICHPROCESS =
+      get(data)[ID]["data"][FIELDNAME]["processSteps"][PROCESSINDEX]["process"];
+
+    console.log(
+      where + " " + ID + " " + fieldName + " " + index + " " + WHICHPROCESS
+    );
+    console.log("EDITING2: " + EDITING);
+    openModal();
+  }
+
   // Deal with the process of updating the processedData for a given field
   function doProcessSteps(where, ID, fieldName) {
     if (where === "data") {
@@ -109,17 +136,20 @@
       let result = get(data)[ID]["data"][fieldName]["data"];
 
       // Iterate through the JSON array and execute the processes
-      for (const processObj of processes) {
-        const processName = processObj.process;
-        const processFunction = processMap[processName];
+      if (processes.length == 0) {
+        result = get(data)[ID]["data"][fieldName]["data"];
+      } else {
+        for (const processObj of processes) {
+          const processName = processObj.process;
+          const processFunction = processMap[processName];
 
-        if (typeof processFunction === "function") {
-          // Check if the function exists in the processMap
-          result = processFunction(result, processObj.parameters, "do"); //CALL THE FUNCTION WITH PARAMS
-          console.log(result);
-        } else {
-          // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
-          console.error(`Function '${processName}' does not exist.`);
+          if (typeof processFunction === "function") {
+            // Check if the function exists in the processMap
+            result = processFunction(result, processObj.parameters, "do"); //CALL THE FUNCTION WITH PARAMS
+          } else {
+            // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
+            console.error(`Function '${processName}' does not exist.`);
+          }
         }
       }
 
@@ -141,7 +171,7 @@
 </script>
 
 <script>
-  import { data, modalActive, modalContent } from "../store.js";
+  import { data, modalActive } from "../store.js";
   import { get } from "svelte/store";
 </script>
 

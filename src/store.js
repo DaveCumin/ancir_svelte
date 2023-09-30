@@ -93,4 +93,3 @@ export var dataIDsforTables = writable([0]);
 export var activeTableTab = writable(0);
 
 export var modalActive = writable(false);
-export var modalContent = writable();

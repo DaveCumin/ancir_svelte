@@ -1,6 +1,10 @@
 <script>
   import { data, dataIDsforTables, activeTableTab } from "../store";
-  import { addProcessStep, removeProcessStep } from "./ProcessStep.svelte";
+  import {
+    addProcessStep,
+    removeProcessStep,
+    editProcessStep,
+  } from "./ProcessStep.svelte";
 
   //show the data in tables
   export function showDataTable(ID) {
@@ -43,6 +47,10 @@
                 {JSON.stringify(processStep.parameters)}
                 {i}
               </div>
+              <button
+                on:click={() => editProcessStep("data", datum.id, key, index)}
+                >[~]</button
+              >
               <button
                 on:click={() => removeProcessStep("data", datum.id, key, index)}
                 >[-]</button

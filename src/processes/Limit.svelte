@@ -35,14 +35,17 @@
 <!-- Modal content -->
 <div class="modal">
   <div class="modal-content">
-    <h1>Add Process</h1>
-    <label for="val">Value:</label>
-    <input type="number" id="min" bind:value={params.min} />
-    <input type="range" id="min" bind:value={params.min} />
-    <label for="val">Value:</label>
-    <input type="number" id="max" bind:value={params.max} />
-    <input type="range" id="max" bind:value={params.max} />
-
+    <h1>Limit the values to [min, max]</h1>
+    <div>
+      <label for="val">Min:</label>
+      <input type="number" id="min" bind:value={params.min} />
+      <input type="range" id="min" bind:value={params.min} />
+    </div>
+    <div>
+      <label for="val">Max:</label>
+      <input type="number" id="max" bind:value={params.max} />
+      <input type="range" id="max" bind:value={params.max} />
+    </div>
     <div class="modal-buttons">
       <button on:click={confirm}>Confirm</button>
       <button on:click={() => dispatch("cancelAdd")}>Cancel</button>

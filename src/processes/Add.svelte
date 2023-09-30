@@ -30,7 +30,7 @@
 <!-- Modal content -->
 <div class="modal">
   <div class="modal-content">
-    <h1>Add Process</h1>
+    <h1>Add a value to all numbers</h1>
     <label for="val">Value:</label>
     <input type="number" id="val" bind:value={params.val} />
     <input type="range" id="val" bind:value={params.val} />
