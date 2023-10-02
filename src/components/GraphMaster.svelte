@@ -1,6 +1,6 @@
 <script>
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { activeGraphTab } from "../store.js";
+  import { activeGraphTab, graphs } from "../store.js";
   import GraphTabs from "./GraphTabs.svelte";
 
   $: showGraphDetails = $activeGraphTab >= 0 ? true : false;
@@ -9,7 +9,7 @@
   // ----- ADD NEW GRAPHS BELOW
   import Actigram from "../charts/Actigram.svelte";
   import ActigramControls from "../charts/Actigram_controls.svelte";
-  // ----- ALSO ADD TO THE BBOTTOM
+  // ----- ALSO ADD TO THE BOTTOM
   //---------------------------------------------------------------------
 </script>
 
@@ -21,12 +21,18 @@
   >
     <Pane>
       <GraphTabs>
-        <Actigram />
+        {#if $graphs[$activeGraphTab].graph === "actigram"}
+          <Actigram />
+        {:else}
+          {$graphs[$activeGraphTab].graph}
+        {/if}
       </GraphTabs>
     </Pane>
     <Pane size={25}>
-      {#if showGraphDetails}
+      {#if showGraphDetails && $graphs[$activeGraphTab].graph === "actigram"}
         <ActigramControls />
+      {:else}
+        {JSON.stringify($graphs[$activeGraphTab].sourceData)}
       {/if}
     </Pane>
   </Splitpanes>
