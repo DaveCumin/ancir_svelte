@@ -1,5 +1,5 @@
 <script context="module">
-  // Define the functions
+  // Define the function
   export function limit(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
     const dataMin = Math.min(...startVals);
     const dataMax = Math.max(...startVals);
@@ -17,9 +17,14 @@
 </script>
 
 <script>
+  // Define the popup to create/edit the process
   import { createEventDispatcher } from "svelte";
+  export let dataIN;
 
-  let params = { min: 0, max: 0 };
+  const dataMin = Math.min(...dataIN);
+  const dataMax = Math.max(...dataIN);
+
+  let params = { min: dataMin, max: dataMax };
   const dispatch = createEventDispatcher();
 
   function confirm() {
@@ -39,12 +44,24 @@
     <div>
       <label for="val">Min:</label>
       <input type="number" id="min" bind:value={params.min} />
-      <input type="range" id="min" bind:value={params.min} />
+      <input
+        type="range"
+        id="min"
+        bind:value={params.min}
+        min={dataMin}
+        max={dataMax}
+      />
     </div>
     <div>
       <label for="val">Max:</label>
       <input type="number" id="max" bind:value={params.max} />
-      <input type="range" id="max" bind:value={params.max} />
+      <input
+        type="range"
+        id="max"
+        bind:value={params.max}
+        min={dataMin}
+        max={dataMax}
+      />
     </div>
     <div class="modal-buttons">
       <button on:click={confirm}>Confirm</button>

@@ -19,7 +19,6 @@ export var data = writable([
         ],
         processSteps: [],
         processedData: [],
-        processedsummary: {},
       },
       value0: {
         name: "value0",
@@ -35,7 +34,7 @@ export var data = writable([
         processSteps: [
           {
             process: "limit",
-            parameters: { min: NaN, max: 12 },
+            parameters: { min: 10, max: 12 },
           },
         ],
         processedData: [10, 11, 12],
@@ -59,19 +58,19 @@ export var data = writable([
         processSteps: [],
         processedData: [],
       },
-      value1: {
+      value0: {
         name: "value3",
         type: "value",
         data: [10, 11, 15],
         processSteps: [
           {
             process: "limit",
-            parameters: { min: NaN, max: 10 },
+            parameters: { min: 10, max: 10 },
           },
         ],
         processedData: [10, 10, 10],
       },
-      value0: {
+      value1: {
         name: "value4",
         type: "value",
         data: [5, 6, 7],
@@ -85,8 +84,36 @@ export var data = writable([
 export var graphTabs = writable([{ name: "tab1" }, { name: "secondTab" }]);
 export var activeGraphTab = writable(0);
 export var graphs = writable([
-  { graph: "actigram", params: { data: "abc123", width: 500 } },
-  { graph: "plotXYZ", params: { data: "def", width: 600 } },
+  {
+    graph: "actigram",
+    sourceData: [
+      {
+        tableID: 0,
+        x: "time",
+        y: "value0",
+        col: { r: 251, g: 251, b: 251, a: 1 },
+      },
+      {
+        tableID: 1,
+        x: "time",
+        y: "value0",
+        col: { r: 251, g: 251, b: 251, a: 1 },
+      },
+    ],
+    params: { width: 500, dayHeight: 20, betweenHeight: 5 },
+  },
+  {
+    graph: "plotXYZ",
+    sourceData: [
+      {
+        tableID: 1,
+        x: "value0",
+        y: "value1",
+        col: { r: 251, g: 251, b: 251, a: 1 },
+      },
+    ],
+    params: { width: 600 },
+  },
 ]);
 
 export var dataIDsforTables = writable([0]);

@@ -17,7 +17,10 @@
     </Pane>
     {#if showTableDetails}
       <Pane size={30}>
-        {$data[$dataIDsforTables[$activeTableTab]].displayName}
+        <div>Data: {$data[$dataIDsforTables[$activeTableTab]].displayName}</div>
+        <div>
+          Imported: {$data[$dataIDsforTables[$activeTableTab]].importedFrom}
+        </div>
       </Pane>
     {/if}
   </Splitpanes>

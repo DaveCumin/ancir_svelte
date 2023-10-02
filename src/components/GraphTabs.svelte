@@ -43,7 +43,7 @@
       {/each}
     </ul>
     <main>
-      {$graphs[$activeGraphTab].graph}
+      <slot />
     </main>
   </nav>
 {/if}

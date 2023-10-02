@@ -20,7 +20,7 @@
       pushOtherPanes={false}
       dblClickSplitter={false}
     >
-      <Pane size={15}>
+      <Pane size={15} snapSize={10}>
         <h1>Data</h1>
         <DataTree />
       </Pane>

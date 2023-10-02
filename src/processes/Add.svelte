@@ -13,6 +13,7 @@
 
 <script>
   import { createEventDispatcher } from "svelte";
+  export let dataIN;
 
   let params = { val: 0 };
   const dispatch = createEventDispatcher();
@@ -30,11 +31,12 @@
 <!-- Modal content -->
 <div class="modal">
   <div class="modal-content">
-    <h1>Add a value to all numbers</h1>
-    <label for="val">Value:</label>
-    <input type="number" id="val" bind:value={params.val} />
-    <input type="range" id="val" bind:value={params.val} />
-
+    {#if typeof dataIN[0] === "number"}
+      <h1>Add a value to all numbers</h1>
+      <label for="val">Value:</label>
+      <input type="number" id="val" bind:value={params.val} />
+      <input type="range" id="valr" bind:value={params.val} />
+    {/if}
     <div class="modal-buttons">
       <button on:click={confirm}>Confirm</button>
       <button on:click={() => dispatch("cancelAdd")}>Cancel</button>

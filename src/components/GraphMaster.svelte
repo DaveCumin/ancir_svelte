@@ -2,8 +2,15 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { activeGraphTab } from "../store.js";
   import GraphTabs from "./GraphTabs.svelte";
-  import GraphDetails from "./GraphDetails.svelte";
+
   $: showGraphDetails = $activeGraphTab >= 0 ? true : false;
+
+  //---------------------------------------------------------------------
+  // ----- ADD NEW GRAPHS BELOW
+  import Actigram from "../charts/Actigram.svelte";
+  import ActigramControls from "../charts/Actigram_controls.svelte";
+  // ----- ALSO ADD TO THE BBOTTOM
+  //---------------------------------------------------------------------
 </script>
 
 <Pane size={80}>
@@ -13,12 +20,14 @@
     dblClickSplitter={false}
   >
     <Pane>
-      <GraphTabs />
+      <GraphTabs>
+        <Actigram />
+      </GraphTabs>
     </Pane>
-    {#if showGraphDetails}
-      <Pane size={30}>
-        <GraphDetails />
-      </Pane>
-    {/if}
+    <Pane size={25}>
+      {#if showGraphDetails}
+        <ActigramControls />
+      {/if}
+    </Pane>
   </Splitpanes>
 </Pane>

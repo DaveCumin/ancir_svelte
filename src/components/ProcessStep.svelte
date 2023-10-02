@@ -15,7 +15,8 @@
     // Add more process functions here as needed
   };
 
-  // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the js file and add to the map.
+  // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the file and add to the map.
+  // ----- ALSO ADD TO THE BBOTTOM
   //---------------------------------------------------------------------
 
   let WHEREP = "";
@@ -46,7 +47,6 @@
 
         // Check if the data entry and key exist
         if (datum && datum.data[FIELDNAME]) {
-          console.log("EDITING: " + EDITING);
           if (EDITING) {
             // Add a new process step to the selected key
             datum.data[FIELDNAME].processSteps.splice(
@@ -119,10 +119,6 @@
     WHICHPROCESS =
       get(data)[ID]["data"][FIELDNAME]["processSteps"][PROCESSINDEX]["process"];
 
-    console.log(
-      where + " " + ID + " " + fieldName + " " + index + " " + WHICHPROCESS
-    );
-    console.log("EDITING2: " + EDITING);
     openModal();
   }
 
@@ -184,11 +180,13 @@
     />
   {:else if WHICHPROCESS === "add"}
     <Add
+      dataIN={$data[ID]["data"][FIELDNAME]["data"]}
       on:confirmAdd={handleConfirmAddProcess}
       on:cancelAdd={handleCancelAddProcess}
     />
   {:else if WHICHPROCESS === "limit"}
     <Limit
+      dataIN={$data[ID]["data"][FIELDNAME]["data"]}
       on:confirmAdd={handleConfirmAddProcess}
       on:cancelAdd={handleCancelAddProcess}
     />

@@ -22,7 +22,7 @@
   function makeTableData(dataIN, d) {
     let out = [];
     for (const key in dataIN) {
-      if (dataIN[key].processedData.length > 0) {
+      if (dataIN[key].processSteps.length > 0) {
         out.push(dataIN[key].processedData);
       } else {
         out.push(dataIN[key].data);
@@ -38,7 +38,7 @@
       var outheadings = [];
       var outprocessed = [];
       for (const key in dataIN) {
-        outprocessed.push(dataIN[key].processedData.length);
+        outprocessed.push(dataIN[key].processSteps.length);
         outheadings.push(dataIN[key].name);
       }
       return { headings: outheadings, processed: outprocessed };
