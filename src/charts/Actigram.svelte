@@ -1,6 +1,7 @@
 <script>
+  // @ts-nocheck
+
   import { data, graphs, activeGraphTab } from "../store";
-  import { scaleBand, scaleLinear } from "d3-scale";
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;

@@ -24,7 +24,7 @@
   }
 
   function setHsvPicker(index) {
-    $graphs[$activeGraphTab].sourceData[activeColChange].col = activeCol;
+    $graphs[$activeGraphTab].sourceData[index].col = activeCol;
     toggleHsvPicker(index);
   }
 
