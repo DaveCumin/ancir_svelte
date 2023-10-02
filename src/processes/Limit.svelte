@@ -20,11 +20,15 @@
   // Define the popup to create/edit the process
   import { createEventDispatcher } from "svelte";
   export let dataIN;
+  export let paramsStart;
 
   const dataMin = Math.min(...dataIN);
   const dataMax = Math.max(...dataIN);
 
   let params = { min: dataMin, max: dataMax };
+  if (Object.keys(paramsStart).length > 0) {
+    params = paramsStart;
+  }
   const dispatch = createEventDispatcher();
 
   function confirm() {
@@ -44,24 +48,12 @@
     <div>
       <label for="val">Min:</label>
       <input type="number" id="min" bind:value={params.min} />
-      <input
-        type="range"
-        id="min"
-        bind:value={params.min}
-        min={dataMin}
-        max={dataMax}
-      />
+      <input type="range" id="min" bind:value={params.min} />
     </div>
     <div>
       <label for="val">Max:</label>
       <input type="number" id="max" bind:value={params.max} />
-      <input
-        type="range"
-        id="max"
-        bind:value={params.max}
-        min={dataMin}
-        max={dataMax}
-      />
+      <input type="range" id="max" bind:value={params.max} />
     </div>
     <div class="modal-buttons">
       <button on:click={confirm}>Confirm</button>

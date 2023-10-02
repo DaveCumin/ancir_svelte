@@ -60,10 +60,31 @@
         }
         return newData;
       });
-
-      //Add for graph here.
-      doProcessSteps(WHEREP, ID, FIELDNAME);
     }
+
+    //FOR GRAPH
+    if (WHEREP === "graph") {
+      graphs.update((currentData) => {
+        // Find the data entry with the specified ID
+        const newData = [...currentData];
+        const datum = newData.find((entry) => entry.id === ID);
+
+        // Check if the data entry and key exist
+        if (EDITING) {
+          newData[get(activeGraphTab)]["sourceData"][ID][
+            FIELDNAME
+          ].processSteps.splice(PROCESSINDEX, 1, selectedSettings);
+        } else {
+          newData[get(activeGraphTab)]["sourceData"][ID][
+            FIELDNAME
+          ].processSteps.push(selectedSettings);
+        }
+
+        return newData;
+      });
+    }
+
+    doProcessSteps(WHEREP, ID, FIELDNAME);
 
     // Reset
     WHICHPROCESS = "";
@@ -108,6 +129,22 @@
       });
       doProcessSteps(where, ID, fieldName);
     }
+
+    // GRAPH
+    if (where === "graph") {
+      graphs.update((currentData) => {
+        const newData = [...currentData];
+        // Remove the process step at the specified index
+
+        newData[get(activeGraphTab)].sourceData[ID][
+          fieldName
+        ].processSteps.splice(index, 1);
+
+        return newData;
+      });
+
+      doProcessSteps(where, ID, fieldName);
+    }
   }
 
   export async function editProcessStep(where, id, fieldName, index) {
@@ -116,8 +153,19 @@
     FIELDNAME = fieldName;
     PROCESSINDEX = index;
     EDITING = true;
-    WHICHPROCESS =
-      get(data)[ID]["data"][FIELDNAME]["processSteps"][PROCESSINDEX]["process"];
+
+    if (WHEREP === "data") {
+      WHICHPROCESS =
+        get(data)[ID]["data"][FIELDNAME]["processSteps"][PROCESSINDEX][
+          "process"
+        ];
+    }
+
+    if (WHEREP === "graph") {
+      WHICHPROCESS =
+        get(graphs)[get(activeGraphTab)]["sourceData"][ID][fieldName]
+          .processSteps[index].process;
+    }
 
     openModal();
   }
@@ -132,16 +180,14 @@
       let result = get(data)[ID]["data"][fieldName]["data"];
 
       // Iterate through the JSON array and execute the processes
-      if (processes.length == 0) {
-        result = get(data)[ID]["data"][fieldName]["data"];
-      } else {
+      if (processes.length > 0) {
         for (const processObj of processes) {
           const processName = processObj.process;
           const processFunction = processMap[processName];
 
           if (typeof processFunction === "function") {
             // Check if the function exists in the processMap
-            result = processFunction(result, processObj.parameters, "do"); //CALL THE FUNCTION WITH PARAMS
+            result = processFunction(result, processObj.parameters); //CALL THE FUNCTION WITH PARAMS
           } else {
             // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
             console.error(`Function '${processName}' does not exist.`);
@@ -163,12 +209,84 @@
         return newData;
       });
     }
+
+    //DO FOR GRAPHS
+    if (where === "graph") {
+      // JSON data containing the functions to execute, from store
+      let processes =
+        get(graphs)[get(activeGraphTab)].sourceData[ID][fieldName].processSteps;
+
+      // Initial values, from store
+      let tableID = get(graphs)[get(activeGraphTab)].sourceData[ID].tableID;
+      let field =
+        get(graphs)[get(activeGraphTab)].sourceData[ID][fieldName].field;
+
+      let result = get(data)[tableID].data[field].data;
+      if (get(data)[tableID].data[field].processedData.length > 0) {
+        result = get(data)[tableID].data[field].processedData;
+      }
+      // Iterate through the JSON array and execute the processes
+      if (processes.length > 0) {
+        for (const processObj of processes) {
+          const processName = processObj.process;
+          const processFunction = processMap[processName];
+
+          if (typeof processFunction === "function") {
+            // Check if the function exists in the processMap
+            result = processFunction(result, processObj.parameters); //CALL THE FUNCTION WITH PARAMS
+          } else {
+            // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
+            console.error(`Function '${processName}' does not exist.`);
+          }
+        }
+      }
+
+      //UPDATE THE STORE
+      graphs.update((currentData) => {
+        // Find the data entry with the specified ID
+        const newData = [...currentData];
+
+        newData[get(activeGraphTab)].sourceData[ID][fieldName].processedData =
+          result;
+
+        return newData;
+      });
+    }
   }
 </script>
 
 <script>
-  import { data, modalActive } from "../store.js";
+  import { data, modalActive, graphs, activeGraphTab } from "../store.js";
   import { get } from "svelte/store";
+
+  // FUNCTION that gets the correct input data
+  function getDataIN() {
+    if (WHEREP === "data") {
+      return $data[ID]["data"][FIELDNAME].data;
+    }
+    if (WHEREP === "graph") {
+      const table = $graphs[$activeGraphTab].sourceData[ID].tableID;
+      const fieldN = $graphs[$activeGraphTab].sourceData[ID][FIELDNAME].field;
+
+      return $data[table].data[fieldN].data;
+    }
+  }
+
+  function getParams() {
+    if (EDITING) {
+      if (WHEREP === "data") {
+        return $data[ID]["data"][FIELDNAME].processSteps[PROCESSINDEX]
+          .parameters;
+      }
+      if (WHEREP === "graph") {
+        return $graphs[$activeGraphTab].sourceData[ID][FIELDNAME].processSteps[
+          PROCESSINDEX
+        ].parameters;
+      }
+    } else {
+      return {};
+    }
+  }
 </script>
 
 {#if $modalActive}
@@ -180,13 +298,15 @@
     />
   {:else if WHICHPROCESS === "add"}
     <Add
-      dataIN={$data[ID]["data"][FIELDNAME]["data"]}
+      dataIN={getDataIN()}
+      paramsStart={getParams()}
       on:confirmAdd={handleConfirmAddProcess}
       on:cancelAdd={handleCancelAddProcess}
     />
   {:else if WHICHPROCESS === "limit"}
     <Limit
-      dataIN={$data[ID]["data"][FIELDNAME]["data"]}
+      dataIN={getDataIN()}
+      paramsStart={getParams()}
       on:confirmAdd={handleConfirmAddProcess}
       on:cancelAdd={handleCancelAddProcess}
     />

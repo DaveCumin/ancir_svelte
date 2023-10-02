@@ -125,14 +125,14 @@
     margin-top: 5px; /* Add margin to separate it from the last "process" */
   }
 
+  .field:hover {
+    background: white;
+  }
   /* Style for the buttons on hover */
   .field:hover .editProcessButton,
-  .field:hover .removeProcessButton {
-    display: inline-block; /* Show buttons on hover */
-  }
-
+  .field:hover .removeProcessButton,
   .field:hover .addProcessButton {
-    display: inline-block; /* Show "add" button on hover */
+    display: inline-block; /* Show buttons on hover */
   }
 
   /* Style for the buttons on hover */

@@ -14,8 +14,13 @@
 <script>
   import { createEventDispatcher } from "svelte";
   export let dataIN;
+  export let paramsStart;
 
-  let params = { val: 0 };
+  export let params = { val: 0 };
+  if (Object.keys(paramsStart).length > 0) {
+    params = paramsStart;
+  }
+
   const dispatch = createEventDispatcher();
 
   function confirm() {

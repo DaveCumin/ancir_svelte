@@ -18,15 +18,16 @@
   $: hsvPickerVisibility = Array(
     $graphs[$activeGraphTab].sourceData.length
   ).fill(false);
+
   function toggleHsvPicker(index) {
-    // Toggle the value at the specified index in the hsvPickerVisibility array
     hsvPickerVisibility[index] = !hsvPickerVisibility[index];
-    activeColChange = index;
   }
+
   function setHsvPicker(index) {
     $graphs[$activeGraphTab].sourceData[activeColChange].col = activeCol;
     toggleHsvPicker(index);
   }
+
   function rgbaToHex(color) {
     // Ensure the color object has the required properties
     if (
@@ -50,24 +51,22 @@
     return hexColor;
   }
 
-  // Example usage:
-  const rgbaColor = { r: 251, g: 251, b: 251, a: 1 };
-  const hexColor = rgbaToHex(rgbaColor);
-
-  console.log(hexColor); // Output: "#fbfbfb"
-
   let activeColChange = 0;
   let activeCol;
+
+  function colorCallback(rgba) {
+    activeCol = rgba.detail;
+  }
+
+  function getFieldNames(i) {
+    return Object.keys(
+      $data[$graphs[$activeGraphTab].sourceData[i].tableID].data
+    );
+  }
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
   $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
-
-  function colorCallback(rgba) {
-    console.log(rgba.detail);
-    console.log(rgba);
-    activeCol = rgba.detail;
-  }
 
   function showDataTable(ID) {
     const tab = $dataIDsforTables.indexOf(ID);
@@ -81,7 +80,6 @@
       $activeTableTab = tab;
     }
   }
-  console.log($graphs[$activeGraphTab].sourceData);
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as datum, i}
@@ -106,20 +104,43 @@
       <label for="dattable">X-values (time):</label>
       <select
         id={"dattable" + i}
-        bind:value={$graphs[$activeGraphTab].sourceData[i].x}
+        bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}
       >
-        {#each Object.keys($data[$graphs[$activeGraphTab].sourceData[i].tableID].data) as key}
-          <option
-            value={key}
-            selected={datum.x ===
-            $data[$graphs[$activeGraphTab].sourceData[i].tableID].data[key].name
-              ? true
-              : false}
+        {#each getFieldNames(i) as key}
+          <option value={key}
             >{$data[$graphs[$activeGraphTab].sourceData[i].tableID].data[key]
               .name}</option
           >
         {/each}
       </select>
+
+      <div class="process">
+        {#each datum.x.processSteps as processStep, index}
+          <div class="process-step" id={"" + index}>
+            {processStep.process}
+            {JSON.stringify(processStep.parameters)}
+            <button
+              class="editProcessButton"
+              on:click={() => editProcessStep("graph", i, "x", index)}
+            >
+              ✎ <!-- Pencil symbol -->
+            </button>
+            <button
+              class="removeProcessButton"
+              on:click={() => removeProcessStep("graph ", i, "x", index)}
+            >
+              🗑️ <!-- Trash bin symbol -->
+            </button>
+          </div>
+        {/each}
+      </div>
+      <!-- ADD PROCESS-->
+      <button
+        class="addProcessButton"
+        on:click={() => addProcessStep("graph", "x", i)}
+      >
+        ➕ <!-- Plus sign symbol -->
+      </button>
     </div>
 
     <!-- y field -->
@@ -127,29 +148,56 @@
       <label for="dattable">Y-values:</label>
       <select
         id={"dattable" + i}
-        bind:value={$graphs[$activeGraphTab].sourceData[i].y}
+        bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
       >
-        {#each Object.keys($data[$graphs[$activeGraphTab].sourceData[i].tableID].data) as key}
-          <option
-            value={key}
-            selected={datum.y ===
-            $data[$graphs[$activeGraphTab].sourceData[i].tableID].data[key].name
-              ? true
-              : false}
+        {#each getFieldNames(i) as key}
+          <option value={key}
             >{$data[$graphs[$activeGraphTab].sourceData[i].tableID].data[key]
               .name}</option
           >
         {/each}
       </select>
+
+      <div class="process">
+        {#each datum.y.processSteps as processStep, index}
+          <div class="process-step" id={"" + index}>
+            {processStep.process}
+            {JSON.stringify(processStep.parameters)}
+            <button
+              class="editProcessButton"
+              on:click={() => editProcessStep("graph", i, "y", index)}
+            >
+              ✎ <!-- Pencil symbol -->
+            </button>
+            <button
+              class="removeProcessButton"
+              on:click={() => removeProcessStep("graph", i, "y", index)}
+            >
+              🗑️ <!-- Trash bin symbol -->
+            </button>
+          </div>
+        {/each}
+      </div>
+      <!-- ADD PROCESS-->
+      <button
+        class="addProcessButton"
+        on:click={() => addProcessStep("graph", i, "y")}
+      >
+        ➕ <!-- Plus sign symbol -->
+      </button>
     </div>
 
     <!-- colour-->
-    <button
-      on:click={() => toggleHsvPicker(i)}
-      style={"background-color:" +
-        rgbaToHex($graphs[$activeGraphTab].sourceData[i].col) +
-        ";'"}>Toggle HSV Picker</button
-    >
+    <div>
+      <button
+        on:click={() => toggleHsvPicker(i)}
+        style="background-color: {rgbaToHex(
+          $graphs[$activeGraphTab].sourceData[i].col
+        )};"
+      >
+        Colour
+      </button>
+    </div>
     {#if hsvPickerVisibility[i]}
       <!-- HSV Picker component for this item -->
       <div class="modal">
@@ -160,7 +208,6 @@
           />
           <div class="modal-buttons">
             <button on:click={() => setHsvPicker(i)}>Set</button>
-            <button on:click={() => toggleHsvPicker(i)}>Cancel</button>
           </div>
         </div>
       </div>
@@ -265,14 +312,14 @@
     margin-top: 5px; /* Add margin to separate it from the last "process" */
   }
 
+  .field:hover {
+    background: white;
+  }
   /* Style for the buttons on hover */
   .field:hover .editProcessButton,
-  .field:hover .removeProcessButton {
-    display: inline-block; /* Show buttons on hover */
-  }
-
+  .field:hover .removeProcessButton,
   .field:hover .addProcessButton {
-    display: inline-block; /* Show "add" button on hover */
+    display: inline-block; /* Show buttons on hover */
   }
 
   /* Style for the buttons on hover */
@@ -284,7 +331,7 @@
   }
 
   .modal {
-    position: fixed; /* Stay in place */
+    position: fixed;
     z-index: 1; /* Sit on top */
     left: 0;
     top: 0;
@@ -297,9 +344,9 @@
 
   .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
+    margin: 15% 72%;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
+    width: 240px;
   }
 </style>

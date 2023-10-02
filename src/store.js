@@ -89,15 +89,23 @@ export var graphs = writable([
     sourceData: [
       {
         tableID: 0,
-        x: "time",
-        y: "value0",
-        col: { r: 251, g: 251, b: 251, a: 1 },
+        x: { field: "time", processSteps: [], processedData: [] },
+        y: {
+          field: "value0",
+          processSteps: [{ process: "add", parameters: { val: 15 } }],
+          processedData: [],
+        },
+        col: { r: 24, g: 251, b: 251, a: 1 },
       },
       {
         tableID: 1,
-        x: "time",
-        y: "value0",
-        col: { r: 251, g: 251, b: 251, a: 1 },
+        x: { field: "time", processSteps: [], processedData: [] },
+        y: {
+          field: "value1",
+          processSteps: [{ process: "add", parameters: { val: 5 } }],
+          processedData: [],
+        },
+        col: { r: 21, g: 21, b: 251, a: 1 },
       },
     ],
     params: { width: 500, dayHeight: 20, betweenHeight: 5 },
@@ -107,9 +115,18 @@ export var graphs = writable([
     sourceData: [
       {
         tableID: 1,
-        x: "value0",
-        y: "value1",
-        col: { r: 251, g: 251, b: 251, a: 1 },
+        x: {
+          field: "value0",
+          process: [],
+          processSteps: [],
+          processedData: [],
+        },
+        y: {
+          field: "value1",
+          processSteps: [{ process: "add", parameters: { val: 10 } }],
+          processedData: [],
+        },
+        col: { r: 251, g: 251, b: 25, a: 1 },
       },
     ],
     params: { width: 600 },

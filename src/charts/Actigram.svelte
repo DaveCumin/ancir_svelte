@@ -1,23 +1,42 @@
 <script>
   import { data, graphs, activeGraphTab } from "../store";
+  import { scaleBand, scaleLinear } from "d3-scale";
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
   $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
 
-  function getTheDataPoints(plotData, d) {
+  let days = 3; //Can code this later
+  $: totalHeight = (dayHeight + betweenHeight) * days;
+
+  function getTheDataPoints(plotData, d, g) {
     let xVals;
     let yVals;
-    if ($data[plotData.tableID].data[plotData.x].processedData.length > 0) {
-      xVals = $data[plotData.tableID].data[plotData.x].processedData;
+    if (plotData.x.processedData.length > 0) {
+      //check for processed graph data
+      xVals = plotData.x.processedData;
     } else {
-      xVals = $data[plotData.tableID].data[plotData.x].data;
+      if (
+        //check for processed data
+        $data[plotData.tableID].data[plotData.x.field].processedData.length > 0
+      ) {
+        xVals = $data[plotData.tableID].data[plotData.x.field].processedData;
+      } else {
+        xVals = $data[plotData.tableID].data[plotData.x.field].data;
+      }
     }
 
-    if ($data[plotData.tableID].data[plotData.y].processedData.length > 0) {
-      yVals = $data[plotData.tableID].data[plotData.y].processedData;
+    if (plotData.y.processedData.length > 0) {
+      //check for processed graph data
+      yVals = plotData.y.processedData;
     } else {
-      yVals = $data[plotData.tableID].data[plotData.y].data;
+      if (
+        $data[plotData.tableID].data[plotData.y.field].processedData.length > 0
+      ) {
+        yVals = $data[plotData.tableID].data[plotData.y.field].processedData;
+      } else {
+        yVals = $data[plotData.tableID].data[plotData.y.field].data;
+      }
     }
 
     return { x: xVals, y: yVals };
@@ -26,9 +45,27 @@
 
 <div>
   {#each $graphs[$activeGraphTab].sourceData as plotData, i}
-    {JSON.stringify(getTheDataPoints(plotData, $data))}
-    <br />
-    {width}, {dayHeight}, {betweenHeight}
+    {JSON.stringify(getTheDataPoints(plotData, $data, $graphs))}
     <br />
   {/each}
+  <br />
+  {width}, {dayHeight}, {betweenHeight}
+  <br />
+</div>
+
+<div class="actigramGraph">
+  <svg {width} {totalHeight}>
+    {#each $graphs[$activeGraphTab].sourceData as plotData, i}
+      {#each Array(3) as _, day}
+        <circle
+          cx={getTheDataPoints(plotData, $data, $graphs).y[day] * 15}
+          cy={getTheDataPoints(plotData, $data, $graphs).y[day] * 10}
+          r="10"
+          stroke="black"
+          stroke-width="3"
+          fill="red"
+        />
+      {/each}
+    {/each}
+  </svg>
 </div>
