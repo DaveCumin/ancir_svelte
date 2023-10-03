@@ -8,15 +8,20 @@
   import Add, { add } from "../processes/Add.svelte";
   import Limit, { limit } from "../processes/Limit.svelte";
 
-  // Import functions here as needed and add to the map below
+  // Import functions and components here as needed and add to the maps below
+  const componentMap = {
+    add: Add,
+    limit: Limit,
+    // Add more process functions here as needed
+  };
+
   const processMap = {
     add,
     limit,
     // Add more process functions here as needed
   };
 
-  // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the file and add to the map.
-  // ----- ALSO ADD TO THE BBOTTOM
+  // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the file and add to the maps.
   //---------------------------------------------------------------------
 
   let WHEREP = "";
@@ -296,15 +301,9 @@
       on:confirmAdd={choseProcess}
       on:cancelAdd={handleCancelAddProcess}
     />
-  {:else if WHICHPROCESS === "add"}
-    <Add
-      dataIN={getDataIN()}
-      paramsStart={getParams()}
-      on:confirmAdd={handleConfirmAddProcess}
-      on:cancelAdd={handleCancelAddProcess}
-    />
-  {:else if WHICHPROCESS === "limit"}
-    <Limit
+  {:else}
+    <svelte:component
+      this={componentMap[WHICHPROCESS]}
       dataIN={getDataIN()}
       paramsStart={getParams()}
       on:confirmAdd={handleConfirmAddProcess}
