@@ -1,4 +1,6 @@
 <script>
+  import { tooltip } from "../components/Tooltip/Tooltip";
+
   // @ts-nocheck
 
   import { data, graphs, activeGraphTab } from "../store";
@@ -59,6 +61,7 @@
     {#each $graphs[$activeGraphTab].sourceData as plotData, i}
       {#each Array(3) as _, day}
         <circle
+        use:tooltip
           cx={getTheDataPoints(plotData, $data, $graphs).y[day] * 15}
           cy={getTheDataPoints(plotData, $data, $graphs).y[day] * 10}
           r="10"
