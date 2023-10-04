@@ -62,7 +62,7 @@
       {#each Array(3) as _, day}
         <circle
           use:tooltip
-          cx={getTheDataPoints(plotData, $data, $graphs).y[day] * 15}
+          cx={getTheDataPoints(plotData, $data, $graphs).y[day] * 10}
           cy={getTheDataPoints(plotData, $data, $graphs).y[day] * 10}
           r="10"
           stroke="black"

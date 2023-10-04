@@ -117,7 +117,6 @@ export var graphs = writable([
         tableID: 1,
         x: {
           field: "value0",
-          process: [],
           processSteps: [],
           processedData: [],
         },

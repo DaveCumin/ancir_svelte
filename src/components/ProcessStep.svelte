@@ -142,7 +142,7 @@
       let processes = get(data)[ID]["data"][fieldName]["processSteps"];
 
       // Initial values, from store
-      let result = get(data)[ID]["data"][fieldName]["data"];
+      let result = [].concat(get(data)[ID]["data"][fieldName]["data"]);
 
       // Iterate through the JSON array and execute the processes
       if (processes.length > 0) {
@@ -187,7 +187,7 @@
       let field =
         get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].field;
 
-      let result = get(data)[tableID].data[field].data;
+      let result = [].concat(get(data)[tableID].data[field].data);
       if (get(data)[tableID].data[field].processedData.length > 0) {
         result = get(data)[tableID].data[field].processedData;
       }

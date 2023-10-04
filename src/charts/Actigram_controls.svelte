@@ -66,10 +66,6 @@
     );
   }
 
-  $: width = $graphs[$activeGraphTab].params.width;
-  $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
-  $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
-
   function showDataTable(ID) {
     const tab = $dataIDsforTables.indexOf(ID);
     if (tab < 0) {
