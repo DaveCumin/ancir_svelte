@@ -136,6 +136,25 @@
     doProcessSteps(where, ID, fieldName);
   }
 
+  function findGraphKeys(table, field) {
+    const results = [];
+
+    for (let i = 0; i < get(graphs).length; i++) {
+      const graph = get(graphs)[i];
+      for (let j = 0; j < graph.sourceData.length; j++) {
+        const sourceData = graph.sourceData[j];
+        if (sourceData.tableID === table && sourceData.y.field === field) {
+          results.push({ graph: i, key: "y" });
+        }
+        if (sourceData.tableID === table && sourceData.x.field === field) {
+          results.push({ graph: i, key: "x" });
+        }
+      }
+    }
+
+    return results.length > 0 ? results : null; // Return an array of results or null if none found
+  }
+
   function doProcessSteps(where, ID, fieldName) {
     if (where === "data") {
       // JSON data containing the functions to execute, from store
@@ -173,6 +192,14 @@
         }
         return newData;
       });
+
+      //Update the graphs
+      const graphsToUpdate = findGraphKeys(ID, fieldName);
+      if (graphsToUpdate) {
+        for (const gtu of graphsToUpdate) {
+          doProcessSteps("graph", gtu.key, gtu.graph);
+        }
+      }
     }
 
     //DO FOR GRAPHS

@@ -47,12 +47,12 @@
 
 <div>
   <label for="val">Min:</label>
-  <input type="number" id="min" bind:value={params.min} on:click={update} />
-  <input type="range" id="min" bind:value={params.min} on:click={update} />
+  <input type="number" id="min" bind:value={params.min} on:input={update} />
+  <input type="range" id="min" bind:value={params.min} on:input={update} />
 </div>
 
 <div>
   <label for="val">Max:</label>
-  <input type="number" id="max" bind:value={params.max} on:click={update} />
-  <input type="range" id="max" bind:value={params.max} on:click={update} />
+  <input type="number" id="max" bind:value={params.max} on:input={update} />
+  <input type="range" id="max" bind:value={params.max} on:input={update} />
 </div>
