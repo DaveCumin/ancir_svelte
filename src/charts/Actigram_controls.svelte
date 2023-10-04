@@ -36,7 +36,8 @@
   import {
     addProcessStep,
     removeProcessStep,
-    editProcessStep,
+    componentMap,
+    updateProcessData,
   } from "../components/ProcessStep.svelte";
 
   $: hsvPickerVisibility = Array(
@@ -118,23 +119,24 @@
       <div class="process">
         {#each datum.x.processSteps as processStep, index}
           <div class="process-step" id={"" + index}>
-            {processStep.process}
-            {JSON.stringify(processStep.parameters)}
-            <button
-              class="editProcessButton"
-              on:click={() => editProcessStep("graph", i, "x", index)}
-            >
-              ✎ <!-- Pencil symbol -->
-            </button>
+            <svelte:component
+              this={componentMap[processStep.process].component}
+              dataIN={$data[$graphs[$activeGraphTab].sourceData[i].tableID]
+                .data[datum.x.field].data}
+              paramsStart={componentMap[processStep.process].startParams}
+              bind:params={processStep.parameters}
+              on:update={(event) => updateProcessData(event, "graph", "x", i)}
+            />
             <button
               class="removeProcessButton"
-              on:click={() => removeProcessStep("graph ", i, "x", index)}
+              on:click={() => removeProcessStep("graph", "x", i, index)}
             >
               🗑️ <!-- Trash bin symbol -->
             </button>
           </div>
         {/each}
       </div>
+
       <!-- ADD PROCESS-->
       <button
         class="addProcessButton"
@@ -161,28 +163,29 @@
 
       <div class="process">
         {#each datum.y.processSteps as processStep, index}
-          <div class="process-step" id={"" + index}>
-            {processStep.process}
-            {JSON.stringify(processStep.parameters)}
-            <button
-              class="editProcessButton"
-              on:click={() => editProcessStep("graph", i, "y", index)}
-            >
-              ✎ <!-- Pencil symbol -->
-            </button>
+          <div class="process-step">
+            <svelte:component
+              this={componentMap[processStep.process].component}
+              dataIN={$data[$graphs[$activeGraphTab].sourceData[i].tableID]
+                .data[datum.y.field].data}
+              paramsStart={componentMap[processStep.process].startParams}
+              bind:params={processStep.parameters}
+              on:update={(event) => updateProcessData(event, "graph", "y", i)}
+            />
             <button
               class="removeProcessButton"
-              on:click={() => removeProcessStep("graph", i, "y", index)}
+              on:click={() => removeProcessStep("graph", "y", i, index)}
             >
               🗑️ <!-- Trash bin symbol -->
             </button>
           </div>
         {/each}
       </div>
+
       <!-- ADD PROCESS-->
       <button
         class="addProcessButton"
-        on:click={() => addProcessStep("graph", i, "y")}
+        on:click={() => addProcessStep("graph", "y", i)}
       >
         ➕ <!-- Plus sign symbol -->
       </button>

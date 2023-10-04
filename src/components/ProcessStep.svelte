@@ -29,12 +29,10 @@
   let FIELDNAME = "";
   let WHICHPROCESS = "";
   let PROCESSINDEX = 0;
-  let EDITING = false;
 
   let selectedSettings = null;
 
   function closeModal() {
-    EDITING = false;
     modalActive.set(false);
   }
   function openModal() {
@@ -42,8 +40,6 @@
   }
 
   function handleConfirmAddProcess(event) {
-    console.log(event);
-
     // Update your data array with the result
     selectedSettings = {
       process: event.detail.selectedProcess,
@@ -58,16 +54,7 @@
 
         // Check if the data entry and key exist
         if (datum && datum.data[FIELDNAME]) {
-          if (EDITING) {
-            // Add a new process step to the selected key
-            datum.data[FIELDNAME].processSteps.splice(
-              PROCESSINDEX,
-              1,
-              selectedSettings
-            );
-          } else {
-            datum.data[FIELDNAME].processSteps.push(selectedSettings);
-          }
+          datum.data[FIELDNAME].processSteps.push(selectedSettings);
         }
         return newData;
       });
@@ -80,16 +67,9 @@
         const newData = [...currentData];
         const datum = newData.find((entry) => entry.id === ID);
 
-        // Check if the data entry and key exist
-        if (EDITING) {
-          newData[get(activeGraphTab)]["sourceData"][ID][
-            FIELDNAME
-          ].processSteps.splice(PROCESSINDEX, 1, selectedSettings);
-        } else {
-          newData[get(activeGraphTab)]["sourceData"][ID][
-            FIELDNAME
-          ].processSteps.push(selectedSettings);
-        }
+        newData[get(activeGraphTab)].sourceData[FIELDNAME][
+          ID
+        ].processSteps.push(selectedSettings);
 
         return newData;
       });
@@ -140,8 +120,8 @@
         const newData = [...currentData];
         // Remove the process step at the specified index
 
-        newData[get(activeGraphTab)].sourceData[ID][
-          fieldName
+        newData[get(activeGraphTab)].sourceData[fieldName][
+          ID
         ].processSteps.splice(index, 1);
 
         return newData;
@@ -149,29 +129,6 @@
 
       doProcessSteps(where, ID, fieldName);
     }
-  }
-
-  export async function editProcessStep(where, id, fieldName, index) {
-    WHEREP = where;
-    ID = id;
-    FIELDNAME = fieldName;
-    PROCESSINDEX = index;
-    EDITING = true;
-
-    if (WHEREP === "data") {
-      WHICHPROCESS =
-        get(data)[ID]["data"][FIELDNAME]["processSteps"][PROCESSINDEX][
-          "process"
-        ];
-    }
-
-    if (WHEREP === "graph") {
-      WHICHPROCESS =
-        get(graphs)[get(activeGraphTab)]["sourceData"][ID][fieldName]
-          .processSteps[index].process;
-    }
-
-    openModal();
   }
 
   // Deal with the process of updating the processedData for a given field
@@ -222,12 +179,13 @@
     if (where === "graph") {
       // JSON data containing the functions to execute, from store
       let processes =
-        get(graphs)[get(activeGraphTab)].sourceData[ID][fieldName].processSteps;
+        get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].processSteps;
 
       // Initial values, from store
-      let tableID = get(graphs)[get(activeGraphTab)].sourceData[ID].tableID;
+      let tableID =
+        get(graphs)[get(activeGraphTab)].sourceData[fieldName].tableID;
       let field =
-        get(graphs)[get(activeGraphTab)].sourceData[ID][fieldName].field;
+        get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].field;
 
       let result = get(data)[tableID].data[field].data;
       if (get(data)[tableID].data[field].processedData.length > 0) {
@@ -254,7 +212,7 @@
         // Find the data entry with the specified ID
         const newData = [...currentData];
 
-        newData[get(activeGraphTab)].sourceData[ID][fieldName].processedData =
+        newData[get(activeGraphTab)].sourceData[fieldName][ID].processedData =
           result;
 
         return newData;

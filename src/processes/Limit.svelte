@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script context="module">
   // Define the function
   export function limit(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
@@ -36,7 +34,7 @@
 
   export let params = { min: dataMin, max: dataMax };
   if (Object.keys(paramsStart).length > 0) {
-    params = paramsStart;
+    params = Object.assign({}, paramsStart);
   }
 
   //ensure max is always greater than min

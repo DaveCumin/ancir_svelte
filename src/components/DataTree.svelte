@@ -41,19 +41,16 @@
 
         {#if datum.data[key].processSteps.length > 0}
           <div class="process">
-            {#each datum.data[key].processSteps as processStep, index (processStep.id || index)}
+            {#each datum.data[key].processSteps as processStep, index}
               <div class="process-step" id={"" + index}>
                 <svelte:component
                   this={componentMap[processStep.process].component}
-                  dataIN={[1, 2, 3]}
-                  paramsStart={[]}
+                  dataIN={$data[i].data[key].data}
+                  paramsStart={componentMap[processStep.process].startParams}
                   bind:params={processStep.parameters}
                   on:update={(event) =>
                     updateProcessData(event, "data", i, key)}
                 />
-                {processStep.process}
-                {JSON.stringify(processStep)}
-                {JSON.stringify($data[i].data[key].processSteps[index])}
 
                 <button
                   class="removeProcessButton"
