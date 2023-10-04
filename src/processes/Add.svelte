@@ -1,3 +1,5 @@
+<svelte:options immutable />
+
 <script context="module">
   // Define the functions
   export function add(startVals = [1, 2, 3], params = { val: 0 }) {
@@ -13,6 +15,15 @@
 </script>
 
 <script>
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+  function update() {
+    dispatch("update", {
+      params,
+    });
+  }
+
   export let dataIN;
   export let paramsStart;
 
@@ -24,6 +35,6 @@
 
 {#if typeof dataIN[0] === "number"}
   <label for="val">Value:</label>
-  <input type="number" id="val" bind:value={params.val} />
-  <input type="range" id="valr" bind:value={params.val} />
+  <input type="number" id="val" bind:value={params.val} on:click={update} />
+  <input type="range" id="valr" bind:value={params.val} on:click={update} />
 {/if}

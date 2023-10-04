@@ -1,3 +1,5 @@
+<svelte:options immutable />
+
 <script context="module">
   // Define the function
   export function limit(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
@@ -17,6 +19,15 @@
 </script>
 
 <script>
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+  function update() {
+    dispatch("update", {
+      params,
+    });
+  }
+
   export let dataIN;
   export let paramsStart;
 
@@ -27,16 +38,23 @@
   if (Object.keys(paramsStart).length > 0) {
     params = paramsStart;
   }
+
+  //ensure max is always greater than min
+  $: {
+    if (params.max < params.min) {
+      params.max = params.min;
+    }
+  }
 </script>
 
 <div>
   <label for="val">Min:</label>
-  <input type="number" id="min" bind:value={params.min} />
-  <input type="range" id="min" bind:value={params.min} />
+  <input type="number" id="min" bind:value={params.min} on:click={update} />
+  <input type="range" id="min" bind:value={params.min} on:click={update} />
 </div>
 
 <div>
   <label for="val">Max:</label>
-  <input type="number" id="max" bind:value={params.max} />
-  <input type="range" id="max" bind:value={params.max} />
+  <input type="number" id="max" bind:value={params.max} on:click={update} />
+  <input type="range" id="max" bind:value={params.max} on:click={update} />
 </div>

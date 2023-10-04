@@ -175,6 +175,10 @@
   }
 
   // Deal with the process of updating the processedData for a given field
+  export function updateProcessData(event, where, ID, fieldName) {
+    doProcessSteps(where, ID, fieldName);
+  }
+
   function doProcessSteps(where, ID, fieldName) {
     if (where === "data") {
       // JSON data containing the functions to execute, from store
@@ -262,14 +266,6 @@
 <script>
   import { data, modalActive, graphs, activeGraphTab } from "../store.js";
   import { get } from "svelte/store";
-
-  $: updateParams = updateProcessedData($data);
-  function updateProcessedData($data) {
-    $data.forEach(function (element) {
-      console.log(element);
-    });
-    //get(data)[ID]["data"][fieldName]["processSteps"];
-  }
 </script>
 
 {#if $modalActive}
@@ -278,5 +274,4 @@
     on:confirmAdd={handleConfirmAddProcess}
     on:cancelAdd={handleCancelAddProcess}
   />
-  <div>{updateParams}</div>
 {/if}

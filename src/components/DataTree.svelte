@@ -16,11 +16,10 @@
   }
 
   import { data, dataIDsforTables, activeTableTab } from "../store";
-  import ProcessStep, {
+  import {
     addProcessStep,
     removeProcessStep,
-    editProcessStep,
-    processMap,
+    updateProcessData,
     componentMap,
   } from "./ProcessStep.svelte";
 </script>
@@ -49,6 +48,8 @@
                   dataIN={[1, 2, 3]}
                   paramsStart={[]}
                   bind:params={processStep.parameters}
+                  on:update={(event) =>
+                    updateProcessData(event, "data", i, key)}
                 />
                 {processStep.process}
                 {JSON.stringify(processStep)}

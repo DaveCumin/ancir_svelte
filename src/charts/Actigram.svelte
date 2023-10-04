@@ -3,6 +3,7 @@
 
   import { data, graphs, activeGraphTab } from "../store";
   import { tooltip } from "../components/Tooltip/Tooltip";
+  import { rgbaToHex } from "../charts/Actigram_controls.svelte";
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
@@ -66,7 +67,7 @@
           r="10"
           stroke="black"
           stroke-width="3"
-          fill="red"
+          fill={rgbaToHex(plotData.col)}
         />
       {/each}
     {/each}
