@@ -9,13 +9,13 @@
   import Limit, { limit } from "../processes/Limit.svelte";
 
   // Import functions and components here as needed and add to the maps below
-  const componentMap = {
-    add: Add,
-    limit: Limit,
+  export const componentMap = {
+    add: { component: Add, startParams: { val: 0 } },
+    limit: { component: Limit, startParams: { min: 0, max: 12 } },
     // Add more process functions here as needed
   };
 
-  const processMap = {
+  export const processMap = {
     add,
     limit,
     // Add more process functions here as needed
@@ -42,8 +42,14 @@
   }
 
   function handleConfirmAddProcess(event) {
+    console.log(event);
+
     // Update your data array with the result
-    selectedSettings = event.detail;
+    selectedSettings = {
+      process: event.detail.selectedProcess,
+      parameters: componentMap[event.detail.selectedProcess].startParams,
+    };
+
     if (WHEREP === "data") {
       data.update((currentData) => {
         // Find the data entry with the specified ID
@@ -99,13 +105,6 @@
   function handleCancelAddProcess() {
     WHICHPROCESS = "";
     closeModal();
-  }
-
-  async function choseProcess(event) {
-    WHICHPROCESS = event.detail.selectedProcess;
-    closeModal();
-    await tick();
-    openModal();
   }
 
   // Function to add a process step to a field in any object
@@ -264,50 +263,20 @@
   import { data, modalActive, graphs, activeGraphTab } from "../store.js";
   import { get } from "svelte/store";
 
-  // FUNCTION that gets the correct input data
-  function getDataIN() {
-    if (WHEREP === "data") {
-      return $data[ID]["data"][FIELDNAME].data;
-    }
-    if (WHEREP === "graph") {
-      const table = $graphs[$activeGraphTab].sourceData[ID].tableID;
-      const fieldN = $graphs[$activeGraphTab].sourceData[ID][FIELDNAME].field;
-
-      return $data[table].data[fieldN].data;
-    }
-  }
-
-  function getParams() {
-    if (EDITING) {
-      if (WHEREP === "data") {
-        return $data[ID]["data"][FIELDNAME].processSteps[PROCESSINDEX]
-          .parameters;
-      }
-      if (WHEREP === "graph") {
-        return $graphs[$activeGraphTab].sourceData[ID][FIELDNAME].processSteps[
-          PROCESSINDEX
-        ].parameters;
-      }
-    } else {
-      return {};
-    }
+  $: updateParams = updateProcessedData($data);
+  function updateProcessedData($data) {
+    $data.forEach(function (element) {
+      console.log(element);
+    });
+    //get(data)[ID]["data"][fieldName]["processSteps"];
   }
 </script>
 
 {#if $modalActive}
-  {#if WHICHPROCESS === ""}
-    <ChooseProcess
-      processes={Object.keys(processMap)}
-      on:confirmAdd={choseProcess}
-      on:cancelAdd={handleCancelAddProcess}
-    />
-  {:else}
-    <svelte:component
-      this={componentMap[WHICHPROCESS]}
-      dataIN={getDataIN()}
-      paramsStart={getParams()}
-      on:confirmAdd={handleConfirmAddProcess}
-      on:cancelAdd={handleCancelAddProcess}
-    />
-  {/if}
+  <ChooseProcess
+    processes={Object.keys(processMap)}
+    on:confirmAdd={handleConfirmAddProcess}
+    on:cancelAdd={handleCancelAddProcess}
+  />
+  <div>{updateParams}</div>
 {/if}

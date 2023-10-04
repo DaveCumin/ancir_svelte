@@ -1,4 +1,6 @@
 <script>
+  // @ts-nocheck
+
   //show the data in tables
   function showDataTable(ID) {
     const tab = $dataIDsforTables.indexOf(ID);
@@ -14,10 +16,12 @@
   }
 
   import { data, dataIDsforTables, activeTableTab } from "../store";
-  import {
+  import ProcessStep, {
     addProcessStep,
     removeProcessStep,
     editProcessStep,
+    processMap,
+    componentMap,
   } from "./ProcessStep.svelte";
 </script>
 
@@ -40,14 +44,16 @@
           <div class="process">
             {#each datum.data[key].processSteps as processStep, index (processStep.id || index)}
               <div class="process-step" id={"" + index}>
+                <svelte:component
+                  this={componentMap[processStep.process].component}
+                  dataIN={[1, 2, 3]}
+                  paramsStart={[]}
+                  bind:params={processStep.parameters}
+                />
                 {processStep.process}
-                {JSON.stringify(processStep.parameters)}
-                <button
-                  class="editProcessButton"
-                  on:click={() => editProcessStep("data", datum.id, key, index)}
-                >
-                  ✎ <!-- Pencil symbol -->
-                </button>
+                {JSON.stringify(processStep)}
+                {JSON.stringify($data[i].data[key].processSteps[index])}
+
                 <button
                   class="removeProcessButton"
                   on:click={() =>
