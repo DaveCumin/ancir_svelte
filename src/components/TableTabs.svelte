@@ -1,7 +1,7 @@
 <script>
   import { dataIDsforTables, activeTableTab, data } from "../store";
 
-  export function changeActiveNav(ind) {
+  function changeActiveNav(ind) {
     $activeTableTab = ind;
   }
 
@@ -60,24 +60,17 @@
   <nav>
     <ul>
       {#each $dataIDsforTables as table, inx}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
-          role="button"
-          tabindex={inx}
           class={inx === $activeTableTab ? "tab active" : "tab"}
           on:click={() => changeActiveNav(inx)}
-          on:keydown={(e) => console.log("here " + e)}
         >
           <span
-            >{$data[$dataIDsforTables[inx]].displayName}
-            <div
-              role="button"
-              tabindex={inx}
-              class="delete"
-              on:click={() => deleteTab(inx)}
-              on:keydown={(e) => console.log("here " + e)}
-            >
-              x
-            </div></span
+            >{$data[table].displayName}
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div class="delete" on:click={() => deleteTab(inx)}>x</div></span
           >
         </div>
       {/each}

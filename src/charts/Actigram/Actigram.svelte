@@ -1,9 +1,9 @@
 <script>
   // @ts-nocheck
 
-  import { data, graphs, activeGraphTab } from "../store";
-  import { tooltip } from "../components/Tooltip/Tooltip";
-  import { rgbaToHex } from "../charts/Actigram_controls.svelte";
+  import { data, graphs, activeGraphTab } from "../../store";
+  import { tooltip } from "../../utils/Tooltip/Tooltip";
+  import { rgbaToHex } from "./Actigram_controls.svelte";
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;

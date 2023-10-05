@@ -16,23 +16,41 @@
   }
 
   import { data, dataIDsforTables, activeTableTab } from "../store";
+
   import {
     addProcessStep,
     removeProcessStep,
     updateProcessData,
     componentMap,
   } from "./ProcessStep.svelte";
+  import TableTabs from "./TableTabs.svelte";
+
+  function removeData(i) {
+    console.log(i);
+
+    //remove any tables associated
+    $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== i);
+    $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
+
+    //remove any graph data using the data
+
+    //remove the data itself
+    data.update((currentData) => {
+      currentData.splice(i, 1);
+      return currentData;
+    });
+    console.log(JSON.stringify($data));
+  }
 </script>
 
 {#each $data as datum, i}
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div class="data">
-    <div
-      class="dataheading"
-      role="button"
-      tabindex={i}
-      on:click={() => showDataTable(datum.id)}
-      on:keydown={(e) => console.log("here " + e)}
-    >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="dataheading" on:click={() => showDataTable(datum.id)}>
+      <button class="removeDataButton" on:click={() => removeData(i)}>
+        🗑️ <!-- Trash bin symbol -->
+      </button>
       <div class="dataheading">{datum.displayName}</div>
     </div>
     {#each Object.keys(datum.data) as key}
@@ -108,8 +126,9 @@
   }
 
   /* Style for process buttons */
-  .editProcessButton,
-  .removeProcessButton {
+
+  .removeProcessButton,
+  .removeDataButton {
     border: none;
     background: none;
     color: #007bff; /* Blue color for buttons */
@@ -133,17 +152,22 @@
     background: white;
   }
   /* Style for the buttons on hover */
-  .field:hover .editProcessButton,
+
   .field:hover .removeProcessButton,
   .field:hover .addProcessButton {
     display: inline-block; /* Show buttons on hover */
   }
 
   /* Style for the buttons on hover */
-  .editProcessButton:hover,
+
   .removeProcessButton:hover,
-  .addProcessButton:hover {
+  .addProcessButton:hover,
+  .removeDataButton:hover {
     text-decoration: underline;
     color: #0056b3; /* Darker blue on hover */
+  }
+
+  .dataheading:hover .removeDataButton {
+    display: inline-block; /* Show buttons on hover */
   }
 </style>

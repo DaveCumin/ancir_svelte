@@ -13,10 +13,11 @@
 
 <script>
   import { createEventDispatcher } from "svelte";
+  import Slider from "../utils/Slider.svelte";
 
   const dispatch = createEventDispatcher();
 
-  function update() {
+  $: {
     dispatch("update", {
       params,
     });
@@ -33,6 +34,6 @@
 
 {#if typeof dataIN[0] === "number"}
   <label for="val">Value:</label>
-  <input type="number" id="val" bind:value={params.val} on:input={update} />
-  <input type="range" id="valr" bind:value={params.val} on:input={update} />
+  <input type="number" id="val" bind:value={params.val} />
+  <Slider min={1} max={100} bind:value={params.val} />
 {/if}

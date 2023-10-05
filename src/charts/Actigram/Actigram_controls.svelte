@@ -23,13 +23,14 @@
 </script>
 
 <script>
+  import Slider from "../../utils/Slider.svelte";
   import {
     data,
     graphs,
     activeGraphTab,
     dataIDsforTables,
     activeTableTab,
-  } from "../store";
+  } from "../../store";
   // @ts-ignore
   import { HsvPicker } from "svelte-color-picker";
 
@@ -38,7 +39,7 @@
     removeProcessStep,
     componentMap,
     updateProcessData,
-  } from "../components/ProcessStep.svelte";
+  } from "../../components/ProcessStep.svelte";
 
   $: hsvPickerVisibility = Array(
     $graphs[$activeGraphTab].sourceData.length
@@ -222,9 +223,9 @@
     id="min"
     bind:value={$graphs[$activeGraphTab].params.width}
   />
-  <input
-    type="range"
-    id="min"
+  <Slider
+    min={100}
+    max={1000}
     bind:value={$graphs[$activeGraphTab].params.width}
   />
 </div>
@@ -236,9 +237,9 @@
     id="min"
     bind:value={$graphs[$activeGraphTab].params.dayHeight}
   />
-  <input
-    type="range"
-    id="min"
+  <Slider
+    min={10}
+    max={30}
     bind:value={$graphs[$activeGraphTab].params.dayHeight}
   />
 </div>
@@ -250,9 +251,9 @@
     id="min"
     bind:value={$graphs[$activeGraphTab].params.betweenHeight}
   />
-  <input
-    type="range"
-    id="min"
+  <Slider
+    min={1}
+    max={20}
     bind:value={$graphs[$activeGraphTab].params.betweenHeight}
   />
 </div>
@@ -291,7 +292,6 @@
   }
 
   /* Style for process buttons */
-  .editProcessButton,
   .removeProcessButton {
     border: none;
     background: none;
@@ -316,14 +316,12 @@
     background: white;
   }
   /* Style for the buttons on hover */
-  .field:hover .editProcessButton,
   .field:hover .removeProcessButton,
   .field:hover .addProcessButton {
     display: inline-block; /* Show buttons on hover */
   }
 
   /* Style for the buttons on hover */
-  .editProcessButton:hover,
   .removeProcessButton:hover,
   .addProcessButton:hover {
     text-decoration: underline;

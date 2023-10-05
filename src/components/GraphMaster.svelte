@@ -7,8 +7,8 @@
 
   //---------------------------------------------------------------------
   // ----- ADD NEW GRAPHS BELOW
-  import Actigram from "../charts/Actigram.svelte";
-  import ActigramControls from "../charts/Actigram_controls.svelte";
+  import Actigram from "../charts/Actigram/Actigram.svelte";
+  import ActigramControls from "../charts/Actigram/Actigram_controls.svelte";
   // ----- ALSO ADD TO THE BOTTOM
   //---------------------------------------------------------------------
 </script>

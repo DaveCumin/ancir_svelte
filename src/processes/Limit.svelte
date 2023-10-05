@@ -18,9 +18,11 @@
 
 <script>
   import { createEventDispatcher } from "svelte";
+  import Slider from "../utils/Slider.svelte";
 
   const dispatch = createEventDispatcher();
-  function update() {
+
+  $: {
     dispatch("update", {
       params,
     });
@@ -47,12 +49,12 @@
 
 <div>
   <label for="val">Min:</label>
-  <input type="number" id="min" bind:value={params.min} on:input={update} />
-  <input type="range" id="min" bind:value={params.min} on:input={update} />
+  <input type="number" id="min" bind:value={params.min} />
+  <Slider min={dataMin} max={dataMax} bind:value={params.min} />
 </div>
 
 <div>
   <label for="val">Max:</label>
-  <input type="number" id="max" bind:value={params.max} on:input={update} />
-  <input type="range" id="max" bind:value={params.max} on:input={update} />
+  <input type="number" id="max" bind:value={params.max} />
+  <Slider min={dataMin} max={dataMax} bind:value={params.max} />
 </div>
