@@ -71,7 +71,7 @@
   ];
 </script>
 
-<nav class="menu-bar">
+<nav class="menu-bar mx-2">
   <ul>
     {#each menuItems as item (item.label)}
       <!-- svelte-ignore a11y-click-events-have-key-events -->

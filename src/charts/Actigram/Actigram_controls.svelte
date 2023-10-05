@@ -84,22 +84,22 @@
 {#each $graphs[$activeGraphTab].sourceData as source, i}
   <div class="data">
     <!-- TABLE -->
-    <div class="field">
-      <label for="dattable">Table:</label>
-      <select bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
+    <div class="flex">
+      <label for="dattable" class='label font-semibold  min-w-[130px]'>Table:</label>
+      <select class='inline-flex select select-info w-32 mb-1' bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}
-            >{d.displayName}</option
+            >{d.displayName}aaa</option
           >
         {/each}
       </select>
     </div>
 
     <!-- x field -->
-    <div class="field">
-      <label for="dattable">X-values (time):</label>
-      <select bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
-        {#each getFieldNames(source) as key}
+    <div class="flex ">
+      <label for="dattable" class='label font-semibold  min-w-[130px]'>X-values (time):</label>
+      <select class='inline-flex select select-info w-32 mb-1' bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
+        {#each getFieldNames(source) as key}aa
           <option value={key}
             >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
               .name}</option
@@ -138,9 +138,9 @@
     </div>
 
     <!-- y field -->
-    <div class="field">
-      <label for="dattable">Y-values:</label>
-      <select
+    <div class="flex">
+      <label for="dattable" class='label font-semibold  min-w-[130px]'>Y-values:</label>
+      <select class='inline-flex select select-info w-32 mb-1'
         id={"dattable" + i}
         bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
       >
@@ -151,10 +151,11 @@
           >
         {/each}
       </select>
-
+      </div>
+   <div class="flex ">
       <div class="process">
         {#each source.y.processSteps as processStep, index}
-          <div class="process-step">
+          <div class="flex">
             <svelte:component
               this={componentMap[processStep.process].component}
               dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
@@ -210,9 +211,10 @@
   </div>
 {/each}
 
-<div>
-  <label for="val">Width:</label>
+<div class='flex pl-4'>
+  <label for="val" class="label font-semibold min-w-[130px]">Width:</label>
   <input
+  class="input input-bordered input-info w-32 max-w-xs mb-1"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.width}
@@ -224,9 +226,17 @@
   />
 </div>
 
-<div>
-  <label for="val">dayHeight:</label>
+  <!-- <div class="form-control flex flex-row  items-center w-full max-w-md ">
+     <label for='val' class="label min-w-[130px]">
+       <span class="label-text">Value:</span>
+     </label>
+      <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-32 max-w-xs"  />
+     <Slider min={1} max={100} bind:value={params.val} />
+   </div> -->
+<div class='flex p-2 pl-4'>
+  <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>
   <input
+  class="input input-bordered input-info w-32 max-w-xs"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.dayHeight}
@@ -238,9 +248,10 @@
   />
 </div>
 
-<div>
-  <label for="val">betweenHeight:</label>
+<div class='flex p-2 pl-4'>
+  <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
   <input
+  class="input input-bordered input-info w-32 max-w-xs"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.betweenHeight}

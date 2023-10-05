@@ -18,12 +18,15 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<input
-  class="slider"
-  type="range"
-  {min}
-  {max}
-  bind:value
-  on:change={update}
-  on:input={() => dispatch("change", { value })}
-/>
+<div class='p-2'>
+
+  <input
+    class="slider range range-info range-xs"
+    type="range"
+    {min}
+    {max}
+    bind:value
+    on:change={update}
+    on:input={() => dispatch("change", { value })}
+  />
+</div>

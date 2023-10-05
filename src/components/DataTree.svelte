@@ -74,7 +74,9 @@
         🗑️ <!-- Trash bin symbol -->
       </button>
       <div class="dataheading" on:click={() => showDataTable(datum.id)}>
-        {datum.displayName}
+        <h3>
+          {datum.displayName}
+        </h3>
       </div>
     </div>
     {#each Object.keys(datum.data) as key}
@@ -84,23 +86,27 @@
         {#if datum.data[key].processSteps.length > 0}
           <div class="process">
             {#each datum.data[key].processSteps as processStep, index}
-              <div class="process-step" id={"" + index}>
-                <svelte:component
-                  this={componentMap[processStep.process].component}
-                  dataIN={$data[i].data[key].data}
-                  paramsStart={componentMap[processStep.process].startParams}
-                  bind:params={processStep.parameters}
-                  on:update={(event) =>
-                    updateProcessData(event, "data", datum.id, key)}
-                />
+              <div class="process-step justify-start items-end gap-2" id={"" + index}>
+            
 
-                <button
-                  class="removeProcessButton"
-                  on:click={() =>
-                    removeProcessStep("data", datum.id, key, index)}
-                >
-                  🗑️ <!-- Trash bin symbol -->
-                </button>
+                  <svelte:component
+                    this={componentMap[processStep.process].component}
+                    dataIN={$data[i].data[key].data}
+                    paramsStart={componentMap[processStep.process].startParams}
+                    bind:params={processStep.parameters}
+                    on:update={(event) =>
+                      updateProcessData(event, "data", datum.id, key)}
+                  />
+          
+
+  <button
+    class=""
+    on:click={() =>
+      removeProcessStep("data", datum.id, key, index)}
+  >
+    🗑️ <!-- Trash bin symbol -->
+  </button>
+
               </div>
             {/each}
           </div>
@@ -138,9 +144,9 @@
   }
 
   .process {
-    display: flex;
-    align-items: center; /* Center vertically */
-    flex-wrap: wrap; /* Allow "process" elements to wrap */
+    /* display: flex; */
+    /* align-items: center; Center vertically */
+    /* flex-wrap: wrap; Allow "process" elements to wrap */
   }
 
   .process-step {
@@ -153,13 +159,13 @@
 
   .removeProcessButton,
   .removeDataButton {
-    border: none;
+     border: none;
     background: none;
-    color: #007bff; /* Blue color for buttons */
+    color: #007bff;   /* Blue color for buttons  */
     font-size: 18px;
     cursor: pointer;
     margin-left: 5px;
-    display: none;
+    display: none; 
   }
 
   /* Style for the "add" button */

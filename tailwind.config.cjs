@@ -5,7 +5,12 @@ const config = {
   darkMode: "class",
 
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        default: defaultTheme.fontFamily.sans,
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        display: ['Montserrat', ...defaultTheme.fontFamily.sans],
+    },
   },
 
   plugins: [],

@@ -47,14 +47,21 @@
   }
 </script>
 
-<div>
-  <label for="val">Min:</label>
-  <input type="number" id="min" bind:value={params.min} />
-  <Slider min={dataMin} max={dataMax} bind:value={params.min} />
-</div>
+<div class='flex gap-2'>
 
-<div>
-  <label for="val">Max:</label>
-  <input type="number" id="max" bind:value={params.max} />
-  <Slider min={dataMin} max={dataMax} bind:value={params.max} />
+  <div class="form-control w-full max-w-xs">
+    <label for='min' class="label font-semibold ">
+      <span class="label-text">Min:</span>
+    </label>
+     <input type="number" id="min" bind:value={params.min} class="input input-bordered input-info max-w-xs w-32"  />
+    <Slider min={1} max={100} bind:value={params.min} />
+  </div>
+  
+  <div class="form-control w-full max-w-xs">
+    <label for='max' class="label font-semibold ">
+      <span class="label-text">Max:</span>
+    </label>
+     <input type="number" id="max" bind:value={params.max} class="input input-bordered input-info  max-w-xs w-32"  />
+    <Slider min={dataMin} max={dataMax} bind:value={params.max} />
+  </div>
 </div>
