@@ -13,9 +13,6 @@
       //tab
       $activeTableTab = tab;
     }
-    console.log(
-      $dataIDsforTables + ", " + $activeTableTab + " after adding tab"
-    );
   }
 
   import { data, dataIDsforTables, activeTableTab, graphs } from "../store";
@@ -94,7 +91,7 @@
                   paramsStart={componentMap[processStep.process].startParams}
                   bind:params={processStep.parameters}
                   on:update={(event) =>
-                    updateProcessData(event, "data", i, key)}
+                    updateProcessData(event, "data", datum.id, key)}
                 />
 
                 <button

@@ -28,7 +28,6 @@
   let ID = 0;
   let FIELDNAME = "";
   let WHICHPROCESS = "";
-  let PROCESSINDEX = 0;
 
   let selectedSettings = null;
 
@@ -158,10 +157,13 @@
   function doProcessSteps(where, ID, fieldName) {
     if (where === "data") {
       // JSON data containing the functions to execute, from store
-      let processes = get(data)[ID]["data"][fieldName]["processSteps"];
+      let processes = get(data).find((entry) => entry.id === ID).data[fieldName]
+        .processSteps;
 
       // Initial values, from store
-      let result = [].concat(get(data)[ID]["data"][fieldName]["data"]);
+      let result = [].concat(
+        get(data).find((entry) => entry.id === ID).data[fieldName].data
+      );
 
       // Iterate through the JSON array and execute the processes
       if (processes.length > 0) {
