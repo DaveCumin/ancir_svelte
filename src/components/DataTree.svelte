@@ -56,12 +56,12 @@
     console.log(JSON.stringify($graphs));
 
     //remove the data itself
-    let dataIndex = $data[$data.findIndex((d) => d.id === dataID)];
+    let dataIndex = $data.findIndex((d) => d.id === dataID);
+
     data.update((currentData) => {
       currentData.splice(dataIndex, 1);
       return currentData;
     });
-    console.log(JSON.stringify($data));
   }
 </script>
 

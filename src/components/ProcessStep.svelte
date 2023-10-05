@@ -196,13 +196,9 @@
       });
 
       //Update the graphs
-      console.log("find from:" + ID + ", " + fieldName);
-      console.log("in");
-      console.log(get(graphs));
       const graphsToUpdate = findGraphKeys(ID, fieldName);
       if (graphsToUpdate) {
         for (const gtu of graphsToUpdate) {
-          console.log(gtu);
           doProcessSteps("graph", gtu.key, gtu.sd, gtu.graph);
         }
       }
@@ -211,14 +207,8 @@
     //DO FOR GRAPHS
     if (where === "graph") {
       if (graphD < 0) {
-        console.log("here");
-
         graphD = get(activeGraphTab);
       }
-      console.log("gd, fn, id: " + graphD + "," + fieldName + ", " + ID);
-      console.log(get(graphs)[graphD]);
-      console.log(get(graphs)[graphD].sourceData[fieldName]);
-      console.log(get(graphs)[graphD].sourceData[fieldName][ID]);
 
       // JSON data containing the functions to execute, from store
       //TO FIX - the deletion doesn't necessarily only delete from activeGraphTab

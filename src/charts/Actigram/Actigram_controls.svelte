@@ -67,6 +67,24 @@
     );
   }
 
+  function addDataToGraph() {
+    $graphs[$activeGraphTab].sourceData.push({
+      tableID: 6,
+      x: {
+        field: "value0",
+        processSteps: [],
+        processedData: [],
+      },
+      y: {
+        field: "value1",
+        processSteps: [],
+        processedData: [],
+      },
+      col: { r: 251, g: 251, b: 251, a: 0.5 },
+    });
+    $graphs = $graphs;
+  }
+
   function showDataTable(ID) {
     const tab = $dataIDsforTables.indexOf(ID);
     if (tab < 0) {
@@ -209,6 +227,11 @@
     {/if}
   </div>
 {/each}
+
+<!-- ADD DATA-->
+<button class="addProcessButton" on:click={() => addDataToGraph()}>
+  ➕ Data
+</button>
 
 <div>
   <label for="val">Width:</label>
