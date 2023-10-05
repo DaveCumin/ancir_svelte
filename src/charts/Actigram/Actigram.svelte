@@ -15,17 +15,19 @@
   function getTheDataPoints(plotData, d, g) {
     let xVals;
     let yVals;
+    let theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+
     if (plotData.x.processedData.length > 0) {
       //check for processed graph data
       xVals = plotData.x.processedData;
     } else {
       if (
         //check for processed data
-        $data[plotData.tableID].data[plotData.x.field].processedData.length > 0
+        $data[theDataIndex].data[plotData.x.field].processedData.length > 0
       ) {
-        xVals = $data[plotData.tableID].data[plotData.x.field].processedData;
+        xVals = $data[theDataIndex].data[plotData.x.field].processedData;
       } else {
-        xVals = $data[plotData.tableID].data[plotData.x.field].data;
+        xVals = $data[theDataIndex].data[plotData.x.field].data;
       }
     }
 
@@ -33,12 +35,10 @@
       //check for processed graph data
       yVals = plotData.y.processedData;
     } else {
-      if (
-        $data[plotData.tableID].data[plotData.y.field].processedData.length > 0
-      ) {
-        yVals = $data[plotData.tableID].data[plotData.y.field].processedData;
+      if ($data[theDataIndex].data[plotData.y.field].processedData.length > 0) {
+        yVals = $data[theDataIndex].data[plotData.y.field].processedData;
       } else {
-        yVals = $data[plotData.tableID].data[plotData.y.field].data;
+        yVals = $data[theDataIndex].data[plotData.y.field].data;
       }
     }
 

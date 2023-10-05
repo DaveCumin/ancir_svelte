@@ -61,9 +61,9 @@
     activeCol = rgba.detail;
   }
 
-  function getFieldNames(i) {
+  function getFieldNames(source) {
     return Object.keys(
-      $data[$graphs[$activeGraphTab].sourceData[i].tableID].data
+      $data[$data.findIndex((d) => d.id === source.tableID)].data
     );
   }
 
@@ -81,7 +81,7 @@
   }
 </script>
 
-{#each $graphs[$activeGraphTab].sourceData as datum, i}
+{#each $graphs[$activeGraphTab].sourceData as source, i}
   <div class="data">
     <!-- TABLE -->
     <div class="field">
@@ -91,7 +91,7 @@
         bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}
       >
         {#each $data as d, ti}
-          <option value={ti} selected={datum.tableID === ti ? true : false}
+          <option value={ti} selected={source.tableID === ti ? true : false}
             >{d.displayName}</option
           >
         {/each}
@@ -105,21 +105,21 @@
         id={"dattable" + i}
         bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}
       >
-        {#each getFieldNames(i) as key}
+        {#each getFieldNames(source) as key}
           <option value={key}
-            >{$data[$graphs[$activeGraphTab].sourceData[i].tableID].data[key]
+            >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
               .name}</option
           >
         {/each}
       </select>
 
       <div class="process">
-        {#each datum.x.processSteps as processStep, index}
+        {#each source.x.processSteps as processStep, index}
           <div class="process-step" id={"" + index}>
             <svelte:component
               this={componentMap[processStep.process].component}
-              dataIN={$data[$graphs[$activeGraphTab].sourceData[i].tableID]
-                .data[datum.x.field].data}
+              dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
+                .data[source.x.field].data}
               paramsStart={componentMap[processStep.process].startParams}
               bind:params={processStep.parameters}
               on:update={(event) => updateProcessData(event, "graph", "x", i)}
@@ -150,21 +150,21 @@
         id={"dattable" + i}
         bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
       >
-        {#each getFieldNames(i) as key}
+        {#each getFieldNames(source) as key}
           <option value={key}
-            >{$data[$graphs[$activeGraphTab].sourceData[i].tableID].data[key]
+            >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
               .name}</option
           >
         {/each}
       </select>
 
       <div class="process">
-        {#each datum.y.processSteps as processStep, index}
+        {#each source.y.processSteps as processStep, index}
           <div class="process-step">
             <svelte:component
               this={componentMap[processStep.process].component}
-              dataIN={$data[$graphs[$activeGraphTab].sourceData[i].tableID]
-                .data[datum.y.field].data}
+              dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
+                .data[source.y.field].data}
               paramsStart={componentMap[processStep.process].startParams}
               bind:params={processStep.parameters}
               on:update={(event) => updateProcessData(event, "graph", "y", i)}

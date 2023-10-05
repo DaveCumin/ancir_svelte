@@ -209,14 +209,17 @@
         get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].processSteps;
 
       // Initial values, from store
-      let tableID =
-        get(graphs)[get(activeGraphTab)].sourceData[fieldName].tableID;
+      let tableindex = get(data).findIndex(
+        (d) =>
+          d.id ===
+          get(graphs)[get(activeGraphTab)].sourceData[fieldName].tableID
+      );
       let field =
         get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].field;
 
-      let result = [].concat(get(data)[tableID].data[field].data);
-      if (get(data)[tableID].data[field].processedData.length > 0) {
-        result = get(data)[tableID].data[field].processedData;
+      let result = [].concat(get(data)[tableindex].data[field].data);
+      if (get(data)[tableindex].data[field].processedData.length > 0) {
+        result = get(data)[tableindex].data[field].processedData;
       }
       // Iterate through the JSON array and execute the processes
       if (processes.length > 0) {

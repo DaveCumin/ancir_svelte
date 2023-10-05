@@ -15,7 +15,7 @@
     }
   }
 
-  import { data, dataIDsforTables, activeTableTab } from "../store";
+  import { data, dataIDsforTables, activeTableTab, graphs } from "../store";
 
   import {
     addProcessStep,
@@ -23,7 +23,6 @@
     updateProcessData,
     componentMap,
   } from "./ProcessStep.svelte";
-  import TableTabs from "./TableTabs.svelte";
 
   function removeData(i) {
     console.log(i);
@@ -32,7 +31,26 @@
     $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== i);
     $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
 
-    //remove any graph data using the data
+    console.log(
+      "post table; dataIDs: active - " +
+        $dataIDsforTables +
+        " : " +
+        $activeTableTab
+    );
+
+    //TODO remove any graph data using the data
+    graphs.update((currentGraphs) =>
+      currentGraphs.filter((graph) => {
+        // Use some to check if 'i' matches any 'tableID' in sourceData
+        const shouldRemove = graph.sourceData.some(
+          (data) => data.tableID === i
+        );
+
+        // Return true to keep the graph if 'i' doesn't match any 'tableID'
+        return !shouldRemove;
+      })
+    );
+    console.log(JSON.stringify($graphs));
 
     //remove the data itself
     data.update((currentData) => {
