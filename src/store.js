@@ -4,7 +4,7 @@ export var counter = writable(0);
 
 export var data = writable([
   {
-    id: 0,
+    id: 9,
     importedFrom: "simulated(24,200)",
     displayName: "Simulated1",
     datalength: 3,
@@ -42,7 +42,7 @@ export var data = writable([
     },
   },
   {
-    id: 1,
+    id: 6,
     importedFrom: "simulated(25,200)",
     displayName: "Simulated2",
     datalength: 3,
@@ -88,7 +88,7 @@ export var graphs = writable([
     graph: "actigram",
     sourceData: [
       {
-        tableID: 0,
+        tableID: 9,
         x: { field: "time", processSteps: [], processedData: [] },
         y: {
           field: "value0",
@@ -98,7 +98,7 @@ export var graphs = writable([
         col: { r: 24, g: 251, b: 251, a: 1 },
       },
       {
-        tableID: 1,
+        tableID: 6,
         x: { field: "time", processSteps: [], processedData: [] },
         y: {
           field: "value1",
@@ -114,7 +114,7 @@ export var graphs = writable([
     graph: "plotXYZ",
     sourceData: [
       {
-        tableID: 1,
+        tableID: 6,
         x: {
           field: "value0",
           processSteps: [],
@@ -132,7 +132,7 @@ export var graphs = writable([
   },
 ]);
 
-export var dataIDsforTables = writable([0]);
-export var activeTableTab = writable(0);
+export var dataIDsforTables = writable([]);
+export var activeTableTab = writable(-1);
 
 export var modalActive = writable(false);

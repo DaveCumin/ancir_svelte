@@ -13,6 +13,9 @@
       //tab
       $activeTableTab = tab;
     }
+    console.log(
+      $dataIDsforTables + ", " + $activeTableTab + " after adding tab"
+    );
   }
 
   import { data, dataIDsforTables, activeTableTab, graphs } from "../store";
@@ -24,11 +27,11 @@
     componentMap,
   } from "./ProcessStep.svelte";
 
-  function removeData(i) {
-    console.log(i);
+  function removeData(dataID) {
+    console.log(dataID);
 
     //remove any tables associated
-    $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== i);
+    $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== dataID);
     $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
 
     console.log(
@@ -40,21 +43,25 @@
 
     //TODO remove any graph data using the data
     graphs.update((currentGraphs) =>
-      currentGraphs.filter((graph) => {
-        // Use some to check if 'i' matches any 'tableID' in sourceData
-        const shouldRemove = graph.sourceData.some(
-          (data) => data.tableID === i
+      currentGraphs.map((graph) => {
+        // Use filter to keep only the source data objects with 'tableID' not equal to 'i'
+        const updatedSourceData = graph.sourceData.filter(
+          (data) => data.tableID !== dataID
         );
 
-        // Return true to keep the graph if 'i' doesn't match any 'tableID'
-        return !shouldRemove;
+        // Return a new graph object with updated source data
+        return {
+          ...graph,
+          sourceData: updatedSourceData,
+        };
       })
     );
     console.log(JSON.stringify($graphs));
 
     //remove the data itself
+    let dataIndex = $data[$data.findIndex((d) => d.id === dataID)];
     data.update((currentData) => {
-      currentData.splice(i, 1);
+      currentData.splice(dataIndex, 1);
       return currentData;
     });
     console.log(JSON.stringify($data));
@@ -65,11 +72,13 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div class="data">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="dataheading" on:click={() => showDataTable(datum.id)}>
-      <button class="removeDataButton" on:click={() => removeData(i)}>
+    <div class="dataheading">
+      <button class="removeDataButton" on:click={() => removeData(datum.id)}>
         🗑️ <!-- Trash bin symbol -->
       </button>
-      <div class="dataheading">{datum.displayName}</div>
+      <div class="dataheading" on:click={() => showDataTable(datum.id)}>
+        {datum.displayName}
+      </div>
     </div>
     {#each Object.keys(datum.data) as key}
       <div class="field">

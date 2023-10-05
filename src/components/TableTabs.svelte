@@ -67,7 +67,7 @@
           on:click={() => changeActiveNav(inx)}
         >
           <span
-            >{$data[table].displayName}
+            >{$data[$data.findIndex((d) => d.id === table)].displayName}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="delete" on:click={() => deleteTab(inx)}>x</div></span

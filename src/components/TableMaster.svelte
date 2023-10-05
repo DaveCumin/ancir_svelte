@@ -17,9 +17,15 @@
     </Pane>
     {#if showTableDetails}
       <Pane size={30}>
-        <div>Data: {$data[$dataIDsforTables[$activeTableTab]].displayName}</div>
         <div>
-          Imported: {$data[$dataIDsforTables[$activeTableTab]].importedFrom}
+          Data: {$data[
+            $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
+          ].displayName}
+        </div>
+        <div>
+          Imported: {$data[
+            $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
+          ].importedFrom}
         </div>
       </Pane>
     {/if}
