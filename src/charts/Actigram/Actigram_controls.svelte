@@ -86,12 +86,9 @@
     <!-- TABLE -->
     <div class="field">
       <label for="dattable">Table:</label>
-      <select
-        id={"dattable" + i}
-        bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}
-      >
-        {#each $data as d, ti}
-          <option value={ti} selected={source.tableID === ti ? true : false}
+      <select bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
+        {#each $data as d}
+          <option value={d.id} selected={source.tableID === d.id ? true : false}
             >{d.displayName}</option
           >
         {/each}
@@ -101,10 +98,7 @@
     <!-- x field -->
     <div class="field">
       <label for="dattable">X-values (time):</label>
-      <select
-        id={"dattable" + i}
-        bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}
-      >
+      <select bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
         {#each getFieldNames(source) as key}
           <option value={key}
             >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
