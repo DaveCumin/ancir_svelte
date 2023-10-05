@@ -11,6 +11,7 @@
 </script>
 
 <ChartGRaphData_xyc />
+<hr />
 <div>
   <label for="val">Width:</label>
   <input

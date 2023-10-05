@@ -6,16 +6,22 @@
   export let step = 1;
 
   function update() {
-    if (Number.isInteger()) {
+    if (Number.isInteger(step)) {
+      // keep whole numbers
       if (value > max - Math.ceil(max * 0.2)) {
-        max = Math.round(max * 2);
-        min = Math.round(value / 2);
+        // @ts-ignore
+        max = parseInt(max * 2);
+        // @ts-ignore
+        min = parseInt(value / 2);
       }
       if (value < min + Math.ceil(min * 0.2)) {
-        min = Math.round(min / 2);
-        max = Math.round(value * 2);
+        // @ts-ignore
+        min = parseInt(min / 2);
+        // @ts-ignore
+        max = parseInt(value * 2);
       }
     } else {
+      //allow fractional steps
       if (value > max - Math.ceil(max * 0.2)) {
         max = max * 2;
         min = value / 2;
