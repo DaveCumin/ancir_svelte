@@ -80,34 +80,45 @@
     }
   }
 </script>
+<!-- 
+    /* background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s, transform 0.3s;
+    position: relative; */ -->
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-  <div class="data">
+  <div class="relative p-2.5 m-2.5 shadow-inner hover:bg-blue-100 border rounded shadow-xl hover:transition-all">
     <!-- TABLE -->
     <div class="flex">
       <label for="dattable" class='label font-semibold  min-w-[130px]'>Table:</label>
-      <select class='inline-flex select select-info w-32 mb-1' bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
+      <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md' bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}
-            >{d.displayName}aaa</option
+            >{d.displayName}</option
           >
         {/each}
       </select>
     </div>
 
     <!-- x field -->
-    <div class="flex ">
-      <label for="dattable" class='label font-semibold  min-w-[130px]'>X-values (time):</label>
-      <select class='inline-flex select select-info w-32 mb-1' bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
-        {#each getFieldNames(source) as key}aa
-          <option value={key}
-            >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
-              .name}</option
-          >
-        {/each}
-      </select>
+    <div class="flex items-center justify-between">
+      <div class='flex'>
+        <label for="dattable" class='label font-semibold  min-w-[130px]'>X-values (time):</label>
+        <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md' bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
+          {#each getFieldNames(source) as key}aa
+            <option value={key}
+              >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
+                .name}</option
+            >
+          {/each}
+        </select>
+      </div>
 
-      <div class="process">
+      <div class="process ">
         {#each source.x.processSteps as processStep, index}
           <div class="process-step" id={"" + index}>
             <svelte:component
@@ -129,18 +140,21 @@
       </div>
 
       <!-- ADD PROCESS-->
+   
       <button
-        class="addProcessButton"
+             class="w-6 h-6 hover:bg-gray-200 items-center"
         on:click={() => addProcessStep("graph", "x", i)}
-      >
-        ➕ <!-- Plus sign symbol -->
+      >       <svg fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
+</svg>
+         <!-- Plus sign symbol ➕ -->
       </button>
     </div>
 
     <!-- y field -->
-    <div class="flex">
+    <div class="flex ">
       <label for="dattable" class='label font-semibold  min-w-[130px]'>Y-values:</label>
-      <select class='inline-flex select select-info w-32 mb-1'
+      <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md'
         id={"dattable" + i}
         bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
       >
@@ -152,7 +166,7 @@
         {/each}
       </select>
       </div>
-   <div class="flex ">
+   <div class="flex items-center justify-between">
       <div class="process">
         {#each source.y.processSteps as processStep, index}
           <div class="flex">
@@ -175,12 +189,16 @@
       </div>
 
       <!-- ADD PROCESS-->
-      <button
-        class="addProcessButton"
+          <button
+             class="w-6 h-6 hover:bg-gray-200 items-center "
         on:click={() => addProcessStep("graph", "y", i)}
-      >
-        ➕ <!-- Plus sign symbol -->
+      >       <svg fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
+</svg>
+         <!-- Plus sign symbol ➕ -->
       </button>
+   
+
     </div>
 
     <!-- colour-->
@@ -211,10 +229,20 @@
   </div>
 {/each}
 
-<div class='flex pl-4'>
+
+
+  <!-- <div class="form-control flex flex-row  items-center w-full max-w-md ">
+     <label for='val' class="label min-w-[130px]">
+       <span class="label-text">Value:</span>
+     </label>
+      <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-32 max-w-xs"  />
+     <Slider min={1} max={100} bind:value={params.val} />
+   </div> -->
+   <div class='hover:bg-blue-100 border rounded shadow-xl hover:transition-all pt-4'>
+    <div class='flex pl-4'>
   <label for="val" class="label font-semibold min-w-[130px]">Width:</label>
   <input
-  class="input input-bordered input-info w-32 max-w-xs mb-1"
+  class="input input-bordered input-info  w-32 max-w-xs mb-1 bg-blue-50 shadow-md"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.width}
@@ -226,54 +254,48 @@
   />
 </div>
 
-  <!-- <div class="form-control flex flex-row  items-center w-full max-w-md ">
-     <label for='val' class="label min-w-[130px]">
-       <span class="label-text">Value:</span>
-     </label>
-      <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-32 max-w-xs"  />
-     <Slider min={1} max={100} bind:value={params.val} />
-   </div> -->
-<div class='flex p-2 pl-4'>
-  <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>
-  <input
-  class="input input-bordered input-info w-32 max-w-xs"
-    type="number"
-    id="min"
-    bind:value={$graphs[$activeGraphTab].params.dayHeight}
-  />
-  <Slider
-    min={10}
-    max={30}
-    bind:value={$graphs[$activeGraphTab].params.dayHeight}
-  />
-</div>
-
-<div class='flex p-2 pl-4'>
-  <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
-  <input
-  class="input input-bordered input-info w-32 max-w-xs"
-    type="number"
-    id="min"
-    bind:value={$graphs[$activeGraphTab].params.betweenHeight}
-  />
-  <Slider
-    min={1}
-    max={20}
-    bind:value={$graphs[$activeGraphTab].params.betweenHeight}
-  />
-</div>
+     <div class='flex p-2 pl-4'>
+       <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>
+       <input
+       class="input input-bordered input-info w-32 max-w-xs bg-blue-50 shadow-md"
+         type="number"
+         id="min"
+         bind:value={$graphs[$activeGraphTab].params.dayHeight}
+       />
+       <Slider
+         min={10}
+         max={30}
+         bind:value={$graphs[$activeGraphTab].params.dayHeight}
+       />
+     </div>
+     
+     <div class='flex p-2 pl-4 pb-10'>
+       <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
+       <input
+       class="input input-bordered input-info w-32 max-w-xs bg-blue-50 shadow-md"
+         type="number"
+         id="min"
+         bind:value={$graphs[$activeGraphTab].params.betweenHeight}
+       />
+       <Slider
+         min={1}
+         max={20}
+         bind:value={$graphs[$activeGraphTab].params.betweenHeight}
+       />
+     </div>
+   </div>
 
 <style>
   /* Style for each data container */
   .data {
-    background-color: #f9f9f9;
+    /* background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     margin: 10px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s, transform 0.3s;
-    position: relative;
+    position: relative; */
   }
 
   /* Style for fields and their buttons */

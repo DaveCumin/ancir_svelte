@@ -71,19 +71,19 @@
   ];
 </script>
 
-<nav class="menu-bar mx-2">
-  <ul>
+<nav class="mx-2">
+  <ul class='flex flex-row'>
     {#each menuItems as item (item.label)}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li class="menu-item" on:click={() => setActiveMenuItem(item.label)}>
+      <li class="pr-4 cursor-pointer" on:click={() => setActiveMenuItem(item.label)}>
         {item.label}
         {#if activeMenuItem === item.label}
-          <ul class="sub-menu">
+          <ul class="none absolute t-0 l-0 p-2 mt-2 min-w-[100px] cursor-pointer rounded shadow-lg bg-cyan-500 text-white text-sm z-[1000] ">
             {#each item.subMenu as subItem (subItem.label)}
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-              <li on:click={() => handleItemClick(subItem.label)}>
+              <li class='py-2 ' on:click={() => handleItemClick(subItem.label)}>
                 {subItem.label}
               </li>
             {/each}
@@ -106,31 +106,37 @@
 <style>
   /* Style your menu bar here */
   .menu-bar ul {
-    list-style-type: none;
+    /* list-style-type: none;
     padding: 0;
-    display: flex;
+    display: flex; */
   }
 
   .menu-bar li {
-    cursor: pointer;
-    margin-right: 20px; /* Add spacing between menu items */
-    position: relative; /* Relative positioning for sub-menu */
+    /* cursor: pointer;
+    margin-right: 20px;  */
+    /* Add spacing between menu items */
+    /* position: relative; */
+     /* Relative positioning for sub-menu */
   }
 
   .menu-item:hover .sub-menu {
-    display: block; /* Show sub-menu on hover */
+    /* display: block; */
+     /* Show sub-menu on hover */
   }
 
   .sub-menu {
-    display: none;
+    /* display: none;
     position: absolute;
-    top: 100%; /* Position below the parent menu item */
-    left: 0;
-    background-color: #fff; /* Background color for sub-menu */
-    border: 1px solid #ccc; /* Border for sub-menu */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Box shadow for sub-menu */
-    list-style-type: none;
-    padding: 0;
+    top: 100%;  */
+    /* Position below the parent menu item */
+    /* left: 0; */
+   
+ /* Background color for sub-menu */
+    /* border: 1px solid #ccc; /* Border for sub-menu */
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  */
+    /* Box shadow for sub-menu */
+    /* list-style-type: none;
+    padding: 0; */ 
   }
 
   .sub-menu li {
@@ -139,22 +145,22 @@
 
   /* Style your modal container and backdrop here */
   .modal-container {
-    position: fixed;
+    /* position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 999; */
   }
 
   .modal {
-    position: absolute;
+    /* position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: #fff;
     padding: 20px;
-    z-index: 1000;
+    z-index: 1000; */
   }
 </style>

@@ -19,7 +19,7 @@
 <div class="modal">
   <div class="modal-content">
     <h1>Select Process</h1>
-    <label for="process">Process:</label>
+    <label for="process" class='font-semibold '>Process:</label>
     <select id="process" bind:value={selectedProcess}>
       {#each processes as process}
         <option value={process}>{process}</option>

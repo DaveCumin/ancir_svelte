@@ -69,7 +69,7 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div class="data">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="dataheading">
+    <div class="dataheading ">
       <button class="removeDataButton" on:click={() => removeData(datum.id)}>
         🗑️ <!-- Trash bin symbol -->
       </button>
@@ -80,7 +80,7 @@
       </div>
     </div>
     {#each Object.keys(datum.data) as key}
-      <div class="field">
+      <div class="font-semibold flex  justify-between items-center">
         {datum.data[key].name}
 
         {#if datum.data[key].processSteps.length > 0}
@@ -112,11 +112,15 @@
           </div>
         {/if}
         <button
-          class="addProcessButton"
+          class="w-6 h-6 hover:bg-gray-200 items-center"
           on:click={() => addProcessStep("data", datum.id, key)}
         >
-          ➕ <!-- Plus sign symbol -->
-        </button>
+        <svg fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
+</svg>
+          
+           <!-- Plus sign symbol -->
+       </button>
       </div>
     {/each}
   </div>

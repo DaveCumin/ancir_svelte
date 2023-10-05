@@ -17,29 +17,31 @@
 {#if $activeGraphTab < 0}
   <p>Need to add a graph</p>
 {:else}
-  <nav>
-    <ul>
+  <nav class=''>
+    <ul class='flex gap-2 items-center  pb-2'>
       {#each $graphTabs as tabItem, inx}
-        <div
-          role="button"
+        <button
+          type='button'
           tabindex={inx}
-          class={inx === $activeGraphTab ? "tab active" : "tab"}
+          class="{inx === $activeGraphTab ? "tab active" : "tab"} btn btn-accent flex items-center gap-2 ml-2"
           on:click={() => changeActiveNav(inx)}
           on:keydown={(e) => console.log("here " + e)}
         >
-          <span
-            >{tabItem.name}
-            <div
-              role="button"
+           {tabItem.name}
+            <button
+              type='button'
               tabindex={inx}
-              class="delete"
+              class="delete text-2xl hover:bg-gray-600"
               on:click={() => deleteTab(inx)}
               on:keydown={(e) => console.log("here " + e)}
             >
-              x
-            </div></span
-          >
-        </div>
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+</svg>
+              
+    </button>
+         
+          </button>
       {/each}
     </ul>
     <main>
@@ -59,19 +61,19 @@
   }
 
   span {
-    border: 1px solid transparent;
+    /* border: 1px solid transparent;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
     display: block;
     padding: 0.5rem 1rem;
-    cursor: pointer;
+    cursor: pointer; */
   }
 
   span:hover {
-    border-color: #e9ecef #e9ecef #dee2e6;
+    /* border-color: #e9ecef #e9ecef #dee2e6; */
   }
   .delete {
-    position: absolute;
+    /* position: absolute;
     right: 3px;
     top: 5px;
     color: #a9a9a9;
@@ -84,10 +86,10 @@
     opacity: 0.6;
     border: 0;
     border-top: 3px solid transparent;
-    border-radius: 3px;
+    border-radius: 3px; */
   }
   .delete:hover {
-    color: red;
+    /* color: red; */
   }
 
   .tab {
