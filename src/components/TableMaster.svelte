@@ -21,7 +21,7 @@
         <div>
           Data: {$data[
             $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
-          ].displayName}aa
+          ].displayName}
         </div>
         <div>
           Imported: {$data[

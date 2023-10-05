@@ -18,10 +18,10 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<div class='p-2'>
+<div class='pt-2 '>
 
   <input
-    class="slider range range-info range-xs"
+    class="slider range range-info w-24 h-3"
     type="range"
     {min}
     {max}
