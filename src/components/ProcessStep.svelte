@@ -143,10 +143,10 @@
       for (let j = 0; j < graph.sourceData.length; j++) {
         const sourceData = graph.sourceData[j];
         if (sourceData.tableID === table && sourceData.y.field === field) {
-          results.push({ graph: i, key: "y" });
+          results.push({ graph: i, sd: j, key: "y" });
         }
         if (sourceData.tableID === table && sourceData.x.field === field) {
-          results.push({ graph: i, key: "x" });
+          results.push({ graph: i, sd: j, key: "x" });
         }
       }
     }
@@ -154,7 +154,7 @@
     return results.length > 0 ? results : null; // Return an array of results or null if none found
   }
 
-  function doProcessSteps(where, ID, fieldName) {
+  function doProcessSteps(where, ID, fieldName, graphD = -1) {
     if (where === "data") {
       // JSON data containing the functions to execute, from store
       let processes = get(data).find((entry) => entry.id === ID).data[fieldName]
@@ -196,28 +196,40 @@
       });
 
       //Update the graphs
+      console.log("find from:" + ID + ", " + fieldName);
+      console.log("in");
+      console.log(get(graphs));
       const graphsToUpdate = findGraphKeys(ID, fieldName);
       if (graphsToUpdate) {
         for (const gtu of graphsToUpdate) {
-          doProcessSteps("graph", gtu.key, gtu.graph);
+          console.log(gtu);
+          doProcessSteps("graph", gtu.key, gtu.sd, gtu.graph);
         }
       }
     }
 
     //DO FOR GRAPHS
     if (where === "graph") {
+      if (graphD < 0) {
+        console.log("here");
+
+        graphD = get(activeGraphTab);
+      }
+      console.log("gd, fn, id: " + graphD + "," + fieldName + ", " + ID);
+      console.log(get(graphs)[graphD]);
+      console.log(get(graphs)[graphD].sourceData[fieldName]);
+      console.log(get(graphs)[graphD].sourceData[fieldName][ID]);
+
       // JSON data containing the functions to execute, from store
+      //TO FIX - the deletion doesn't necessarily only delete from activeGraphTab
       let processes =
-        get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].processSteps;
+        get(graphs)[graphD].sourceData[fieldName][ID].processSteps;
 
       // Initial values, from store
       let tableindex = get(data).findIndex(
-        (d) =>
-          d.id ===
-          get(graphs)[get(activeGraphTab)].sourceData[fieldName].tableID
+        (d) => d.id === get(graphs)[graphD].sourceData[fieldName].tableID
       );
-      let field =
-        get(graphs)[get(activeGraphTab)].sourceData[fieldName][ID].field;
+      let field = get(graphs)[graphD].sourceData[fieldName][ID].field;
 
       let result = [].concat(get(data)[tableindex].data[field].data);
       if (get(data)[tableindex].data[field].processedData.length > 0) {
