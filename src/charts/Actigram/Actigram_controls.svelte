@@ -98,7 +98,7 @@
       <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md' bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}
-            >{d.displayName}</option
+            >{d.displayName}aa</option
           >
         {/each}
       </select>

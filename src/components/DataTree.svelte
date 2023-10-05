@@ -67,24 +67,25 @@
 
 {#each $data as datum, i}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="data">
+  <div class="data bg-indigo-100">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="dataheading ">
-      <button class="removeDataButton" on:click={() => removeData(datum.id)}>
+    <div class="flex justify-start gap-2  items-center">
+     
+      <div class="" on:click={() => showDataTable(datum.id)}>
+        <h5 class="font-bold text-2xl text-gray-700 hover:text-gray-950 font-display mb-2 cursor-pointer">
+          {datum.displayName}
+        </h5>
+      </div>
+       <button class="mr-1 px-2 py-1 hover:bg-indigo-200 mb-2" on:click={() => removeData(datum.id)}>
         🗑️ <!-- Trash bin symbol -->
       </button>
-      <div class="dataheading" on:click={() => showDataTable(datum.id)}>
-        <h3>
-          {datum.displayName}
-        </h3>
-      </div>
     </div>
     {#each Object.keys(datum.data) as key}
       <div class="font-semibold flex  justify-between items-center">
         {datum.data[key].name}
 
         {#if datum.data[key].processSteps.length > 0}
-          <div class="process">
+          <div class="process bg-indigo-100">
             {#each datum.data[key].processSteps as processStep, index}
               <div class="process-step justify-start items-end gap-2" id={"" + index}>
             
@@ -100,7 +101,7 @@
           
 
   <button
-    class=""
+    class="mr-1 px-2 py-1 hover:bg-indigo-200"
     on:click={() =>
       removeProcessStep("data", datum.id, key, index)}
   >
@@ -129,7 +130,7 @@
 <style>
   /* Style for each data container */
   .data {
-    background-color: #f9f9f9;
+  
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
@@ -202,6 +203,6 @@
   }
 
   .dataheading:hover .removeDataButton {
-    display: inline-block; /* Show buttons on hover */
+    /* display: inline-block; Show buttons on hover */
   }
 </style>

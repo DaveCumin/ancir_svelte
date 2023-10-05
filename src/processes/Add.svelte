@@ -40,7 +40,7 @@
      <label for='val' class="label font-semibold  min-w-[130px]">
        <span class="label-text">Value:</span>
      </label>
-      <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-32 max-w-xs bg-blue-50 shadow-md"  />
+      <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-32 max-w-xs bg-indigo-50 shadow-md"  />
      <Slider min={1} max={100} bind:value={params.val} />
    </div>
 

@@ -23,7 +23,7 @@
         <button
           type='button'
           tabindex={inx}
-          class="{inx === $activeGraphTab ? "tab active" : "tab"} btn btn-accent flex items-center gap-2 ml-2"
+          class="btn flex items-center gap-2 ml-2 {inx === $activeGraphTab ? "outline" : ""} "
           on:click={() => changeActiveNav(inx)}
           on:keydown={(e) => console.log("here " + e)}
         >
@@ -31,7 +31,7 @@
             <button
               type='button'
               tabindex={inx}
-              class="delete text-2xl hover:bg-gray-600"
+              class="delete text-2xl hover:bg-gray-300"
               on:click={() => deleteTab(inx)}
               on:keydown={(e) => console.log("here " + e)}
             >

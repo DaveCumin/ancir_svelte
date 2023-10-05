@@ -9,7 +9,7 @@
 </script>
 
 <div class='w-full'>
-<div class='px-4 py-4 font-semibold text-lg bg-cyan-600 text-white'>
+<div class='px-4 py-4 font-semibold text-lg text-blue-900 bg-blue-200'>
 
   <MenuMaster />
 </div>
@@ -17,12 +17,14 @@
   <div class='prose'>
 
     <Splitpanes
+      theme="modern-theme"
       horizontal
       style="height: calc(100vh - 10px - 3em); width: calc(100vw - 15px);"
       pushOtherPanes={false}
     >
       <Pane minSize={30}>
         <Splitpanes
+         theme="modern-theme"
           style="height: 100%"
           pushOtherPanes={false}
           dblClickSplitter={false}
@@ -33,6 +35,7 @@
           </Pane>
           <Pane>
             <Splitpanes
+              theme="modern-theme"
               horizontal
               style="height: 100%"
               pushOtherPanes={false}

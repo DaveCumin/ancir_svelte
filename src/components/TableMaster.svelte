@@ -8,6 +8,7 @@
 
 <Pane>
   <Splitpanes
+       theme="modern-theme"
     style="height: 100%"
     pushOtherPanes={false}
     dblClickSplitter={false}
@@ -20,7 +21,7 @@
         <div>
           Data: {$data[
             $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
-          ].displayName}
+          ].displayName}aa
         </div>
         <div>
           Imported: {$data[

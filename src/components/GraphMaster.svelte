@@ -15,6 +15,7 @@
 
 <Pane size={80}>
   <Splitpanes
+    theme='modern-theme'
     style="height: 100%"
     pushOtherPanes={false}
     dblClickSplitter={false}

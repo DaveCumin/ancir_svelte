@@ -16,3 +16,35 @@
 .splitpanes__pane {
   overflow: scroll !important;
 }
+
+.splitpanes.modern-theme .splitpanes__pane {
+  background-color: theme(backgroundColor.indigo.50);
+}
+
+.splitpanes__splitter {
+  position: relative;
+  cursor: grab;
+}
+.splitpanes__splitter:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: opacity 0.4s;
+  background-color: rgba(252, 252, 246, 0.8);
+  opacity: 0;
+  z-index: 1;
+}
+.splitpanes__splitter:hover:before {
+  opacity: 1;
+}
+.splitpanes--vertical > .splitpanes__splitter:before {
+  left: -3px;
+  right: -3px;
+  height: 100%;
+}
+.splitpanes--horizontal > .splitpanes__splitter:before {
+  top: -3px;
+  bottom: -3px;
+  width: 100%;
+}
