@@ -169,7 +169,7 @@
    <div class="flex items-center justify-between">
       <div class="process">
         {#each source.y.processSteps as processStep, index}
-          <div class="flex ">
+          <div class="flex flex-col">
             <svelte:component
               this={componentMap[processStep.process].component}
               dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
@@ -242,7 +242,7 @@
     <div class='flex pl-4'>
   <label for="val" class="label font-semibold min-w-[130px]">Width:</label>
   <input
-  class="input input-bordered input-info  w-32 mr-2 max-w-xs mb-1 bg-blue-50 shadow-md"
+  class="input input-bordered input-info h-10 w-24 mr-2 max-w-xs mb-1 bg-blue-50 shadow-md"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.width}
@@ -257,7 +257,7 @@
      <div class='flex p-2 pl-4'>
        <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>
        <input
-       class="input input-bordered input-info w-32 mr-2 max-w-xs bg-blue-50 shadow-md"
+       class="input input-bordered input-info w-24 h-10 mr-2 max-w-xs bg-blue-50 shadow-md"
          type="number"
          id="min"
          bind:value={$graphs[$activeGraphTab].params.dayHeight}
@@ -272,7 +272,7 @@
      <div class='flex p-2 pl-4 pb-10'>
        <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
        <input
-       class="input input-bordered input-info w-32 mr-2 max-w-xs bg-blue-50 shadow-md"
+       class="input input-bordered input-info w-24 h-10 mr-2 max-w-xs bg-blue-50 shadow-md"
          type="number"
          id="min"
          bind:value={$graphs[$activeGraphTab].params.betweenHeight}
