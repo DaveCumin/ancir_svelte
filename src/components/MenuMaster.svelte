@@ -1,15 +1,14 @@
 <script>
   // @ts-nocheck
-
   import GenerateSimulated from "../data/GenerateSimulated.svelte";
 
-  let showModal = false;
+  import { menuModalActive } from "../store";
 
   import { createEventDispatcher } from "svelte"; // Import createEventDispatcher
   const dispatch = createEventDispatcher();
 
   function closeModal() {
-    showModal = false;
+    $menuModalActive = false;
     // Emit the 'close' event when the modal is closed
     dispatch("close");
   }
@@ -20,7 +19,7 @@
     activeMenuItem = "";
     if (itemLabel == "Simulate Data") {
       console.log("modal...");
-      showModal = true;
+      $menuModalActive = true;
     }
   }
 
@@ -95,7 +94,7 @@
   </ul>
 </nav>
 
-{#if showModal}
+{#if $menuModalActive}
   <div class="modal-container">
     <div class="modal">
       <GenerateSimulated />

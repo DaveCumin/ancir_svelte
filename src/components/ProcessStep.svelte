@@ -32,10 +32,10 @@
   let selectedSettings = null;
 
   function closeModal() {
-    modalActive.set(false);
+    processModalActive.set(false);
   }
   function openModal() {
-    modalActive.set(true);
+    processModalActive.set(true);
   }
 
   function handleConfirmAddProcess(event) {
@@ -256,11 +256,16 @@
 </script>
 
 <script>
-  import { data, modalActive, graphs, activeGraphTab } from "../store.js";
+  import {
+    data,
+    processModalActive,
+    graphs,
+    activeGraphTab,
+  } from "../store.js";
   import { get } from "svelte/store";
 </script>
 
-{#if $modalActive}
+{#if $processModalActive}
   <ChooseProcess
     processes={Object.keys(processMap)}
     on:confirmAdd={handleConfirmAddProcess}
