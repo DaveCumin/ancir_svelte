@@ -29,6 +29,7 @@
   function setActiveMenuItem(menuItem) {
     activeMenuItem = menuItem;
   }
+
   document.addEventListener("click", (event) => {
     const menuBar = document.querySelector(".menu-bar");
     if (!menuBar.contains(event.target)) {

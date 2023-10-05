@@ -3,7 +3,7 @@
 
   import { data, graphs, activeGraphTab } from "../../store";
   import { tooltip } from "../../utils/Tooltip/Tooltip";
-  import { rgbaToHex } from "./Actigram_controls.svelte";
+  import { rgbaToHex } from "../../utils/Color";
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
@@ -46,24 +46,14 @@
   }
 </script>
 
-<div>
-  {#each $graphs[$activeGraphTab].sourceData as plotData, i}
-    {JSON.stringify(getTheDataPoints(plotData, $data, $graphs))}
-    <br />
-  {/each}
-  <br />
-  {width}, {dayHeight}, {betweenHeight}
-  <br />
-</div>
-
-<div class="actigramGraph">
-  <svg {width} {totalHeight}>
-    {#each $graphs[$activeGraphTab].sourceData as plotData, i}
-      {#each Array(3) as _, day}
+<div class="actigramGraph" style="overflow:auto;">
+  <svg {width} height={totalHeight} style="border: 1px solid #000;">
+    {#each $graphs[$activeGraphTab].sourceData as plotData}
+      {#each getTheDataPoints(plotData, $data, $graphs).x as x, p}
         <circle
           use:tooltip
-          cx={getTheDataPoints(plotData, $data, $graphs).y[day] * 10}
-          cy={getTheDataPoints(plotData, $data, $graphs).y[day] * 10}
+          cx={x * 10}
+          cy={getTheDataPoints(plotData, $data, $graphs).y[p] * 10}
           r="10"
           stroke="black"
           stroke-width="3"
