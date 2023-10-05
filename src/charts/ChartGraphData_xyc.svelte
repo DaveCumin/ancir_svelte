@@ -81,13 +81,14 @@
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-  <div class="data">
+  <div class="data bg-indigo-100">
+     <div class="flex justify-start gap-2  items-center"></div>
     <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>
       🗑️ <!-- Trash bin symbol -->
     </button>
     <!-- TABLE -->
     <div class="field">
-      <label for="dattable">Table:</label>
+      <label class="label font-semibold min-w-[130px]" for="dattable">Table:</label>
       <select bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}

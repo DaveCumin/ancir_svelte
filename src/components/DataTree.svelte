@@ -73,13 +73,15 @@
      
       <div class="" on:click={() => showDataTable(datum.id)}>
         <h5 class="font-bold text-2xl text-gray-700 hover:text-gray-950 font-display mb-2 cursor-pointer">
-          {datum.displayName}
+          {datum.displayName}aaa
         </h5>
       </div>
        <button class="mr-1 px-2 py-1 hover:bg-indigo-200 mb-2" on:click={() => removeData(datum.id)}>
         🗑️ <!-- Trash bin symbol -->
       </button>
     </div>
+   
+    
     {#each Object.keys(datum.data) as key}
       <div class="font-semibold flex  justify-between items-center">
         {datum.data[key].name}

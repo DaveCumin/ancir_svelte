@@ -11,9 +11,10 @@
 </script>
 
 <ChartGRaphData_xyc />
-<div>
-  <label for="val">Width:</label>
+<div class='flex pl-4'>
+  <label for="val" class="label font-semibold min-w-[130px]">Width:</label>
   <input
+    class="input input-bordered input-info h-10 w-24 mr-2 max-w-xs mb-1 bg-blue-50 shadow-md"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.width}
@@ -25,9 +26,11 @@
   />
 </div>
 
-<div>
-  <label for="val">dayHeight:</label>
+    <div class='flex p-2 pl-4'>
+       <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>  
   <input
+  class="input input-bordered input-info w-24 h-10 mr-2 max-w-xs bg-blue-50 shadow-md"
+
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.dayHeight}
@@ -39,9 +42,10 @@
   />
 </div>
 
-<div>
-  <label for="val">betweenHeight:</label>
-  <input
+   <div class='flex p-2 pl-4 pb-10'>
+       <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
+       <input
+       class="input input-bordered input-info w-24 h-10 mr-2 max-w-xs bg-blue-50 shadow-md"
     type="number"
     id="min"
     bind:value={$graphs[$activeGraphTab].params.betweenHeight}
