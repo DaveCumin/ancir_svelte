@@ -68,6 +68,7 @@
   }
 
   function addDataToGraph() {
+    //TODO: make this generic
     $graphs[$activeGraphTab].sourceData.push({
       tableID: 6,
       x: {
@@ -97,10 +98,31 @@
       $activeTableTab = tab;
     }
   }
+
+  function removeGraphData(srcID) {
+    graphs.update((currentData) => {
+      const newData = [...currentData];
+      const currentGraphID = newData[$activeGraphTab].id;
+
+      // Find the current graph by ID
+      const currentGraph = newData.find((graph) => graph.id === currentGraphID);
+
+      // Check if the currentGraph exists and has sourceData
+      if (currentGraph && currentGraph.sourceData) {
+        // Remove the i-th sourceData element from the currentGraph
+        currentGraph.sourceData.splice(srcID, 1);
+      }
+
+      return newData;
+    });
+  }
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
   <div class="data">
+    <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>
+      🗑️ <!-- Trash bin symbol -->
+    </button>
     <!-- TABLE -->
     <div class="field">
       <label for="dattable">Table:</label>
