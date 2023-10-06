@@ -25,18 +25,9 @@
   } from "./ProcessStep.svelte";
 
   function removeData(dataID) {
-    console.log(dataID);
-
     //remove any tables associated
     $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== dataID);
     $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
-
-    console.log(
-      "post table; dataIDs: active - " +
-        $dataIDsforTables +
-        " : " +
-        $activeTableTab
-    );
 
     //TODO remove any graph data using the data
     graphs.update((currentGraphs) =>
@@ -53,7 +44,6 @@
         };
       })
     );
-    console.log(JSON.stringify($graphs));
 
     //remove the data itself
     let dataIndex = $data.findIndex((d) => d.id === dataID);

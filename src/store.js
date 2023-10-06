@@ -135,4 +135,5 @@ export var graphs = writable([
 export var dataIDsforTables = writable([]);
 export var activeTableTab = writable(-1);
 
-export var modalActive = writable(false);
+export var processModalActive = writable(false);
+export var menuModalActive = writable(false);

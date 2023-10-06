@@ -11,6 +11,7 @@
 </script>
 
 <ChartGRaphData_xyc />
+<hr />
 <div class='relative p-2.5 m-1.5 shadow-inner bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all'>
 
   <div class='flex pl-4 items-center'>
