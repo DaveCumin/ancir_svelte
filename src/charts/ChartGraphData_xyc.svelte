@@ -8,7 +8,7 @@
     activeTableTab,
   } from "../store";
   // @ts-ignore
-  import { HsvPicker } from "svelte-color-picker";
+  import ColorPicker  from 'svelte-awesome-color-picker';
 
   import {
     addProcessStep,
@@ -78,6 +78,7 @@
       return newData;
     });
   }
+  let rgb = 'hsv'
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
@@ -201,37 +202,17 @@
   </button>
 
 </div>
-    <!-- colour-->
-    <div>
-      <button
-        class="w-6 h-6 ml-2 mt-4 hover:bg-gray-200 items-center "
-
-        on:click={() => toggleHsvPicker(i)}
-        style="background-color: {rgbaToHex(
-          $graphs[$activeGraphTab].sourceData[i].col
-        )};"
-      >
-      <span class='ml-8 font-semibold'>
-        Colour
-      </span>
-      
-      </button>
-    </div>
-    {#if hsvPickerVisibility[i]}
-      <!-- HSV Picker component for this item -->
-      <div class="modal">
-        <div class="modal-content">
-          <HsvPicker
+  <!-- HSV PIRCKER NEW -->
+    <div class='flex w-12'>
+        <ColorPicker label={'Colour'}
             on:colorChange={colorCallback}
-            startColor={rgbaToHex($graphs[$activeGraphTab].sourceData[i].col)}
+            bind:rgb={$graphs[$activeGraphTab].sourceData[i].col}
           />
-          <div class="modal-buttons">
-            <button on:click={() => setHsvPicker(i)}>Set</button>
-          </div>
-        </div>
-      </div>
-    {/if}
+    </div>
+  
   </div>
+
+
 {/each}
 
 <!-- ADD DATA-->
@@ -240,6 +221,15 @@
 </button>
 
 <style>
+
+  :global(.main-container ){
+    height: 450px;
+  }
+
+  :global(.color) {
+    color:blue;
+    background-color: green;
+  }
   /* Style for each data container */
   .data {
     /* background-color: #f9f9f9;
@@ -310,23 +300,12 @@
     color: #0056b3; /* Darker blue on hover */
   }
 
-  .modal {
-    position: fixed;
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-  }
+.modal {
+  z-index:1;
+  opacity:1;;
+}
+.modal-box {
+  z-index:2;
+}
 
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% 72%;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 240px;
-  }
 </style>
