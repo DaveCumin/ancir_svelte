@@ -14,7 +14,7 @@
 @tailwind utilities;
 
 .splitpanes__pane {
-  overflow: scroll !important;
+  overflow: auto !important;
 }
 
 .splitpanes.modern-theme .splitpanes__pane {
@@ -22,16 +22,22 @@
 }
 
 .splitpanes__splitter {
+  width: 5px;
   position: relative;
   cursor: grab;
 }
+.splitpanes.modern-theme .splitpanes__splitter {
+  background-color: theme(backgroundColor.indigo.200);
+  position: relative;
+}
+
 .splitpanes__splitter:before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   transition: opacity 0.4s;
-  background-color: rgba(252, 252, 246, 0.8);
+  background-color: theme(backgroundColor.indigo.200);
   opacity: 0;
   z-index: 1;
 }

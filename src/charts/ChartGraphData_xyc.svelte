@@ -81,15 +81,14 @@
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-  <div class="data bg-indigo-100">
-     <div class="flex justify-start gap-2  items-center"></div>
-    <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>
-      🗑️ <!-- Trash bin symbol -->
-    </button>
+  <div class="relative p-2.5 m-1.5 shadow-inner hover:bg-blue-100 border rounded shadow-xl hover:transition-all">
+    <div class="flex">
+      <!-- <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>🗑️</button> -->
+    </div>
     <!-- TABLE -->
-    <div class="field">
+       <div class="flex">
       <label class="label font-semibold min-w-[130px]" for="dattable">Table:</label>
-      <select bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
+      <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md mb-4'   bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}
             >{d.displayName}</option
@@ -99,9 +98,10 @@
     </div>
 
     <!-- x field -->
-    <div class="field">
-      <label for="dattable">X-values (time):</label>
-      <select bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
+      <div class="flex items-center justify-between">
+      <div class='flex'>
+      <label class='label font-semibold' for="dattable">X-values (time):</label>
+      <select class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md' bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
         {#each getFieldNames(source) as key}
           <option value={key}
             >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
@@ -139,11 +139,15 @@
         ➕ <!-- Plus sign symbol -->
       </button>
     </div>
+     </div>
+     
 
     <!-- y field -->
-    <div class="field">
-      <label for="dattable">Y-values:</label>
+      <div class="flex ">
+      <label class='label font-semibold  min-w-[130px]' for="dattable">Y-values:</label>
       <select
+      class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md'
+
         id={"dattable" + i}
         bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
       >
@@ -154,10 +158,11 @@
           >
         {/each}
       </select>
-
+   <div class="flex items-center justify-between">
       <div class="process">
         {#each source.y.processSteps as processStep, index}
-          <div class="process-step">
+          <div class="flex flex-col">
+
             <svelte:component
               this={componentMap[processStep.process].component}
               dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
@@ -181,13 +186,18 @@
         class="addProcessButton"
         on:click={() => addProcessStep("graph", "y", i)}
       >
-        ➕ <!-- Plus sign symbol -->
+        <svg fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
+</svg>
       </button>
     </div>
 
+  </div>
     <!-- colour-->
     <div>
       <button
+        class="w-6 h-6 hover:bg-gray-200 items-center "
+
         on:click={() => toggleHsvPicker(i)}
         style="background-color: {rgbaToHex(
           $graphs[$activeGraphTab].sourceData[i].col
