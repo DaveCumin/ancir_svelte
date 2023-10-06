@@ -203,18 +203,17 @@
           />
 
           <div class="modal-buttons">
-            <button on:click={() => setHsvPicker(i)}>Set</button>
+            <button on:click={() => setHsvPicker(i)}>Done</button>
           </div>
         </div>
       </div>
     {/if}
   </div>
 {/each}
-}
 
 <!-- ADD DATA-->
 <button class="addProcessButton" on:click={() => addDataToGraph()}>
-  ➕ Data
+  + Data
 </button>
 
 <style>

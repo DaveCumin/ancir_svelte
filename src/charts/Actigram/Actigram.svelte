@@ -4,62 +4,95 @@
   import { data, graphs, activeGraphTab } from "../../store";
   import { tooltip } from "../../utils/Tooltip/Tooltip";
   import { rgbaTorgba } from "../../utils/Color";
+  import { scaleLinear } from "d3-scale";
+  import Axis from "../Axis.svelte";
+
+  let days = 3; //Can code this later
+  const margin = { top: 20, bottom: 20, left: 20, right: 20 };
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
   $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
-
-  let days = 3; //Can code this later
   $: totalHeight = (dayHeight + betweenHeight) * days;
+  $: innerHeight = totalHeight - margin.top - margin.bottom;
+  $: innerWidth = width - margin.left - margin.right;
 
-  function getTheDataPoints(plotData, d, g) {
+  let xValsToPlot = [];
+  let yValsToPlot = [];
+
+  let xScale;
+  let yScale;
+
+  //This makes the data required for the plot; reactive to any changes
+  $: {
+    xValsToPlot = [];
+    yValsToPlot = [];
+
     let xVals;
     let yVals;
-    let theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
 
-    if (plotData.x.processedData.length > 0) {
-      //check for processed graph data
-      xVals = plotData.x.processedData;
-    } else {
-      if (
-        //check for processed data
-        $data[theDataIndex].data[plotData.x.field].processedData.length > 0
-      ) {
-        xVals = $data[theDataIndex].data[plotData.x.field].processedData;
+    $graphs[$activeGraphTab].sourceData.forEach((plotData, index) => {
+      const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+      if (plotData.x.processedData.length > 0) {
+        //check for processed graph data
+        xVals = plotData.x.processedData;
       } else {
-        xVals = $data[theDataIndex].data[plotData.x.field].data;
+        if (
+          //check for processed data
+          $data[theDataIndex].data[plotData.x.field].processedData.length > 0
+        ) {
+          xVals = $data[theDataIndex].data[plotData.x.field].processedData;
+        } else {
+          xVals = $data[theDataIndex].data[plotData.x.field].data;
+        }
       }
-    }
 
-    if (plotData.y.processedData.length > 0) {
-      //check for processed graph data
-      yVals = plotData.y.processedData;
-    } else {
-      if ($data[theDataIndex].data[plotData.y.field].processedData.length > 0) {
-        yVals = $data[theDataIndex].data[plotData.y.field].processedData;
+      if (plotData.y.processedData.length > 0) {
+        //check for processed graph data
+        yVals = plotData.y.processedData;
       } else {
-        yVals = $data[theDataIndex].data[plotData.y.field].data;
+        if (
+          $data[theDataIndex].data[plotData.y.field].processedData.length > 0
+        ) {
+          yVals = $data[theDataIndex].data[plotData.y.field].processedData;
+        } else {
+          yVals = $data[theDataIndex].data[plotData.y.field].data;
+        }
       }
-    }
 
-    return { x: xVals, y: yVals };
+      xScale = scaleLinear().domain([0, 20]).range([0, innerWidth]);
+      yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
+
+      xValsToPlot.push(xVals);
+      yValsToPlot.push(yVals);
+    });
   }
 </script>
 
 <div class="actigramGraph" style="overflow:auto;">
   <svg {width} height={totalHeight} style="border: 1px solid #000;">
-    {#each $graphs[$activeGraphTab].sourceData as plotData}
-      {#each getTheDataPoints(plotData, $data, $graphs).x as x, p}
-        <circle
-          use:tooltip
-          cx={x * 10}
-          cy={getTheDataPoints(plotData, $data, $graphs).y[p] * 10}
-          r="10"
-          stroke="black"
-          stroke-width="3"
-          fill={rgbaTorgba(plotData.col)}
-        />
+    <g transform={`translate(${margin.left},${margin.right})`}>
+      {#each yValsToPlot as ys, ysi}
+        {#each ys as y, yi}
+          <circle
+            use:tooltip
+            cx={xScale(xValsToPlot[ysi][yi])}
+            cy={yScale(y)}
+            r="10"
+            stroke="black"
+            stroke-width="3"
+            fill={rgbaTorgba($graphs[$activeGraphTab].sourceData[ysi].col)}
+          />
+        {/each}
       {/each}
-    {/each}
+
+      <!-- axis stuff-->
+      <text transform={`translate(${-25},${innerHeight / 2}) rotate(-90)`}
+        >y-axis title</text
+      >
+      <text x={innerWidth / 2} y={innerHeight + 30}>x-axis title</text>
+    </g>
+    <Axis {innerHeight} {margin} scale={xScale} position="bottom" />
+    <Axis {innerHeight} {margin} scale={yScale} position="left" />
   </svg>
 </div>

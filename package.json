@@ -11,6 +11,8 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "autoprefixer": "^10.4.14",
+    "d3-axis": "^3.0.0",
+    "d3-selection": "^3.0.0",
     "svelte": "^4.0.5",
     "svelte-awesome-color-picker": "^2.4.7",
     "svelte-splitpanes": "^0.8.0",
