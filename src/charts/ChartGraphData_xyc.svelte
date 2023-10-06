@@ -1,12 +1,6 @@
 <script>
-  import { rgbaToHex } from "../utils/Color";
-  import {
-    data,
-    graphs,
-    activeGraphTab,
-    dataIDsforTables,
-    activeTableTab,
-  } from "../store";
+  import { rgbaToHex, rgbaTorgba } from "../utils/Color";
+  import { data, graphs, activeGraphTab } from "../store";
   // @ts-ignore
   import ColorPicker  from 'svelte-awesome-color-picker';
 
@@ -17,7 +11,7 @@
     updateProcessData,
   } from "../components/ProcessStep.svelte";
 
-  $: hsvPickerVisibility = Array(
+  let hsvPickerVisibility = Array(
     $graphs[$activeGraphTab].sourceData.length
   ).fill(false);
 
@@ -32,8 +26,9 @@
 
   let activeCol;
 
-  function colorCallback(rgba) {
+  function colorCallback(rgba, index) {
     activeCol = rgba.detail;
+    $graphs[$activeGraphTab].sourceData[index].col = activeCol;
   }
 
   function getFieldNames(source) {
@@ -59,6 +54,7 @@
       col: { r: 251, g: 251, b: 251, a: 0.5 },
     });
     $graphs = $graphs;
+    hsvPickerVisibility.push(false);
   }
 
   function removeGraphData(srcID) {
@@ -77,6 +73,8 @@
 
       return newData;
     });
+
+    hsvPickerVisibility.slice(srcID, 1);
   }
   let rgb = 'hsv'
 </script>

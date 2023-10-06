@@ -19,3 +19,20 @@ export function rgbaToHex(color) {
 
   return hexColor;
 }
+
+export function rgbaTorgba(color) {
+  // Ensure the color object has the required properties
+  if (
+    !color ||
+    typeof color !== "object" ||
+    isNaN(color.r) ||
+    isNaN(color.g) ||
+    isNaN(color.b)
+  ) {
+    return null;
+  }
+
+  return (
+    "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")"
+  );
+}
