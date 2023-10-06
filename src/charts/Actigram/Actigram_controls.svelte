@@ -11,8 +11,8 @@
 </script>
 
 <ChartGRaphData_xyc />
-<hr />
-<div class='relative p-2.5 m-1.5 shadow-inner bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all'>
+
+<div class='relative p-2.5 m-1.5 shadow-inner border rounded shadow-xl transition ease-in-out delay-75 bg-indigo-100 hover:bg-indigo-200 duration-200 '>
 
   <div class='flex pl-4 items-center'>
     <label for="val" class="label font-semibold min-w-[130px]">Width:</label>

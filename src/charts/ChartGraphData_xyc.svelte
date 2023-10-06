@@ -80,7 +80,7 @@
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-  <div class="relative p-2.5 m-1.5 shadow-inner bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all">
+  <div class="relative p-2.5 m-1.5 shadow-inner border rounded shadow-xl transition ease-in-out delay-75 bg-indigo-100 hover:bg-indigo-200 duration-200 ">
     <div class="flex">
       <!-- <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>🗑️</button> -->
     </div>

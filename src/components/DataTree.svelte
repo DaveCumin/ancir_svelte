@@ -57,7 +57,7 @@
 
 {#each $data as datum, i}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="data bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all">
+  <div class="data bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all hover:duration:1000 ease-in-out">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="flex justify-start gap-2  items-center">
      
