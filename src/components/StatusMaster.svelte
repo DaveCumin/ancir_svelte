@@ -1,1 +1,1 @@
-<p>statusbar</p>
+<h3>statusbar</h3>

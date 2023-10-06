@@ -18,7 +18,7 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<div class='pt-2 '>
+<div class=''>
 
   <input
     class="slider range range-info w-24 h-3"

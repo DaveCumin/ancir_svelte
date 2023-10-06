@@ -81,7 +81,7 @@
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-  <div class="relative p-2.5 m-1.5 shadow-inner hover:bg-blue-100 border rounded shadow-xl hover:transition-all">
+  <div class="relative p-2.5 m-1.5 shadow-inner bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all">
     <div class="flex">
       <!-- <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>🗑️</button> -->
     </div>
@@ -98,8 +98,8 @@
     </div>
 
     <!-- x field -->
-      <div class="flex items-center justify-between">
-      <div class='flex'>
+    <div class="flex items-center  justify-between shrink-0  min-w-[280px]">
+      <div class='flex '>
       <label class='label font-semibold' for="dattable">X-values (time):</label>
       <select class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md' bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
         {#each getFieldNames(source) as key}
@@ -110,7 +110,7 @@
         {/each}
       </select>
 
-      <div class="process">
+      <div class="">
         {#each source.x.processSteps as processStep, index}
           <div class="process-step" id={"" + index}>
             <svelte:component
@@ -130,20 +130,24 @@
           </div>
         {/each}
       </div>
+    </div>
 
       <!-- ADD PROCESS-->
+
+
       <button
-        class="addProcessButton"
+         class="btn btn-xs btn-neutral shadow-lg items-center"
         on:click={() => addProcessStep("graph", "x", i)}
       >
-        ➕ <!-- Plus sign symbol -->
+                      <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
+</svg>
       </button>
-    </div>
      </div>
      
 
     <!-- y field -->
-      <div class="flex ">
+      <div class="flex min-w-[280px] ">
       <label class='label font-semibold  min-w-[130px]' for="dattable">Y-values:</label>
       <select
       class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md'
@@ -158,6 +162,7 @@
           >
         {/each}
       </select>
+  </div>
    <div class="flex items-center justify-between">
       <div class="process">
         {#each source.y.processSteps as processStep, index}
@@ -181,29 +186,35 @@
         {/each}
       </div>
 
-      <!-- ADD PROCESS-->
-      <button
-        class="addProcessButton"
-        on:click={() => addProcessStep("graph", "y", i)}
-      >
-        <svg fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+
+  <!-- ADD PROCESS-->
+
+     
+
+  <button
+    class="btn btn-xs btn-neutral shadow-lg items-center"
+    on:click={() => addProcessStep("graph", "y", i)}
+  >
+         <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
 </svg>
-      </button>
-    </div>
+  </button>
 
-  </div>
+</div>
     <!-- colour-->
     <div>
       <button
-        class="w-6 h-6 hover:bg-gray-200 items-center "
+        class="w-6 h-6 ml-2 mt-4 hover:bg-gray-200 items-center "
 
         on:click={() => toggleHsvPicker(i)}
         style="background-color: {rgbaToHex(
           $graphs[$activeGraphTab].sourceData[i].col
         )};"
       >
+      <span class='ml-8 font-semibold'>
         Colour
+      </span>
+      
       </button>
     </div>
     {#if hsvPickerVisibility[i]}
@@ -224,29 +235,30 @@
 {/each}
 
 <!-- ADD DATA-->
-<button class="addProcessButton" on:click={() => addDataToGraph()}>
-  ➕ Data
+<button class="ml-4 my-2 btn btn-info btn-xs" on:click={() => addDataToGraph()}>
+➕ Data
 </button>
 
 <style>
   /* Style for each data container */
   .data {
-    background-color: #f9f9f9;
+    /* background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     margin: 10px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s, transform 0.3s;
-    position: relative;
+    position: relative; */
   }
 
   /* Style for fields and their buttons */
   .field {
-    display: flow;
+    /* display: flow;
     align-items: center;
-    margin: 10px 0;
-    flex-wrap: wrap; /* Allow content to wrap to the next line */
+    margin: 10px 0; */
+    /* flex-wrap: wrap; */
+     /* Allow content to wrap to the next line */
   }
 
   .process {

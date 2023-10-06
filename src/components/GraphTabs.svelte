@@ -15,7 +15,7 @@
 </script>
 
 {#if $activeGraphTab < 0}
-  <p>Need to add a graph</p>
+  <h3>Need to add a graph</h3>
 {:else}
   <nav class=''>
     <ul class='flex gap-2 items-center  pb-2'>

@@ -34,9 +34,7 @@
 
 {#if typeof dataIN[0] === "number"}
 
-
-
-  <div class="form-control flex flex-row  items-center w-full max-w-md ">
+  <div class="form-control flex flex-row  items-center w-full max-w-md">
      <label for='val' class="label font-semibold  min-w-[130px]">
        <span class="label-text">Value:</span>
      </label>

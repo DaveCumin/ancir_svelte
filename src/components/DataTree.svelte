@@ -67,7 +67,7 @@
 
 {#each $data as datum, i}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="data bg-indigo-100">
+  <div class="data bg-indigo-100 hover:bg-indigo-200 border rounded shadow-xl hover:transition-all">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="flex justify-start gap-2  items-center">
      
@@ -87,7 +87,7 @@
         {datum.data[key].name}
 
         {#if datum.data[key].processSteps.length > 0}
-          <div class="process bg-indigo-100">
+          <div class="process ">
             {#each datum.data[key].processSteps as processStep, index}
               <div class="process-step justify-start items-end gap-2" id={"" + index}>
             
@@ -115,14 +115,12 @@
           </div>
         {/if}
         <button
-          class="w-6 h-6 hover:bg-gray-200 items-center"
+          class="btn btn-xs btn-neutral shadow-lg items-center"
           on:click={() => addProcessStep("data", datum.id, key)}
         >
-        <svg fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
 </svg>
-          
-           <!-- Plus sign symbol -->
        </button>
       </div>
     {/each}
