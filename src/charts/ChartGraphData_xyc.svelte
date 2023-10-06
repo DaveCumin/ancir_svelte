@@ -1,12 +1,6 @@
 <script>
-  import { rgbaToHex } from "../utils/Color";
-  import {
-    data,
-    graphs,
-    activeGraphTab,
-    dataIDsforTables,
-    activeTableTab,
-  } from "../store";
+  import { rgbaToHex, rgbaTorgba } from "../utils/Color";
+  import { data, graphs, activeGraphTab } from "../store";
   // @ts-ignore
   import { HsvPicker } from "svelte-color-picker";
 
@@ -17,7 +11,7 @@
     updateProcessData,
   } from "../components/ProcessStep.svelte";
 
-  $: hsvPickerVisibility = Array(
+  let hsvPickerVisibility = Array(
     $graphs[$activeGraphTab].sourceData.length
   ).fill(false);
 
@@ -32,8 +26,9 @@
 
   let activeCol;
 
-  function colorCallback(rgba) {
+  function colorCallback(rgba, index) {
     activeCol = rgba.detail;
+    $graphs[$activeGraphTab].sourceData[index].col = activeCol;
   }
 
   function getFieldNames(source) {
@@ -59,6 +54,7 @@
       col: { r: 251, g: 251, b: 251, a: 0.5 },
     });
     $graphs = $graphs;
+    hsvPickerVisibility.push(false);
   }
 
   function removeGraphData(srcID) {
@@ -77,6 +73,8 @@
 
       return newData;
     });
+
+    hsvPickerVisibility.slice(srcID, 1);
   }
 </script>
 
@@ -188,7 +186,7 @@
     <div>
       <button
         on:click={() => toggleHsvPicker(i)}
-        style="background-color: {rgbaToHex(
+        style="background-color: {rgbaTorgba(
           $graphs[$activeGraphTab].sourceData[i].col
         )};"
       >
@@ -200,9 +198,10 @@
       <div class="modal">
         <div class="modal-content">
           <HsvPicker
-            on:colorChange={colorCallback}
+            on:colorChange={(rgba) => colorCallback(rgba, i)}
             startColor={rgbaToHex($graphs[$activeGraphTab].sourceData[i].col)}
           />
+
           <div class="modal-buttons">
             <button on:click={() => setHsvPicker(i)}>Set</button>
           </div>
@@ -211,6 +210,7 @@
     {/if}
   </div>
 {/each}
+}
 
 <!-- ADD DATA-->
 <button class="addProcessButton" on:click={() => addDataToGraph()}>
@@ -296,7 +296,7 @@
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    background-color: rgba(0, 0, 0, 0); /* Black w/ opacity */
   }
 
   .modal-content {

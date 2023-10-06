@@ -3,7 +3,7 @@
 
   import { data, graphs, activeGraphTab } from "../../store";
   import { tooltip } from "../../utils/Tooltip/Tooltip";
-  import { rgbaToHex } from "../../utils/Color";
+  import { rgbaTorgba } from "../../utils/Color";
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
@@ -57,7 +57,7 @@
           r="10"
           stroke="black"
           stroke-width="3"
-          fill={rgbaToHex(plotData.col)}
+          fill={rgbaTorgba(plotData.col)}
         />
       {/each}
     {/each}
