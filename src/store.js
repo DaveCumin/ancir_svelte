@@ -108,7 +108,7 @@ export var graphs = writable([
         col: { r: 21, g: 21, b: 251, a: 1 },
       },
     ],
-    params: { width: 500, dayHeight: 20, betweenHeight: 5 },
+    params: { width: 600, dayHeight: 100, betweenHeight: 5 },
   },
   {
     graph: "plotXYZ",

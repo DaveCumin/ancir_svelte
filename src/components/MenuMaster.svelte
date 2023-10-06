@@ -18,7 +18,6 @@
     console.log(`Clicked on "${itemLabel}"`);
     activeMenuItem = "";
     if (itemLabel == "Simulate Data") {
-      console.log("modal...");
       $menuModalActive = true;
     }
   }

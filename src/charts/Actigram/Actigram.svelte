@@ -8,7 +8,7 @@
   import Axis from "../Axis.svelte";
 
   let days = 3; //Can code this later
-  const margin = { top: 20, bottom: 20, left: 20, right: 20 };
+  const margin = { top: 20, bottom: 50, left: 50, right: 20 };
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
@@ -87,12 +87,13 @@
       {/each}
 
       <!-- axis stuff-->
-      <text transform={`translate(${-25},${innerHeight / 2}) rotate(-90)`}
+      <text transform={`translate(${-30},${innerHeight / 2}) rotate(-90)`}
         >y-axis title</text
       >
       <text x={innerWidth / 2} y={innerHeight + 30}>x-axis title</text>
+
+      <Axis {innerHeight} {margin} scale={xScale} position="bottom" />
+      <Axis {innerHeight} {margin} scale={yScale} position="left" />
     </g>
-    <Axis {innerHeight} {margin} scale={xScale} position="bottom" />
-    <Axis {innerHeight} {margin} scale={yScale} position="left" />
   </svg>
 </div>
