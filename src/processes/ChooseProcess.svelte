@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import { processModalActive } from "../store";
 
   let selectedProcess = {};
   const dispatch = createEventDispatcher();
@@ -16,40 +17,35 @@
 </script>
 
 <!-- Modal content -->
-<div class="modal">
-  <div class="modal-content">
-    <h1>Select Process</h1>
-    <label for="process" class='font-semibold '>Process:</label>
-    <select id="process" bind:value={selectedProcess}>
-      {#each processes as process}
-        <option value={process}>{process}</option>
-      {/each}
-    </select>
-    <div class="modal-buttons">
-      <button on:click={confirm}>Confirm</button>
-      <button on:click={() => dispatch("cancelAdd")}>Cancel</button>
+<dialog id="my_modal_1" class="menu-bar modal pointer-events-auto pointer-cursor">
+  <div class="modal-box bg-blue-50">
+     <h5 class="font-bold  text-center text-2xl mb-6">Select Process</h5>
+   <div class="flex items-center">
+
+     <label for="process" class='flex text-lg font-semibold pr-2'>Process:</label> 
+     <select class='inline-flex select select-info select-md w-24 mb-1 bg-blue-50 shadow-md'  id="process" bind:value={selectedProcess}>
+       {#each processes as process}
+         <option value={process}>{process}</option>
+       {/each}
+     </select>
+   </div>
+    <div class="modal-buttons flex w-48 gap-2 pt-4 pl-20 mb-2">
+      <button class='btn   btn-accent text-gray-900' on:click={confirm}>Confirm</button>
+      <button class='btn btn-outline'  on:click={() => dispatch("cancelAdd")}>Cancel</button>
+       <button class='btn btn-outline' on:click={()=> $processModalActive = false} >Close</button>
     </div>
+   
   </div>
-</div>
+
+</dialog>
 
 <style>
-  .modal {
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-  }
+.modal {
+  z-index:1;
+  opacity:1;;
+}
+.modal-box {
+  z-index:2;
+}
 
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
-  }
 </style>
