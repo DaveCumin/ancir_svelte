@@ -95,48 +95,101 @@
   }
 </script>
 
-<div>
-  <div>GENERATE SIMULATED DATA</div>
-  <div>
-    <label for="val">Days:</label>
-    <input type="number" id="val" bind:value={Ndays} />
-    <Slider min={1} max={100} bind:value={Ndays} />
+<!-- <dialog
+  id="my_modal_1"
+  class="menu-bar modal pointer-events-auto pointer-cursor"
+>
+  <div class="modal-box bg-blue-50">
+    <h5 class="font-bold text-center text-2xl mb-6">Select Process</h5>
+    <div class="flex items-center">
+      <label for="process" class="flex text-lg font-semibold pr-2"
+        >Process:</label
+      >
+      <select
+        class="inline-flex select select-info select-md w-24 mb-1 bg-blue-50 shadow-md"
+        id="process"
+        bind:value={selectedProcess}
+      >
+        {#each processes as process}
+          <option value={process}>{process}</option>
+        {/each}
+      </select>
+    </div>
+    <div class="modal-buttons flex w-48 gap-2 pt-4 pl-20 mb-2">
+      <button class="btn btn-accent text-gray-900" on:click={confirm}
+        >Confirm</button
+      >
+      <button class="btn btn-outline" on:click={() => dispatch("cancelAdd")}
+        >Cancel</button
+      >
+      <button
+        class="btn btn-outline"
+        on:click={() => ($processModalActive = false)}>Close</button
+      >
+    </div>
   </div>
-  <div>
-    <label for="val">Sampling period (minutes):</label>
-    <input type="number" id="val" bind:value={fs_min} />
-    <Slider min={1} max={100} bind:value={fs_min} />
-  </div>
-  <div>
-    <label for="val">Start time:</label>
-    <input type="datetime-local" name="start" bind:value={start} />
-  </div>
-  <hr />
-  <hr />
-  {#each Array.from({ length: N_simulated }) as _, i}
-    <div>value{i}:</div>
-    <button class="removeSimDataButton" on:click={() => removeSimData(i)}>
-      🗑️ <!-- Trash bin symbol -->
-    </button>
+</dialog> -->
+
+{#if $menuModalActive}
+<dialog
+  id="modal_simulated_data"
+  class="menu-bar modal pointer-events-auto pointer-cursor"
+>
+  <div class="modal-box bg-blue-50">
+    <h5 class="font-bold text-center text-2xl mb-6">
+      GENERATE SIMULATED DATA</h5>
     <div>
-      <div>
-        <label for="val">Rhythm period (hours):</label>
-        <input type="number" id="val" bind:value={periods[i]} />
-        <Slider min={21} max={26} step="0.1" bind:value={periods[i]} />
-      </div>
-      <div>
-        <label for="val">Max values:</label>
-        <input type="number" id="val" bind:value={maxheights[i]} />
-        <Slider min={1} max={100} bind:value={maxheights[i]} />
-      </div>
+      <label class="flex text-lg font-semibold pr-2" for="val">Days:</label>
+      <input type="number" id="val" bind:value={Ndays} />
+      <Slider min={1} max={100} bind:value={Ndays} />
+    </div>
+    <div>
+      <label class="flex text-lg font-semibold pr-2" for="val">Sampling period (minutes):</label>
+      <input type="number" id="val" bind:value={fs_min} />
+      <Slider min={1} max={100} bind:value={fs_min} />
+    </div>
+    <div>
+      <label class="flex text-lg font-semibold pr-2" for="val">Start time:</label>
+      <input type="datetime-local" name="start" bind:value={start} />
     </div>
     <hr />
-  {/each}
-  <button class="addSimDataButton" on:click={() => addSimData()}>
-    ➕ <!-- Plus sign symbol -->
-  </button>
-  <button
-    on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
-    >Generate</button
-  >
-</div>
+    <hr />
+    {#each Array.from({ length: N_simulated }) as _, i}
+      <div>value{i}:</div>
+      <button class="btn btn-accent text-gray-900"   on:click={() => removeSimData(i)}>
+        🗑️ <!-- Trash bin symbol -->
+      </button>
+      <div>
+        <div>
+          <label class="flex text-lg font-semibold pr-2" for="val">Rhythm period (hours):</label>
+          <input type="number" id="val" bind:value={periods[i]} />
+          <Slider min={21} max={26} step="0.1" bind:value={periods[i]} />
+        </div>
+        <div>
+          <label class="flex text-lg font-semibold pr-2" for="val">Max values:</label>
+          <input type="number" id="val" bind:value={maxheights[i]} />
+          <Slider min={1} max={100} bind:value={maxheights[i]} />
+        </div>
+      </div>
+      <hr />
+    {/each}
+    <button class="addSimDataButton" on:click={() => addSimData()}>
+      ➕ <!-- Plus sign symbol -->
+    </button>
+    <button
+      on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
+      >Generate</button
+    >
+    <button on:click={ ()=> $menuModalActive = false}>Close</button>
+  </div>
+</dialog>
+{/if }
+<style>
+    .modal {
+    z-index: 1;
+    opacity: 1;
+  }
+  .modal-box {
+    z-index: 2;
+  }
+</style>

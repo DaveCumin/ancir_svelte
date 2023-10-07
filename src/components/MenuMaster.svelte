@@ -102,33 +102,12 @@
   </ul>
 </nav>
 
-{#if $menuModalActive}
+ <GenerateSimulated />
+<!-- {#if $menuModalActive}
   <div class="modal-container">
     <div class="modal">
       <GenerateSimulated />
       <button on:click={closeModal}>Close</button>
     </div>
   </div>
-{/if}
-
-<style>
-  .modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-  }
-
-  .modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    padding: 20px;
-    z-index: 1000;
-  }
-</style>
+{/if} -->
