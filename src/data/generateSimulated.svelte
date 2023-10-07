@@ -142,10 +142,11 @@
       ➕ <!-- Plus sign symbol -->
     </button>
     <button
+     class='btn btn-neutral'
       on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
       >Generate</button
     >
-    <button on:click={ ()=> $menuModalActive = false}>Close</button>
+    <button class='btn btn-neutral' on:click={ ()=> $menuModalActive = false}>Close</button>
   </div>
 </dialog>
 {/if }
