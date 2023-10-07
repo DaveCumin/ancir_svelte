@@ -2,7 +2,7 @@
   import { rgbaToHex, rgbaTorgba } from "../utils/Color";
   import { data, graphs, activeGraphTab } from "../store";
   // @ts-ignore
-  import ColorPicker  from 'svelte-awesome-color-picker';
+  import { HsvPicker } from "svelte-color-picker";
 
   import {
     addProcessStep,
@@ -76,18 +76,17 @@
 
     hsvPickerVisibility.slice(srcID, 1);
   }
-  let rgb = 'hsv'
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-  <div class="relative p-2.5 m-1.5 shadow-inner border rounded shadow-xl transition ease-in-out delay-75 bg-indigo-100 hover:bg-indigo-200 duration-200 ">
-    <div class="flex">
-      <!-- <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>🗑️</button> -->
-    </div>
+  <div class="data">
+    <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>
+      🗑️ <!-- Trash bin symbol -->
+    </button>
     <!-- TABLE -->
-       <div class="flex">
-      <label class="label font-semibold min-w-[130px]" for="dattable">Table:</label>
-      <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md mb-4'   bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
+    <div class="field">
+      <label for="dattable">Table:</label>
+      <select bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}
             >{d.displayName}</option
@@ -97,10 +96,12 @@
     </div>
 
     <!-- x field -->
-    <div class="flex items-center  justify-between shrink-0  min-w-[280px]">
-      <div class='flex '>
-      <label class='label font-semibold' for="dattable">X-values (time):</label>
-      <select class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md' bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}>
+    <div class="field">
+      <label for="dattable">X-values (time):</label>
+      <select
+        id={"dattablex" + i}
+        bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}
+      >
         {#each getFieldNames(source) as key}
           <option value={key}
             >{$data[$data.findIndex((d) => d.id === source.tableID)].data[key]
@@ -109,7 +110,7 @@
         {/each}
       </select>
 
-      <div class="">
+      <div class="process">
         {#each source.x.processSteps as processStep, index}
           <div class="process-step" id={"" + index}>
             <svelte:component
@@ -129,29 +130,21 @@
           </div>
         {/each}
       </div>
-    </div>
 
       <!-- ADD PROCESS-->
-
-
       <button
-         class="btn btn-xs btn-neutral shadow-lg items-center"
+        class="addProcessButton"
         on:click={() => addProcessStep("graph", "x", i)}
       >
-                      <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
-</svg>
+        ➕ <!-- Plus sign symbol -->
       </button>
-     </div>
-     
+    </div>
 
     <!-- y field -->
-      <div class="flex min-w-[280px] ">
-      <label class='label font-semibold  min-w-[130px]' for="dattable">Y-values:</label>
+    <div class="field">
+      <label for="dattable">Y-values:</label>
       <select
-      class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md'
-
-        id={"dattable" + i}
+        id={"dattabley" + i}
         bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
       >
         {#each getFieldNames(source) as key}
@@ -161,12 +154,10 @@
           >
         {/each}
       </select>
-  </div>
-   <div class="flex items-center justify-between">
+
       <div class="process">
         {#each source.y.processSteps as processStep, index}
-          <div class="flex flex-col">
-
+          <div class="process-step">
             <svelte:component
               this={componentMap[processStep.process].component}
               dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
@@ -185,68 +176,68 @@
         {/each}
       </div>
 
-
-  <!-- ADD PROCESS-->
-
-     
-
-  <button
-    class="btn btn-xs btn-neutral shadow-lg items-center"
-    on:click={() => addProcessStep("graph", "y", i)}
-  >
-         <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"></path>
-</svg>
-  </button>
-
-</div>
-  <!-- HSV PIRCKER NEW -->
-    <div class='flex w-12'>
-        <ColorPicker label={'Colour'}
-            on:colorChange={colorCallback}
-            bind:rgb={$graphs[$activeGraphTab].sourceData[i].col}
-          />
+      <!-- ADD PROCESS-->
+      <button
+        class="addProcessButton"
+        on:click={() => addProcessStep("graph", "y", i)}
+      >
+        ➕ <!-- Plus sign symbol -->
+      </button>
     </div>
-  
+
+    <!-- colour-->
+    <div>
+      <button
+        on:click={() => toggleHsvPicker(i)}
+        style="background-color: {rgbaTorgba(
+          $graphs[$activeGraphTab].sourceData[i].col
+        )};"
+      >
+        Colour
+      </button>
+    </div>
+    {#if hsvPickerVisibility[i]}
+      <!-- HSV Picker component for this item -->
+      <div class="modal">
+        <div class="modal-content">
+          <HsvPicker
+            on:colorChange={(rgba) => colorCallback(rgba, i)}
+            startColor={rgbaToHex($graphs[$activeGraphTab].sourceData[i].col)}
+          />
+
+          <div class="modal-buttons">
+            <button on:click={() => setHsvPicker(i)}>Done</button>
+          </div>
+        </div>
+      </div>
+    {/if}
   </div>
-
-
 {/each}
 
 <!-- ADD DATA-->
-<button class="ml-4 my-2 btn btn-info btn-xs" on:click={() => addDataToGraph()}>
-➕ Data
+<button class="addProcessButton" on:click={() => addDataToGraph()}>
+  + Data
 </button>
 
 <style>
-
-  :global(.main-container ){
-    height: 450px;
-  }
-
-  :global(.color) {
-    color:blue;
-    background-color: green;
-  }
   /* Style for each data container */
   .data {
-    /* background-color: #f9f9f9;
+    background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     margin: 10px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s, transform 0.3s;
-    position: relative; */
+    position: relative;
   }
 
   /* Style for fields and their buttons */
   .field {
-    /* display: flow;
+    display: flow;
     align-items: center;
-    margin: 10px 0; */
-    /* flex-wrap: wrap; */
-     /* Allow content to wrap to the next line */
+    margin: 10px 0;
+    flex-wrap: wrap; /* Allow content to wrap to the next line */
   }
 
   .process {
@@ -298,12 +289,23 @@
     color: #0056b3; /* Darker blue on hover */
   }
 
-.modal {
-  z-index:1;
-  opacity:1;;
-}
-.modal-box {
-  z-index:2;
-}
+  .modal {
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0); /* Black w/ opacity */
+  }
 
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% 72%;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 240px;
+  }
 </style>

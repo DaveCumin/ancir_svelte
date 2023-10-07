@@ -31,7 +31,7 @@
     let xVals;
     let yVals;
 
-    $graphs[$activeGraphTab].sourceData.forEach((plotData, index) => {
+    $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
       const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
       if (plotData.x.processedData.length > 0) {
         //check for processed graph data
@@ -60,28 +60,31 @@
         }
       }
 
-      xScale = scaleLinear().domain([0, 20]).range([0, innerWidth]);
-      yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
-
       xValsToPlot.push(xVals);
       yValsToPlot.push(yVals);
     });
+
+    xScale = scaleLinear().domain([0, 20]).range([0, innerWidth]);
+    yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
   }
 </script>
 
 <div class="actigramGraph" style="overflow:auto;">
+  {innerHeight} <br />
+  {xValsToPlot}<br />
+  {yValsToPlot}<br />
   <svg {width} height={totalHeight} style="border: 1px solid #000;">
     <g transform={`translate(${margin.left},${margin.right})`}>
-      {#each yValsToPlot as ys, ysi}
+      {#each yValsToPlot as ys, sourceI}
         {#each ys as y, yi}
           <circle
             use:tooltip
-            cx={xScale(xValsToPlot[ysi][yi])}
+            cx={xScale(xValsToPlot[sourceI][yi])}
             cy={yScale(y)}
             r="10"
             stroke="black"
             stroke-width="3"
-            fill={rgbaTorgba($graphs[$activeGraphTab].sourceData[ysi].col)}
+            fill={rgbaTorgba($graphs[$activeGraphTab].sourceData[sourceI].col)}
           />
         {/each}
       {/each}

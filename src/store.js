@@ -20,14 +20,14 @@ export var data = writable([
         processSteps: [],
         processedData: [],
       },
-      value0: {
+      value90: {
         name: "value0",
         type: "value",
         data: [1, 2, 3],
         processSteps: [],
         processedData: [],
       },
-      value1: {
+      value91: {
         name: "value1",
         type: "value",
         data: [10, 11, 15],
@@ -58,10 +58,10 @@ export var data = writable([
         processSteps: [],
         processedData: [],
       },
-      value0: {
+      value60: {
         name: "value3",
         type: "value",
-        data: [10, 11, 15],
+        data: [10, 11, 16],
         processSteps: [
           {
             process: "limit",
@@ -70,10 +70,10 @@ export var data = writable([
         ],
         processedData: [10, 10, 10],
       },
-      value1: {
+      value61: {
         name: "value4",
         type: "value",
-        data: [5, 6, 7],
+        data: [5, 6, 8],
         processSteps: [],
         processedData: [],
       },
@@ -89,9 +89,9 @@ export var graphs = writable([
     sourceData: [
       {
         tableID: 9,
-        x: { field: "time", processSteps: [], processedData: [] },
+        x: { field: "value91", processSteps: [], processedData: [] },
         y: {
-          field: "value0",
+          field: "value90",
           processSteps: [{ process: "add", parameters: { val: 15 } }],
           processedData: [],
         },
@@ -99,9 +99,9 @@ export var graphs = writable([
       },
       {
         tableID: 6,
-        x: { field: "time", processSteps: [], processedData: [] },
+        x: { field: "value60", processSteps: [], processedData: [] },
         y: {
-          field: "value1",
+          field: "value61",
           processSteps: [{ process: "add", parameters: { val: 5 } }],
           processedData: [],
         },
@@ -116,12 +116,12 @@ export var graphs = writable([
       {
         tableID: 6,
         x: {
-          field: "value0",
+          field: "value60",
           processSteps: [],
           processedData: [],
         },
         y: {
-          field: "value1",
+          field: "value61",
           processSteps: [{ process: "add", parameters: { val: 10 } }],
           processedData: [],
         },

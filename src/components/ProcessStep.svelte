@@ -136,6 +136,7 @@
   }
 
   function findGraphKeys(table, field) {
+    console.log("table, field: " + table + ", " + field);
     const results = [];
 
     for (let i = 0; i < get(graphs).length; i++) {
@@ -245,7 +246,7 @@
       graphs.update((currentData) => {
         // Find the data entry with the specified ID
         const newData = [...currentData];
-
+        console.log("fn, id: " + fieldName + ", " + ID);
         newData[get(activeGraphTab)].sourceData[fieldName][ID].processedData =
           result;
 

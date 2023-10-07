@@ -17,31 +17,43 @@
 {#if $activeGraphTab < 0}
   <h3>Need to add a graph</h3>
 {:else}
-  <nav class=''>
-    <ul class='flex gap-2 items-center  pb-2'>
+  <nav class="">
+    <ul class="flex gap-2 items-center pb-2">
       {#each $graphTabs as tabItem, inx}
         <button
-          type='button'
+          type="button"
           tabindex={inx}
-          class="btn btn-neutral flex items-center gap-2 ml-2 {inx === $activeGraphTab ? "bg-gray-700 text-gray-100 " : "bg-gray-100 text-gray-800 hover:bg-gray-200"} "
-          on:click={() => (changeActiveNav(inx))}
+          class="btn btn-neutral flex items-center gap-2 ml-2 {inx ===
+          $activeGraphTab
+            ? 'bg-gray-700 text-gray-100 '
+            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'} "
+          on:click={() => changeActiveNav(inx)}
           on:keydown={(e) => console.log("here " + e)}
         >
-           {tabItem.name}
-            <button
-              type='button'
-              tabindex={inx}
-              class="delete text-2xl hover:bg-gray-300"
-              on:click={() => deleteTab(inx)}
-              on:keydown={(e) => console.log("here " + e)}
+          {tabItem.name}
+          <button
+            type="button"
+            tabindex={inx}
+            class="delete text-base hover:bg-gray-300"
+            on:click={() => deleteTab(inx)}
+            on:keydown={(e) => console.log("here " + e)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
             >
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-</svg>
-              
-    </button>
-         
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
+        </button>
       {/each}
     </ul>
     <main>
