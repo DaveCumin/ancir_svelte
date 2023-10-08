@@ -38,7 +38,7 @@
      <label for='val' class="label  min-w-[130px]">
        <span class="label-text text-xs">Value:</span>
      </label>
-      <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-24 h-10 mr-3 max-w-xs bg-indigo-50 shadow-md"  />
+      <input type="number" id="val" bind:value={params.val} class="input input-xs input-bordered input-neutral focus:outline-none  w-20  max-w-xs bg-base-100 shadow-md"  />
      <Slider min={1} max={100} bind:value={params.val} />
    </div>
 

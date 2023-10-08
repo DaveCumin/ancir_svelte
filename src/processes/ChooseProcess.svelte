@@ -21,14 +21,14 @@
   id="my_modal_1"
   class="menu-bar modal pointer-events-auto pointer-cursor"
 >
-  <div class="modal-box bg-blue-50">
+  <div class="modal-box bg-base-100">
     <h5 class="font-bold text-center text-2xl mb-6">Select Process</h5>
     <div class="flex items-center">
       <label for="process" class="flex text-lg font-semibold pr-2"
         >Process:</label
       >
       <select
-        class="inline-flex select select-info select-md w-24 mb-1 bg-blue-50 shadow-md"
+        class="inline-flex select select-info select-md w-24 mb-1 bg-base-100 shadow-md"
         id="process"
         bind:value={selectedProcess}
       >

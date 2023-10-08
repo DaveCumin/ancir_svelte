@@ -23,7 +23,7 @@
         <button
           type="button"
           tabindex={inx}
-          class="btn btn-neutral flex items-center gap-2 ml-2 {inx ===
+          class="btn flex items-center gap-2 ml-2 {inx ===
           $activeGraphTab
             ? 'bg-gray-700 text-gray-100 '
             : 'bg-gray-100 text-gray-800 hover:bg-gray-200'} "

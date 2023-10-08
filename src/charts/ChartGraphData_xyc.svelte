@@ -79,16 +79,16 @@
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
-   <div class="relative p-2.5 m-1.5 shadow-inner border rounded shadow-xl transition ease-in-out delay-75 bg-indigo-100 hover:bg-indigo-200 duration-200 ">
+   <div class="relative p-2.5 m-1.5 border border-neutral rounded shadow-sm transition ease-in-out delay-75 bg-base-100 hover:shadow-xl  duration-200 ">
  <div class="flex">
 
    <!-- <button class="removeGraphDataButton" on:click={() => removeGraphData(i)}>🗑️  </button> -->
  </div>
     
     <!-- TABLE -->
-    <div class="flex">
+    <div class="flex ">
       <label class="label font-semibold min-w-[130px]" for="dattable">Table:</label>
-      <select class='inline-flex select select-info w-32 mb-1 bg-blue-50 shadow-md mb-4'    bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
+      <select class='inline-flex select select-xs  select-bordered select-neutral focus:outline-none w-32 h-8  bg-base-100 shadow-md mb-4'    bind:value={$graphs[$activeGraphTab].sourceData[i].tableID}>
         {#each $data as d}
           <option value={d.id} selected={source.tableID === d.id ? true : false}
             >{d.displayName}</option
@@ -99,11 +99,11 @@
 
     <!-- x field -->
         <div class="flex flex-col min-w-[280px]">
-        <div class='flex justify-between items-center'>
+        <div class='flex justify-between items-center '>
 <div class='flex '>
     <label  class='label font-semibold' for="dattable">X-values (time):</label>
     <select
-    class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md'
+    class='inline-flex select select-neutral select-xs select-bordered focus:outline-none h-8 mt-1 w-20  bg-base-100 shadow-md'
       id={"dattablex" + i}
       bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}
     >
@@ -117,7 +117,7 @@
   </div>
         <!-- ADD PROCESS-->
          <button
-         class="btn btn-xs btn-neutral shadow-lg items-center"
+         class="btn btn-xs  shadow-lg items-center"
         on:click={() => addProcessStep("graph", "x", i)}
       >
                       <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -160,7 +160,7 @@
 
             <label class='label font-semibold  min-w-[130px]'  for="dattable">Y-values:</label>
             <select
-             class='inline-flex select select-info w-24 mb-1 bg-blue-50 shadow-md'
+             class='inline-flex select select-neutral select-xs select-bordered focus:outline-none h-8 w-20 mt-1 bg-base-100 shadow-md'
               id={"dattabley" + i}
               bind:value={$graphs[$activeGraphTab].sourceData[i].y.field}
             >
@@ -174,7 +174,7 @@
           </div>
                 <!-- ADD PROCESS-->
       <button
-            class="btn btn-xs btn-neutral shadow-lg items-center"
+            class="btn btn-xs shadow-lg items-center"
         on:click={() => addProcessStep("graph", "y", i)}
       >
         <svg class='w-5 h-5' fill="currentColor" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -306,22 +306,6 @@
     cursor: pointer;
     margin-top: 5px; */
      /* Add margin to separate it from the last "process" */
-  }
-
-  .field:hover {
-    background: white;
-  }
-  /* Style for the buttons on hover */
-  .field:hover .removeProcessButton,
-  .field:hover .addProcessButton {
-    display: inline-block; /* Show buttons on hover */
-  }
-
-  /* Style for the buttons on hover */
-  .removeProcessButton:hover,
-  .addProcessButton:hover {
-    text-decoration: underline;
-    color: #0056b3; /* Darker blue on hover */
   }
 
 

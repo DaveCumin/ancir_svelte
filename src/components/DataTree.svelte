@@ -58,7 +58,7 @@
 {#each $data as datum, i}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="data bg-indigo-100 hover:bg-indigo-200 m-2 border rounded shadow-xl hover:transition-all hover:duration:1000 ease-in-out"
+    class="data bg-base-100  m-2 p-2 border border-neutral rounded shadow-sm hover:shadow-xl"
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="flex justify-start gap-2 items-center">
@@ -70,7 +70,7 @@
         </h5>
       </div>
       <button
-        class="mr-1 px-2 py-1 hover:bg-indigo-200 mb-2"
+        class="mr-1 px-2 py-1 hover:bg-base-200 mb-2"
         on:click={() => removeData(datum.id)}
       >
         🗑️ <!-- Trash bin symbol -->
@@ -81,7 +81,7 @@
       <div class="font-semibold flex justify-between items-center ">
         {datum.data[key].name}
         <button
-          class="btn btn-xs btn-neutral shadow-lg items-center"
+          class="btn btn-xs  shadow-lg items-center"
           on:click={() => addProcessStep("data", datum.id, key)}
         >
           <svg
@@ -118,7 +118,7 @@
           />
 
           <button
-            class="mr-1 px-2 py-1 hover:bg-indigo-200"
+            class="mr-1 px-2 py-1 hover:bg-base-200"
             on:click={() =>
               removeProcessStep("data", datum.id, key, index)}
           >

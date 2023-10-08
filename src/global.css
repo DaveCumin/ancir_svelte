@@ -18,7 +18,7 @@
 }
 
 .splitpanes.modern-theme .splitpanes__pane {
-  background-color: theme(backgroundColor.indigo.50);
+  background-color: hsl(var(--b1));
 }
 /* 
 .splitpanes__splitter {

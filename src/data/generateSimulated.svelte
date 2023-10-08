@@ -100,7 +100,7 @@
   id="modal_simulated_data"
   class="menu-bar modal pointer-events-auto pointer-cursor"
 >
-  <div class="modal-box bg-blue-50">
+  <div class="modal-box bg-base-100">
     <h5 class="font-bold text-center text-2xl mb-6">
       GENERATE SIMULATED DATA</h5>
     <div>
@@ -142,11 +142,11 @@
       ➕ <!-- Plus sign symbol -->
     </button>
     <button
-     class='btn btn-neutral'
+     class='btn '
       on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
       >Generate</button
     >
-    <button class='btn btn-neutral' on:click={ ()=> $menuModalActive = false}>Close</button>
+    <button class='btn ' on:click={ ()=> $menuModalActive = false}>Close</button>
   </div>
 </dialog>
 {/if }

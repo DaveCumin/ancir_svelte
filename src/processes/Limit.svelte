@@ -53,7 +53,7 @@
     <label for='min' class="label  ">
       <span class="label-text text-xs">Min:</span>
     </label>
-     <input type="number" id="min" bind:value={params.min} class="ml-3 input input-bordered input-info max-w-xs w-24 h-10 bg-blue-50 shadow-md mb-1"  />
+     <input type="number" id="min" bind:value={params.min} class="ml-3 input input-xs input-bordered input-neutral focus:outline-none max-w-xs w-20 bg-base-100 shadow-md mb-1"  />
     <div class='ml-3'>
 
       <Slider min={1} max={100} bind:value={params.min} />
@@ -64,7 +64,7 @@
     <label for='max' class="label ">
       <span class="label-text text-xs">Max:</span>
     </label>
-     <input type="number" id="max" bind:value={params.max} class="ml-1 input input-bordered input-info  max-w-xs w-24 h-10 bg-blue-50 shadow-md mb-1"  />
+     <input type="number" id="max" bind:value={params.max} class="ml-1 input input-xs input-bordered input-neutral focus:outline-none  max-w-xs w-20 bg-base-100 shadow-md mb-1"  />
     <div class='ml-1'>
 
       <Slider min={dataMin} max={dataMax} bind:value={params.max} />

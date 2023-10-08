@@ -39,7 +39,7 @@
 <div class=''>
 
   <input
-    class="slider range range-info w-24 h-3"
+    class="slider range range-info range-xs w-20 h-3"
     type="range"
     {min}
     {max}

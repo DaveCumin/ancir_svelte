@@ -63,7 +63,7 @@
       {#each $dataIDsforTables as table, inx}
         <button
           type='button'
-           class="btn btn-neutral btn-sm flex items-center gap-2 ml-2 {inx === $activeTableTab ? "bg-gray-700 text-gray-100 " : "bg-gray-100 text-gray-800 hover:bg-gray-200"} "
+           class="btn  btn-sm flex items-center gap-2 ml-2 {inx === $activeTableTab ? "bg-gray-700 text-gray-100 " : "bg-gray-100 text-gray-800 hover:bg-gray-200"} "
  
           on:click={() => changeActiveNav(inx)}
         >{$data[$data.findIndex((d) => d.id === table)].displayName}
