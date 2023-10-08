@@ -101,7 +101,7 @@
         <div class="flex flex-col min-w-[280px]">
         <div class='flex justify-between items-center '>
 <div class='flex '>
-    <label  class='label font-semibold' for="dattable">X-values (time):</label>
+    <label  class='label font-semibold text-sm' for="dattable">X-values (time):</label>
     <select
     class='inline-flex select select-neutral select-xs select-bordered focus:outline-none h-8 mt-1 w-20  bg-base-100 shadow-md'
       id={"dattablex" + i}
@@ -158,7 +158,7 @@
         <div class='flex justify-between items-center'>
           <div class='flex'>
 
-            <label class='label font-semibold  min-w-[130px]'  for="dattable">Y-values:</label>
+            <label class='label font-semibold  text-sm min-w-[130px]'  for="dattable">Y-values:</label>
             <select
              class='inline-flex select select-neutral select-xs select-bordered focus:outline-none h-8 w-20 mt-1 bg-base-100 shadow-md'
               id={"dattabley" + i}
