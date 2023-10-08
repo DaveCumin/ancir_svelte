@@ -14,13 +14,13 @@
 @tailwind utilities;
 
 .splitpanes__pane {
-  overflow: auto !important;
+  overflow: scroll !important;
 }
 
 .splitpanes.modern-theme .splitpanes__pane {
   background-color: theme(backgroundColor.indigo.50);
 }
-
+/* 
 .splitpanes__splitter {
   width: 5px;
   position: relative;
@@ -53,4 +53,4 @@
   top: -3px;
   bottom: -3px;
   width: 100%;
-}
+} */

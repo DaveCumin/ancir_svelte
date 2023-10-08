@@ -78,36 +78,8 @@
     </div>
 
     {#each Object.keys(datum.data) as key}
-      <div class="font-semibold flex justify-between items-center">
+      <div class="font-semibold flex justify-between items-center ">
         {datum.data[key].name}
-
-        {#if datum.data[key].processSteps.length > 0}
-          <div class="process">
-            {#each datum.data[key].processSteps as processStep, index}
-              <div
-                class="process-step justify-start items-end gap-2"
-                id={"" + index}
-              >
-                <svelte:component
-                  this={componentMap[processStep.process].component}
-                  dataIN={$data[i].data[key].data}
-                  paramsStart={componentMap[processStep.process].startParams}
-                  bind:params={processStep.parameters}
-                  on:update={(event) =>
-                    updateProcessData(event, "data", datum.id, key)}
-                />
-
-                <button
-                  class="mr-1 px-2 py-1 hover:bg-indigo-200"
-                  on:click={() =>
-                    removeProcessStep("data", datum.id, key, index)}
-                >
-                  🗑️ <!-- Trash bin symbol -->
-                </button>
-              </div>
-            {/each}
-          </div>
-        {/if}
         <button
           class="btn btn-xs btn-neutral shadow-lg items-center"
           on:click={() => addProcessStep("data", datum.id, key)}
@@ -129,6 +101,36 @@
           </svg>
         </button>
       </div>
+      {#if datum.data[key].processSteps.length > 0}
+    <div class="flex">
+      {#each datum.data[key].processSteps as processStep, index}
+        <div
+          class="flex justify-start items-end gap-2"
+          id={"" + index}
+        >
+          <svelte:component
+            this={componentMap[processStep.process].component}
+            dataIN={$data[i].data[key].data}
+            paramsStart={componentMap[processStep.process].startParams}
+            bind:params={processStep.parameters}
+            on:update={(event) =>
+              updateProcessData(event, "data", datum.id, key)}
+          />
+
+          <button
+            class="mr-1 px-2 py-1 hover:bg-indigo-200"
+            on:click={() =>
+              removeProcessStep("data", datum.id, key, index)}
+          >
+            🗑️ <!-- Trash bin symbol -->
+          </button>
+        </div>
+      {/each}
+    </div>
+  {/if}
     {/each}
+    <div>
+      
+    </div>
   </div>
 {/each}

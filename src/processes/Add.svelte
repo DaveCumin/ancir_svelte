@@ -34,9 +34,9 @@
 
 {#if typeof dataIN[0] === "number"}
 
-  <div class="form-control flex flex-row  items-center w-full max-w-md">
-     <label for='val' class="label font-semibold  min-w-[130px]">
-       <span class="label-text">Value:</span>
+  <div class="form-control flex justify-left items-center w-full max-w-md ">
+     <label for='val' class="label  min-w-[130px]">
+       <span class="label-text text-xs">Value:</span>
      </label>
       <input type="number" id="val" bind:value={params.val} class="input input-bordered input-info w-24 h-10 mr-3 max-w-xs bg-indigo-50 shadow-md"  />
      <Slider min={1} max={100} bind:value={params.val} />
