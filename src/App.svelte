@@ -6,9 +6,12 @@
   import StatusMaster from "./components/StatusMaster.svelte";
   import MenuMaster from "./components/MenuMaster.svelte";
   import ProcessStep from "./components/ProcessStep.svelte";
+  import { selectedTheme } from "./store";
+
 </script>
 
-<div class='w-full'>
+<div class='w-full' data-theme={$selectedTheme}
+>
 <div class='px-4 py-4 font-semibold text-lg text-blue-900 bg-base-200'>
 
   <MenuMaster />

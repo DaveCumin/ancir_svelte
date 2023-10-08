@@ -4,7 +4,7 @@
 
   import GenerateSimulated from "../data/GenerateSimulated.svelte";
 
-  import { menuModalActive } from "../store";
+  import { menuModalActive, selectedTheme } from "../store";
 
   import { createEventDispatcher } from "svelte"; // Import createEventDispatcher
   const dispatch = createEventDispatcher();
@@ -39,6 +39,39 @@
     });
   });
 
+   const themes = [
+      "light",
+      "dark",
+      "cupcake",
+      "bumblebee",
+      "emerald",
+      "corporate",
+      "synthwave",
+      "retro",
+      "cyberpunk",
+      "valentine",
+      "halloween",
+      "garden",
+      "forest",
+      "aqua",
+      "lofi",
+      "pastel",
+      "fantasy",
+      "wireframe",
+      "black",
+      "luxury",
+      "dracula",
+      "cmyk",
+      "autumn",
+      "business",
+      "acid",
+      "lemonade",
+      "night",
+      "coffee",
+      "winter",
+    ]
+
+    
   // Define your menu items as an array of objects
   const menuItems = [
     {
@@ -73,34 +106,47 @@
     },
   ];
 </script>
+<div class="flex">
+  
+  <nav class="mx-2" id="menu-bar">
+    <ul class="flex flex-row">
+      {#each menuItems as item (item.label)}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <li
+          class="pr-4 cursor-pointer"
+          on:click={() => setActiveMenuItem(item.label)}
+        >
+          {item.label}
+          {#if activeMenuItem === item.label}
+            <ul
+              class="none absolute t-0 l-0 p-2 mt-2 min-w-[100px] cursor-pointer rounded shadow-lg bg-cyan-500 text-white text-sm z-[1000]"
+            >
+              {#each item.subMenu as subItem (subItem.label)}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <li class="py-2" on:click={() => handleItemClick(subItem.label)}>
+                  {subItem.label}
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </li>
+      {/each}
+    </ul>
+  
+  </nav>
 
-<nav class="mx-2" id="menu-bar">
-  <ul class="flex flex-row">
-    {#each menuItems as item (item.label)}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <li
-        class="pr-4 cursor-pointer"
-        on:click={() => setActiveMenuItem(item.label)}
-      >
-        {item.label}
-        {#if activeMenuItem === item.label}
-          <ul
-            class="none absolute t-0 l-0 p-2 mt-2 min-w-[100px] cursor-pointer rounded shadow-lg bg-cyan-500 text-white text-sm z-[1000]"
-          >
-            {#each item.subMenu as subItem (subItem.label)}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-              <li class="py-2" on:click={() => handleItemClick(subItem.label)}>
-                {subItem.label}
-              </li>
-            {/each}
-          </ul>
-        {/if}
-      </li>
-    {/each}
-  </ul>
-</nav>
+  <select class='inline-flex select  select-info  focus:outline-none w-24  bg-base-100 '    
+  bind:value={$selectedTheme}>
+       {#each themes as theme}
+         <option value={theme} 
+           >{theme}</option
+         >
+       {/each}
+     </select>
+</div>
+
 
  <GenerateSimulated />
 <!-- {#if $menuModalActive}

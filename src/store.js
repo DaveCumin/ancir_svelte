@@ -137,3 +137,4 @@ export var activeTableTab = writable(-1);
 
 export var processModalActive = writable(false);
 export var menuModalActive = writable(false);
+export let selectedTheme = writable("light");
