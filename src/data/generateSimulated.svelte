@@ -105,34 +105,34 @@
       GENERATE SIMULATED DATA</h5>
     <div>
       <label class="flex text-lg font-semibold pr-2" for="val">Days:</label>
-      <input type="number" id="val" bind:value={Ndays} />
+      <input  class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md" type="number" id="val" bind:value={Ndays} />
       <Slider min={1} max={100} bind:value={Ndays} />
     </div>
     <div>
       <label class="flex text-lg font-semibold pr-2" for="val">Sampling period (minutes):</label>
-      <input type="number" id="val" bind:value={fs_min} />
+      <input  class="input input-bordered input-neutral focus:outline-noneh-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md" type="number" id="val" bind:value={fs_min} />
       <Slider min={1} max={100} bind:value={fs_min} />
     </div>
     <div>
       <label class="flex text-lg font-semibold pr-2" for="val">Start time:</label>
-      <input type="datetime-local" name="start" bind:value={start} />
+      <input  class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md" type="datetime-local" name="start" bind:value={start} />
     </div>
     <hr />
     <hr />
     {#each Array.from({ length: N_simulated }) as _, i}
       <div>value{i}:</div>
-      <button class="btn btn-accent text-gray-900"   on:click={() => removeSimData(i)}>
+      <button class="btn bg-base-100"   on:click={() => removeSimData(i)}>
         🗑️ <!-- Trash bin symbol -->
       </button>
       <div>
         <div>
           <label class="flex text-lg font-semibold pr-2" for="val">Rhythm period (hours):</label>
-          <input type="number" id="val" bind:value={periods[i]} />
+          <input  class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md" type="number" id="val" bind:value={periods[i]} />
           <Slider min={21} max={26} step="0.1" bind:value={periods[i]} />
         </div>
         <div>
           <label class="flex text-lg font-semibold pr-2" for="val">Max values:</label>
-          <input type="number" id="val" bind:value={maxheights[i]} />
+          <input  class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md" type="number" id="val" bind:value={maxheights[i]} />
           <Slider min={1} max={100} bind:value={maxheights[i]} />
         </div>
       </div>
@@ -142,11 +142,11 @@
       ➕ <!-- Plus sign symbol -->
     </button>
     <button
-     class='btn '
+     class='btn text-base hover:bg-base-300'
       on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
       >Generate</button
     >
-    <button class='btn ' on:click={ ()=> $menuModalActive = false}>Close</button>
+    <button class='btn text-base hover:bg-base-300' on:click={ ()=> $menuModalActive = false}>Close</button>
   </div>
 </dialog>
 {/if }

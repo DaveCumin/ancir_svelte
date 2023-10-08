@@ -23,10 +23,10 @@
         <button
           type="button"
           tabindex={inx}
-          class="btn flex items-center gap-2 ml-2 {inx ===
+          class="btn btn-sm flex items-center gap-2 ml-2 {inx ===
           $activeGraphTab
-            ? 'bg-gray-700 text-gray-100 '
-            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'} "
+            ? 'outline'
+            : ''} "
           on:click={() => changeActiveNav(inx)}
           on:keydown={(e) => console.log("here " + e)}
         >
@@ -64,12 +64,7 @@
 
 <style>
   ul {
-    display: flex;
-    flex-wrap: wrap;
-    padding-left: 0;
-    margin-bottom: 0;
-    list-style: none;
-    border-bottom: 1px solid #dee2e6;
+
   }
 
   span {

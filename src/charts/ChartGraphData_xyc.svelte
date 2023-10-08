@@ -103,7 +103,7 @@
 <div class='flex '>
     <label  class='label font-semibold text-sm' for="dattable">X-values (time):</label>
     <select
-    class='inline-flex select select-neutral select-xs select-bordered focus:outline-none h-8 mt-1 w-20  bg-base-100 shadow-md'
+    class='inline-flex select select-neutral select-xs select-bordered focus:outline-none h-8 mt-1 w-20 ml-4 bg-base-100 shadow-md'
       id={"dattablex" + i}
       bind:value={$graphs[$activeGraphTab].sourceData[i].x.field}
     >

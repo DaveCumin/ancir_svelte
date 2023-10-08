@@ -17,7 +17,7 @@
   <div class='flex pl-4 items-center'>
     <label for="val" class="label font-semibold min-w-[130px]">Width:</label>
     <input
-      class="input input-bordered input-info h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
+      class="input input-bordered input-neutral input-xs focus:outline-none w-20 h-8 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
       type="number"
       id="min"
       bind:value={$graphs[$activeGraphTab].params.width}
@@ -32,7 +32,7 @@
     <div class='flex p-2 pl-4 items-center'>
          <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>  
     <input
-    class="input input-bordered input-info w-24 h-10 mr-2 max-w-xs bg-base-100 shadow-md"
+    class="input input-bordered input-neutral input-xs  focus:outline-none w-20 h-8 mr-2 max-w-xs bg-base-100 shadow-md"
   
       type="number"
       id="min"
@@ -48,7 +48,7 @@
      <div class='flex p-2 pl-4 pb-10 items-center'>
          <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
          <input
-         class="input input-bordered input-info w-24 h-10 mr-2 max-w-xs bg-base-100 shadow-md"
+         class="input input-bordered input-neutral input-xs focus:outline-none w-20 h-8 mr-2 max-w-xs bg-base-100 shadow-md"
       type="number"
       id="min"
       bind:value={$graphs[$activeGraphTab].params.betweenHeight}
