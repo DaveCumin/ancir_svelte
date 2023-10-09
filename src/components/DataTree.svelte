@@ -64,7 +64,7 @@
     <div class="flex justify-start gap-2 items-center">
       <div class="" on:click={() => showDataTable(datum.id)}>
         <h5
-          class="font-bold text-2xl text-gray-700 hover:text-gray-950 font-display mb-2 cursor-pointer"
+          class="font-bold text-2xl text-content hover:bg-info font-display mb-2 cursor-pointer"
         >
           {datum.displayName}
         </h5>
@@ -122,7 +122,7 @@
             on:click={() =>
               removeProcessStep("data", datum.id, key, index)}
           >
-            🗑️ <!-- Trash bin symbol -->
+            {datum.id}{key}{index}🗑️ <!-- Trash bin symbol -->
           </button>
         </div>
       {/each}

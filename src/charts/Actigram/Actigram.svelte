@@ -68,7 +68,7 @@
     yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
   }
 </script>
-
+{#key $data}
 <div class="actigramGraph" style="overflow:auto;">
   {innerHeight} <br />
   {xValsToPlot}<br />
@@ -100,3 +100,4 @@
     </g>
   </svg>
 </div>
+{/key}

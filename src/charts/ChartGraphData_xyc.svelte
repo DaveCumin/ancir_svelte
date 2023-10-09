@@ -76,6 +76,8 @@
 
     hsvPickerVisibility.slice(srcID, 1);
   }
+
+  $: console.log({$data})
 </script>
 
 {#each $graphs[$activeGraphTab].sourceData as source, i}
@@ -143,7 +145,7 @@
               class="removeProcessButton"
               on:click={() => removeProcessStep("graph", "x", i, index)}
             >
-              🗑️ <!-- Trash bin symbol -->
+             🗑️<!-- Trash bin symbol -->
             </button>
           </div>
         {/each}

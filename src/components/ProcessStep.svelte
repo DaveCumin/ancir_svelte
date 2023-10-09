@@ -96,7 +96,9 @@
 
   // Function to remove a process step to a field in any object
   export function removeProcessStep(where, ID, fieldName, index) {
+    console.log('xx',where, ID, fieldName, index, get(data) )
     if (where === "data") {
+      console.log('where===data', where)
       data.update((currentData) => {
         // Find the data entry with the specified ID
         const newData = [...currentData];
@@ -115,6 +117,7 @@
 
     // GRAPH
     if (where === "graph") {
+       console.log('where==graph', where)
       graphs.update((currentData) => {
         const newData = [...currentData];
         // Remove the process step at the specified index
@@ -127,6 +130,7 @@
       });
 
       doProcessSteps(where, ID, fieldName);
+       console.log('doprocess')
     }
   }
 

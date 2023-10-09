@@ -106,10 +106,10 @@
     },
   ];
 </script>
-<div class="flex">
+<div class="flex items-center">
   
   <nav class="mx-2" id="menu-bar">
-    <ul class="flex flex-row">
+    <ul class="flex ">
       {#each menuItems as item (item.label)}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -136,8 +136,9 @@
     </ul>
   
   </nav>
+<div class=flex>
 
-  <select class='inline-flex select  select-info  focus:outline-none w-24  bg-base-100 '    
+  <select class='inline-flex select  select-xs h-9  focus:outline-none w-24  bg-base-100 '    
   bind:value={$selectedTheme}>
        {#each themes as theme}
          <option value={theme} 
@@ -145,6 +146,7 @@
          >
        {/each}
      </select>
+</div>
 </div>
 
 

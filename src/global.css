@@ -20,7 +20,7 @@
 .splitpanes.modern-theme .splitpanes__pane {
   background-color: hsl(var(--b1));
 }
-/* 
+
 .splitpanes__splitter {
   width: 5px;
   position: relative;
@@ -53,4 +53,4 @@
   top: -3px;
   bottom: -3px;
   width: 100%;
-} */
+}
