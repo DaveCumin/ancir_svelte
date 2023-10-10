@@ -122,7 +122,7 @@
             on:click={() =>
               removeProcessStep("data", datum.id, key, index)}
           >
-            {datum.id}{key}{index}🗑️ <!-- Trash bin symbol -->
+            🗑️ <!-- Trash bin symbol -->
           </button>
         </div>
       {/each}
