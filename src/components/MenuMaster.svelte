@@ -39,39 +39,38 @@
     });
   });
 
-   const themes = [
-      "light",
-      "dark",
-      "cupcake",
-      "bumblebee",
-      "emerald",
-      "corporate",
-      "synthwave",
-      "retro",
-      "cyberpunk",
-      "valentine",
-      "halloween",
-      "garden",
-      "forest",
-      "aqua",
-      "lofi",
-      "pastel",
-      "fantasy",
-      "wireframe",
-      "black",
-      "luxury",
-      "dracula",
-      "cmyk",
-      "autumn",
-      "business",
-      "acid",
-      "lemonade",
-      "night",
-      "coffee",
-      "winter",
-    ]
+  const themes = [
+    "light",
+    "dark",
+    "cupcake",
+    "bumblebee",
+    "emerald",
+    "corporate",
+    "synthwave",
+    "retro",
+    "cyberpunk",
+    "valentine",
+    "halloween",
+    "garden",
+    "forest",
+    "aqua",
+    "lofi",
+    "pastel",
+    "fantasy",
+    "wireframe",
+    "black",
+    "luxury",
+    "dracula",
+    "cmyk",
+    "autumn",
+    "business",
+    "acid",
+    "lemonade",
+    "night",
+    "coffee",
+    "winter",
+  ];
 
-    
   // Define your menu items as an array of objects
   const menuItems = [
     {
@@ -106,10 +105,10 @@
     },
   ];
 </script>
+
 <div class="flex items-center">
-  
   <nav class="mx-2" id="menu-bar">
-    <ul class="flex ">
+    <ul class="flex">
       {#each menuItems as item (item.label)}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -125,7 +124,10 @@
               {#each item.subMenu as subItem (subItem.label)}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                <li class="py-2" on:click={() => handleItemClick(subItem.label)}>
+                <li
+                  class="py-2"
+                  on:click={() => handleItemClick(subItem.label)}
+                >
                   {subItem.label}
                 </li>
               {/each}
@@ -134,28 +136,17 @@
         </li>
       {/each}
     </ul>
-  
   </nav>
-<div class=flex>
-
-  <select class='inline-flex select  select-xs h-9  focus:outline-none w-24  bg-base-100 '    
-  bind:value={$selectedTheme}>
-       {#each themes as theme}
-         <option value={theme} 
-           >{theme}</option
-         >
-       {/each}
-     </select>
-</div>
-</div>
-
-
- <GenerateSimulated />
-<!-- {#if $menuModalActive}
-  <div class="modal-container">
-    <div class="modal">
-      <GenerateSimulated />
-      <button on:click={closeModal}>Close</button>
-    </div>
+  <div class="flex">
+    <select
+      class="inline-flex select select-xs h-9 focus:outline-none w-24 bg-base-100"
+      bind:value={$selectedTheme}
+    >
+      {#each themes as theme}
+        <option value={theme}>{theme}</option>
+      {/each}
+    </select>
   </div>
-{/if} -->
+</div>
+
+<GenerateSimulated />
