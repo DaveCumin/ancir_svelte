@@ -17,7 +17,7 @@
 
   function handleItemClick(itemLabel) {
     // You can perform any actions you want here
-    console.log(`Clicked on "${itemLabel}"`);
+    console.log(`Clicked on menu: "${itemLabel}"`);
     activeMenuItem = "";
     if (itemLabel === "Simulate Data") {
       $menuModalActive = true;
