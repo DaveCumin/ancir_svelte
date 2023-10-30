@@ -22,7 +22,7 @@
 }
 
 .splitpanes__splitter {
-  width: 5px;
+  
   position: relative;
   cursor: grab;
 }

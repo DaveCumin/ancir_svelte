@@ -29,7 +29,7 @@
     $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== dataID);
     $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
 
-    //TODO remove any graph data using the data
+    //remove any graph data using the data
     graphs.update((currentGraphs) =>
       currentGraphs.map((graph) => {
         // Use filter to keep only the source data objects with 'tableID' not equal to 'i'
@@ -58,7 +58,7 @@
 {#each $data as datum, i}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="data bg-base-100  m-2 p-2 border border-neutral rounded shadow-sm hover:shadow-xl"
+    class="data bg-base-100 m-2 p-2 border border-neutral rounded shadow-sm hover:shadow-xl"
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="flex justify-start gap-2 items-center">
@@ -78,10 +78,10 @@
     </div>
 
     {#each Object.keys(datum.data) as key}
-      <div class="font-semibold flex justify-between items-center ">
+      <div class="font-semibold flex justify-between items-center">
         {datum.data[key].name}
         <button
-          class="btn btn-xs  shadow-lg items-center"
+          class="btn btn-xs shadow-lg items-center"
           on:click={() => addProcessStep("data", datum.id, key)}
         >
           <svg
@@ -102,35 +102,29 @@
         </button>
       </div>
       {#if datum.data[key].processSteps.length > 0}
-    <div class="flex">
-      {#each datum.data[key].processSteps as processStep, index}
-        <div
-          class="flex justify-start items-end gap-2"
-          id={"" + index}
-        >
-          <svelte:component
-            this={componentMap[processStep.process].component}
-            dataIN={$data[i].data[key].data}
-            paramsStart={componentMap[processStep.process].startParams}
-            bind:params={processStep.parameters}
-            on:update={(event) =>
-              updateProcessData(event, "data", datum.id, key)}
-          />
+        <div class="flex">
+          {#each datum.data[key].processSteps as processStep, index}
+            <div class="flex justify-start items-end gap-2" id={"" + index}>
+              <svelte:component
+                this={componentMap[processStep.process].component}
+                dataIN={$data[i].data[key].data}
+                paramsStart={componentMap[processStep.process].startParams}
+                bind:params={processStep.parameters}
+                on:update={(event) =>
+                  updateProcessData(event, "data", datum.id, key)}
+              />
 
-          <button
-            class="mr-1 px-2 py-1 hover:bg-base-200"
-            on:click={() =>
-              removeProcessStep("data", datum.id, key, index)}
-          >
-            🗑️ <!-- Trash bin symbol -->
-          </button>
+              <button
+                class="mr-1 px-2 py-1 hover:bg-base-200"
+                on:click={() => removeProcessStep("data", datum.id, key, index)}
+              >
+                🗑️ <!-- Trash bin symbol -->
+              </button>
+            </div>
+          {/each}
         </div>
-      {/each}
-    </div>
-  {/if}
+      {/if}
     {/each}
-    <div>
-      
-    </div>
+    <div />
   </div>
 {/each}
