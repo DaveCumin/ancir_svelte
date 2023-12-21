@@ -29,6 +29,7 @@
     "D": "^1.0.0",
     "d3-scale": "^4.0.2",
     "daisyUI": "npm:daisyui@^3.9.2",
+    "esbuild": "^0.19.10",
     "svelte-awesome-color-picker": "^2.4.7",
     "svelte-color-picker": "^1.0.7"
   }

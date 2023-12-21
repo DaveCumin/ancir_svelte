@@ -57,54 +57,64 @@
 {#if $activeTableTab < 0}
   <h3>Need to add a table</h3>
 {:else}
-
-<nav>
-   <ul class='flex gap-2 items-center pb-2'>
-      {#each $dataIDsforTables as table, inx}
-        <button
-          type='button'
-           class="btn  btn-sm flex items-center gap-2 ml-2 {inx === $activeTableTab ? "bg-gray-700 text-gray-100 " : "bg-gray-100 text-gray-800 hover:bg-gray-200"} "
- 
-          on:click={() => changeActiveNav(inx)}
+  <ul class="flex gap-2 items-center pb-2">
+    {#each $dataIDsforTables as table, inx}
+      <button
+        type="button"
+        class="btn btn-sm flex items-center gap-2 ml-2 {inx === $activeTableTab
+          ? 'bg-gray-700 text-gray-100 '
+          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'} "
+        on:click={() => changeActiveNav(inx)}
         >{$data[$data.findIndex((d) => d.id === table)].displayName}
-          <button class='text-base inline-flex hover:bg-gray-500' on:click={() => deleteTab(inx)}>
-      
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-           </button>
+        <button
+          class="text-base inline-flex hover:bg-gray-500"
+          on:click={() => deleteTab(inx)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </button>
+    {/each}
+  </ul>
 
-   </button>
-      {/each}
-    </ul>
-    <main>
-      <table>
-        <thead
-          ><tr>
-            {#each tableHeadings.headings as heading, i}
-              {#if tableHeadings.processed[i]}
-                <th><i>{heading}*</i></th>
+  <main>
+    <table>
+      <thead
+        ><tr>
+          {#each tableHeadings.headings as heading, i}
+            {#if tableHeadings.processed[i]}
+              <th><i>{heading}*</i></th>
+            {:else}
+              <th>{heading}</th>
+            {/if}
+          {/each}
+        </tr></thead
+      >
+      <tbody>
+        {#each tableData[0] as tdr, row}
+          <tr>
+            {#each tableData as tdc, col}
+              {#if tableHeadings.processed[col]}
+                <td><i>{tableData[col][row]}</i></td>
               {:else}
-                <th>{heading}</th>
+                <td>{tableData[col][row]}</td>
               {/if}
             {/each}
-          </tr></thead
-        >
-        <tbody>
-          {#each tableData[0] as tdr, row}
-            <tr>
-              {#each tableData as tdc, col}
-                {#if tableHeadings.processed[col]}
-                  <td><i>{tableData[col][row]}</i></td>
-                {:else}
-                  <td>{tableData[col][row]}</td>
-                {/if}
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </main>
-  </nav>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </main>
 {/if}
-

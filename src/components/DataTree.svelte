@@ -1,5 +1,6 @@
 <script>
   // @ts-nocheck
+  import { onMount } from "svelte";
 
   //show the data in tables
   function showDataTable(ID) {
@@ -18,11 +19,24 @@
   import { data, dataIDsforTables, activeTableTab, graphs } from "../store";
 
   import {
+    updateDataProcess,
     addProcessStep,
-    removeProcessStep,
-    updateProcessData,
     componentMap,
   } from "./ProcessStep.svelte";
+
+  function updateProcess(dataID, datakey, processindex, processParams) {
+    let dataIndex = $data.findIndex((d) => d.id === dataID);
+    $data[dataIndex].data[datakey].processSteps[processindex].parameters =
+      processParams;
+    dataID, datakey;
+    updateDataProcess(dataID, datakey);
+  }
+
+  function removeProcess(dataID, datakey, processindex) {
+    let dataIndex = $data.findIndex((d) => d.id === dataID);
+    $data[dataIndex].data[datakey].processSteps.splice(processindex, 1);
+    updateDataProcess(dataID, datakey);
+  }
 
   function removeData(dataID) {
     //remove any tables associated
@@ -80,10 +94,12 @@
     {#each Object.keys(datum.data) as key}
       <div class="font-semibold flex justify-between items-center">
         {datum.data[key].name}
+        <!-- ADD A PROCESS TO THE DATA Column -->
         <button
           class="btn btn-xs shadow-lg items-center"
           on:click={() => addProcessStep("data", datum.id, key)}
         >
+          <!-- plus symbol -->
           <svg
             class="w-5 h-5"
             fill="currentColor"
@@ -101,22 +117,22 @@
           </svg>
         </button>
       </div>
+      <!-- put in the processes, if there are any -->
       {#if datum.data[key].processSteps.length > 0}
-        <div class="flex">
+        <div class="flex-col">
           {#each datum.data[key].processSteps as processStep, index}
             <div class="flex justify-start items-end gap-2" id={"" + index}>
               <svelte:component
                 this={componentMap[processStep.process].component}
                 dataIN={$data[i].data[key].data}
-                paramsStart={componentMap[processStep.process].startParams}
-                bind:params={processStep.parameters}
+                paramsStart={processStep.parameters}
                 on:update={(event) =>
-                  updateProcessData(event, "data", datum.id, key)}
+                  updateProcess(datum.id, key, index, event.detail.params)}
               />
 
               <button
                 class="mr-1 px-2 py-1 hover:bg-base-200"
-                on:click={() => removeProcessStep("data", datum.id, key, index)}
+                on:click={() => removeProcess(datum.id, key, index)}
               >
                 🗑️ <!-- Trash bin symbol -->
               </button>

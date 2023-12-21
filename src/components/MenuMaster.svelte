@@ -24,7 +24,7 @@
     }
   }
 
-  let activeMenuItem = "";
+  let activeMenuItem = null;
 
   function setActiveMenuItem(menuItem) {
     activeMenuItem = menuItem;
@@ -37,12 +37,22 @@
         setActiveMenuItem("");
       }
     });
+    // Add a click event listener to the window
+    window.addEventListener("click", handleWindowClick);
   });
+
+  function handleWindowClick(event) {
+    // Check if the clicked element is outside the menu
+    const menuBar = document.getElementById("menu-bar");
+    if (menuBar && !menuBar.contains(event.target)) {
+      activeMenuItem = null; // Reset the activeMenuItem
+    }
+  }
 
   const themes = [
     "light",
     "dark",
-    "cupcake",
+    /* "cupcake",
     "bumblebee",
     "emerald",
     "corporate",
@@ -68,7 +78,7 @@
     "lemonade",
     "night",
     "coffee",
-    "winter",
+    "winter", */
   ];
 
   // Define your menu items as an array of objects
@@ -119,7 +129,7 @@
           {item.label}
           {#if activeMenuItem === item.label}
             <ul
-              class="none absolute t-0 l-0 p-2 mt-2 min-w-[100px] cursor-pointer rounded shadow-lg bg-cyan-500 text-white text-sm z-[1000]"
+              class="none absolute t-0 l-0 p-2 mt-2 min-w-[100px] cursor-pointer rounded shadow-lg text-sm z-[1000]"
             >
               {#each item.subMenu as subItem (subItem.label)}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->

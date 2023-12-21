@@ -1,20 +1,15 @@
 <script>
-  import ChartGRaphData_xyc from "../ChartGraphData_xyc.svelte";
+  import ChartMaster from "../ChartMaster.svelte";
   import Slider from "../../utils/Slider.svelte";
-  import {
-    data,
-    graphs,
-    activeGraphTab,
-    dataIDsforTables,
-    activeTableTab,
-  } from "../../store";
+  import { graphs, activeGraphTab } from "../../store";
 </script>
 
-<ChartGRaphData_xyc />
+<ChartMaster />
 
-<div class='relative p-2.5 m-1.5 shadow-inner border rounded shadow-xl transition ease-in-out delay-75 bg-base-100 hover:bg-base-200 duration-200 '>
-
-  <div class='flex pl-4 items-center'>
+<div
+  class="relative p-2.5 m-1.5 shadow-inner border rounded shadow-xl transition ease-in-out delay-75 bg-base-100 hover:bg-base-200 duration-200"
+>
+  <div class="flex pl-4 items-center">
     <label for="val" class="label font-semibold min-w-[130px]">Width:</label>
     <input
       class="input input-bordered input-neutral input-xs focus:outline-none w-20 h-8 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
@@ -28,12 +23,12 @@
       bind:value={$graphs[$activeGraphTab].params.width}
     />
   </div>
-  
-    <div class='flex p-2 pl-4 items-center'>
-         <label for="val" class='label font-semibold  min-w-[130px]'>dayHeight:</label>  
+
+  <div class="flex p-2 pl-4 items-center">
+    <label for="val" class="label font-semibold min-w-[130px]">dayHeight:</label
+    >
     <input
-    class="input input-bordered input-neutral input-xs  focus:outline-none w-20 h-8 mr-2 max-w-xs bg-base-100 shadow-md"
-  
+      class="input input-bordered input-neutral input-xs focus:outline-none w-20 h-8 mr-2 max-w-xs bg-base-100 shadow-md"
       type="number"
       id="min"
       bind:value={$graphs[$activeGraphTab].params.dayHeight}
@@ -44,11 +39,13 @@
       bind:value={$graphs[$activeGraphTab].params.dayHeight}
     />
   </div>
-  
-     <div class='flex p-2 pl-4 pb-10 items-center'>
-         <label for="val" class='label font-semibold  min-w-[130px]'>betweenHeight:</label>
-         <input
-         class="input input-bordered input-neutral input-xs focus:outline-none w-20 h-8 mr-2 max-w-xs bg-base-100 shadow-md"
+
+  <div class="flex p-2 pl-4 pb-10 items-center">
+    <label for="val" class="label font-semibold min-w-[130px]"
+      >betweenHeight:</label
+    >
+    <input
+      class="input input-bordered input-neutral input-xs focus:outline-none w-20 h-8 mr-2 max-w-xs bg-base-100 shadow-md"
       type="number"
       id="min"
       bind:value={$graphs[$activeGraphTab].params.betweenHeight}

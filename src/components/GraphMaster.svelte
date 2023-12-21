@@ -3,35 +3,46 @@
   import { activeGraphTab, graphs } from "../store.js";
   import GraphTabs from "./GraphTabs.svelte";
 
-  $: showGraphDetails = $activeGraphTab >= 0 ? true : false;
-
   //---------------------------------------------------------------------
   // ----- ADD NEW GRAPHS BELOW
   import Actigram from "../charts/Actigram/Actigram.svelte";
   import ActigramControls from "../charts/Actigram/Actigram_controls.svelte";
-  // ----- ALSO ADD TO THE BOTTOM
+
+  import Raw from "../charts/Raw/Raw.svelte";
+  import RawControls from "../charts/Raw/Raw_controls.svelte";
+
+  export const graphMap = {
+    actigram: { graph: Actigram, controls: ActigramControls },
+    raw: { graph: Raw, controls: RawControls },
+  };
   //---------------------------------------------------------------------
 </script>
 
 <Pane size={80}>
   <Splitpanes
-    theme='modern-theme'
-    style="height: 100%"
+    theme="modern-theme"
+    style="height: 100%;"
     pushOtherPanes={false}
     dblClickSplitter={false}
   >
     <Pane>
-      <GraphTabs>
-        {#if $graphs[$activeGraphTab].graph === "actigram"}
-          <Actigram />
+      <div style="margin:1em;">
+        <GraphTabs />
+
+        {#if $graphs[$activeGraphTab].graph in graphMap}
+          <svelte:component
+            this={graphMap[$graphs[$activeGraphTab].graph].graph}
+          />
         {:else}
           {$graphs[$activeGraphTab].graph}
         {/if}
-      </GraphTabs>
+      </div>
     </Pane>
     <Pane size={25}>
-      {#if showGraphDetails && $graphs[$activeGraphTab].graph === "actigram"}
-        <ActigramControls />
+      {#if $graphs[$activeGraphTab].graph in graphMap}
+        <svelte:component
+          this={graphMap[$graphs[$activeGraphTab].graph].controls}
+        />
       {:else}
         {JSON.stringify($graphs[$activeGraphTab].sourceData)}
       {/if}

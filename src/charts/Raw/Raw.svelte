@@ -7,14 +7,11 @@
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
 
-  let days = 3; //Can code this later
   const margin = { top: 20, bottom: 50, left: 50, right: 20 };
 
   $: width = $graphs[$activeGraphTab].params.width;
-  $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
-  $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
-  $: totalHeight = (dayHeight + betweenHeight) * days;
-  $: innerHeight = totalHeight - margin.top - margin.bottom;
+  $: height = $graphs[$activeGraphTab].params.height;
+  $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
   let xValsToPlot = [];
@@ -64,36 +61,40 @@
       yValsToPlot.push(yVals);
     });
 
-    xScale = scaleLinear().domain([0, 20]).range([0, innerWidth]);
-    yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
+    xScale = scaleLinear()
+      .domain([
+        $graphs[$activeGraphTab].params.xDomainMin,
+        $graphs[$activeGraphTab].params.xDomainMax,
+      ])
+      .range([0, innerWidth]);
+    yScale = scaleLinear()
+      .domain([
+        $graphs[$activeGraphTab].params.yDomainMin,
+        $graphs[$activeGraphTab].params.yDomainMax,
+      ])
+      .range([innerHeight, 0]);
   }
 </script>
 
-{#if $graphs[$activeGraphTab].graph === "actigram"}
-  <div class="actigramGraph" style="overflow:auto;">
-    <svg {width} height={totalHeight} style="border: 1px solid #000;">
+{#if $graphs[$activeGraphTab].graph === "raw"}
+  <div class="rawGraph" style="overflow:auto;">
+    <svg {width} {height} style="border: 1px solid #000;">
       <g transform={`translate(${margin.left},${margin.right})`}>
-        {#if yValsToPlot.length > 0}
-          {#each yValsToPlot as ys, sourceI}
-            {#each ys as y, yi}
-              <circle
-                use:tooltip
-                cx={xScale(xValsToPlot[sourceI][yi])}
-                cy={yScale(y)}
-                r="10"
-                stroke="black"
-                stroke-width="3"
-                fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
-                fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
-                  .alpha}
-              />
-            {/each}
+        {#each yValsToPlot as ys, sourceI}
+          {#each ys as y, yi}
+            <circle
+              use:tooltip
+              cx={xScale(xValsToPlot[sourceI][yi])}
+              cy={yScale(y)}
+              r="10"
+              stroke="black"
+              stroke-width="3"
+              fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
+              fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
+                .alpha}
+            />
           {/each}
-        {:else}
-          <text x="50%" y="50%" text-anchor="middle" fill="red">
-            No data available for the selected tab.
-          </text>
-        {/if}
+        {/each}
 
         <!-- axis stuff-->
         <Axis {innerHeight} {margin} scale={xScale} position="bottom" />
@@ -102,12 +103,13 @@
         <text
           style="text-anchor: middle;"
           transform={`translate(-30,${innerHeight / 2}) rotate(-90)     `}
-          >y-axis title</text
+          >{$graphs[$activeGraphTab].params.yAxisLabel}</text
         >
         <text
           style="text-anchor: middle;"
           x={innerWidth / 2}
-          y={innerHeight + 30}>x-axis title</text
+          y={innerHeight + 30}
+          >{$graphs[$activeGraphTab].params.xAxisLabel}</text
         >
       </g>
     </svg>

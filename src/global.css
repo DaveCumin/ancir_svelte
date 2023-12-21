@@ -13,21 +13,29 @@
 @tailwind components;
 @tailwind utilities;
 
-.splitpanes__pane {
-  overflow: scroll !important;
-}
 
 .splitpanes.modern-theme .splitpanes__pane {
   background-color: hsl(var(--b1));
+  overflow: auto !important;
 }
 
+
+
 .splitpanes__splitter {
-  
   position: relative;
   cursor: grab;
+  padding: 0.2em;
+  opacity: 0.6;
 }
+.splitpanes--vertical>.splitpanes__splitter {
+  cursor: col-resize;
+}
+.splitpanes--horizontal>.splitpanes__splitter {
+  cursor: row-resize;
+}
+
 .splitpanes.modern-theme .splitpanes__splitter {
-  background-color: theme(backgroundColor.indigo.200);
+  background-color: theme(backgroundColor.base-200);
   position: relative;
 }
 
@@ -37,9 +45,12 @@
   left: 0;
   top: 0;
   transition: opacity 0.4s;
-  background-color: theme(backgroundColor.indigo.200);
+  background-color: theme(backgroundColor.base-300);
   opacity: 0;
   z-index: 1;
+}
+.splitpanes__splitter:hover {
+  opacity: 1;
 }
 .splitpanes__splitter:hover:before {
   opacity: 1;

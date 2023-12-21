@@ -25,10 +25,9 @@
           tabindex={inx}
           class="btn btn-sm flex items-center gap-2 ml-2 {inx ===
           $activeGraphTab
-            ? 'outline'
-            : ''} "
+            ? 'bg-gray-700 text-gray-100 '
+            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'} "
           on:click={() => changeActiveNav(inx)}
-          on:keydown={(e) => console.log("here " + e)}
         >
           {tabItem.name}
           <button
@@ -36,7 +35,6 @@
             tabindex={inx}
             class="delete text-base hover:bg-gray-300"
             on:click={() => deleteTab(inx)}
-            on:keydown={(e) => console.log("here " + e)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -63,42 +61,6 @@
 {/if}
 
 <style>
-  ul {
-
-  }
-
-  span {
-    /* border: 1px solid transparent;
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-    display: block;
-    padding: 0.5rem 1rem;
-    cursor: pointer; */
-  }
-
-  span:hover {
-    /* border-color: #e9ecef #e9ecef #dee2e6; */
-  }
-  .delete {
-    /* position: absolute;
-    right: 3px;
-    top: 5px;
-    color: #a9a9a9;
-    float: right;
-    margin-top: -3px;
-    margin-right: 12px;
-    padding: 2px 4px;
-    width: 20px;
-    height: 20px;
-    opacity: 0.6;
-    border: 0;
-    border-top: 3px solid transparent;
-    border-radius: 3px; */
-  }
-  .delete:hover {
-    /* color: red; */
-  }
-
   .tab {
     position: relative;
     padding: 0px 28px 0px 20px;

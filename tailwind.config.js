@@ -11,10 +11,8 @@ export default {
     require("@tailwindcss/typography"),
   ],
   daisyui: {
-    themes: [
-      "light",
-      "dark",
-      "cupcake",
+    themes: ["light", "dark"],
+    /* "cupcake",
       "bumblebee",
       "emerald",
       "corporate",
@@ -41,6 +39,6 @@ export default {
       "night",
       "coffee",
       "winter",
-    ],
+    ] ,*/
   },
 };

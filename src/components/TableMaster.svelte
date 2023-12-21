@@ -8,7 +8,7 @@
 
 <Pane>
   <Splitpanes
-       theme="modern-theme"
+    theme="modern-theme"
     style="height: 100%"
     pushOtherPanes={false}
     dblClickSplitter={false}
