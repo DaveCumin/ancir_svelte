@@ -89,21 +89,25 @@ export var graphs = writable([
     sourceData: [
       {
         tableID: 9,
-        x: { field: "value91", processSteps: [], processedData: [] },
-        y: {
-          field: "value90",
-          processSteps: [{ process: "add", parameters: { val: 15 } }],
-          processedData: [16, 17, 18],
+        chartvalues: {
+          x: { field: "value91", processSteps: [], processedData: [] },
+          y: {
+            field: "value90",
+            processSteps: [{ process: "add", parameters: { val: 15 } }],
+            processedData: [16, 17, 18],
+          },
         },
         col: { hex: "#19ff25", alpha: 0.7 },
       },
       {
         tableID: 6,
-        x: { field: "value60", processSteps: [], processedData: [] },
-        y: {
-          field: "value61",
-          processSteps: [{ process: "add", parameters: { val: 5 } }],
-          processedData: [10, 11, 13],
+        chartvalues: {
+          x: { field: "value60", processSteps: [], processedData: [] },
+          y: {
+            field: "value61",
+            processSteps: [{ process: "add", parameters: { val: 5 } }],
+            processedData: [10, 11, 13],
+          },
         },
         col: { hex: "#891211", alpha: 0.6 },
       },
@@ -115,15 +119,17 @@ export var graphs = writable([
     sourceData: [
       {
         tableID: 6,
-        x: {
-          field: "value60",
-          processSteps: [],
-          processedData: [],
-        },
-        y: {
-          field: "value61",
-          processSteps: [{ process: "add", parameters: { val: 10 } }],
-          processedData: [15, 16, 18],
+        chartvalues: {
+          x: {
+            field: "value60",
+            processSteps: [],
+            processedData: [],
+          },
+          y: {
+            field: "value61",
+            processSteps: [{ process: "add", parameters: { val: 10 } }],
+            processedData: [15, 16, 18],
+          },
         },
         col: { hex: "#3469ff", alpha: 1 },
       },
@@ -144,6 +150,18 @@ export var graphs = writable([
 export var dataIDsforTables = writable([]);
 export var activeTableTab = writable(-1);
 
-export var processModalActive = writable(false);
 export var menuModalActive = writable(false);
+export var contextMenu = writable({
+  labels: ["test", "test2"],
+  funcs: [
+    function a() {
+      console.log("a");
+    },
+    function b() {
+      console.log("b");
+      console.log("C");
+    },
+  ],
+});
+
 export let selectedTheme = writable("light");

@@ -7,17 +7,18 @@
   import MenuMaster from "./components/MenuMaster.svelte";
   import ProcessStep from "./components/ProcessStep.svelte";
   import { selectedTheme } from "./store";
+  import ContextMenu from "./utils/ContextMenu.svelte";
 </script>
 
-<div class="w-full h-full" data-theme={$selectedTheme}>
-  <div class="px-4 py-4 font-semibold text-lg text-blue-900 bg-base-200">
+<div data-theme={$selectedTheme}>
+  <div>
     <MenuMaster />
   </div>
 
   <Splitpanes
     theme="modern-theme"
     horizontal
-    style="height: calc(100vh - 10px - 3em); width: calc(100vw - 15px);"
+    style="height: calc(100vh - 3em); width: calc(100vw - 15px);"
     pushOtherPanes={false}
   >
     <Pane minSize={30}>
@@ -25,10 +26,14 @@
         theme="modern-theme"
         style="height: 100%;"
         pushOtherPanes={false}
-        dblClickSplitter={false}
+        dblClickSplitter={true}
       >
         <Pane size={25}>
-          <h1 class="mx-2 mt-4 mb-6 px-2 text-3xl">Data</h1>
+          <h1
+            style="min-width: 200px; padding: 6px 6px 0px 6px; font-weight:bold; font-size: 1.4em; text-decoration: underline;"
+          >
+            Data Tables
+          </h1>
           <DataTree />
         </Pane>
         <Pane>
@@ -45,10 +50,12 @@
         </Pane>
       </Splitpanes>
     </Pane>
-    <Pane size={8}>
+    <Pane size={10}>
       <StatusMaster />
     </Pane>
   </Splitpanes>
 
   <ProcessStep />
 </div>
+
+<ContextMenu />

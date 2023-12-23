@@ -28,7 +28,8 @@
     <Pane>
       <div style="margin:1em;">
         <GraphTabs />
-
+      </div>
+      <div>
         {#if $graphs[$activeGraphTab].graph in graphMap}
           <svelte:component
             this={graphMap[$graphs[$activeGraphTab].graph].graph}
@@ -38,7 +39,7 @@
         {/if}
       </div>
     </Pane>
-    <Pane size={25}>
+    <Pane size={30}>
       {#if $graphs[$activeGraphTab].graph in graphMap}
         <svelte:component
           this={graphMap[$graphs[$activeGraphTab].graph].controls}

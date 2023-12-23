@@ -33,30 +33,36 @@
 
     $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
       const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
-      if (plotData.x.processedData.length > 0) {
+      if (plotData.chartvalues.x.processedData.length > 0) {
         //check for processed graph data
-        xVals = plotData.x.processedData;
+        xVals = plotData.chartvalues.x.processedData;
       } else {
         if (
           //check for processed data
-          $data[theDataIndex].data[plotData.x.field].processedData.length > 0
+          $data[theDataIndex].data[plotData.chartvalues.x.field].processedData
+            .length > 0
         ) {
-          xVals = $data[theDataIndex].data[plotData.x.field].processedData;
+          xVals =
+            $data[theDataIndex].data[plotData.chartvalues.x.field]
+              .processedData;
         } else {
-          xVals = $data[theDataIndex].data[plotData.x.field].data;
+          xVals = $data[theDataIndex].data[plotData.chartvalues.x.field].data;
         }
       }
 
-      if (plotData.y.processedData.length > 0) {
+      if (plotData.chartvalues.y.processedData.length > 0) {
         //check for processed graph data
-        yVals = plotData.y.processedData;
+        yVals = plotData.chartvalues.y.processedData;
       } else {
         if (
-          $data[theDataIndex].data[plotData.y.field].processedData.length > 0
+          $data[theDataIndex].data[plotData.chartvalues.y.field].processedData
+            .length > 0
         ) {
-          yVals = $data[theDataIndex].data[plotData.y.field].processedData;
+          yVals =
+            $data[theDataIndex].data[plotData.chartvalues.y.field]
+              .processedData;
         } else {
-          yVals = $data[theDataIndex].data[plotData.y.field].data;
+          yVals = $data[theDataIndex].data[plotData.chartvalues.y.field].data;
         }
       }
 
