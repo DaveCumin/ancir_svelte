@@ -11,6 +11,11 @@
     updateGraphProcess,
   } from "../components/ProcessStep.svelte";
 
+  import { graphMap } from "../components/GraphMaster.svelte";
+
+  $: prototypechartvalues =
+    graphMap[$graphs[$activeGraphTab].graph].prototypechartvalues;
+
   function removeProcess(sourceID, xy, processindex) {
     $graphs[$activeGraphTab].sourceData[sourceID].chartvalues[
       xy
@@ -26,20 +31,28 @@
 
   function addDataToGraph() {
     //TODO: make this generic / selectable to initialise
+    // use graphMap prototypechartvalues
+    console.log(graphMap);
+    console.log(prototypechartvalues);
+
+    let chartvalues = {};
+
+    // Iterate over the keys of the original object
+    Object.keys(prototypechartvalues).forEach((key) => {
+      // Create a new object structure for each key
+      chartvalues[key] = {
+        field: "",
+        processSteps: [],
+        processedData: [],
+      };
+    });
+
+    console.log(chartvalues);
+
     $graphs[$activeGraphTab].sourceData.push({
       tableID: 9,
-      chartvalues: {
-        x: {
-          field: "value90",
-          processSteps: [],
-          processedData: [],
-        },
-        y: {
-          field: "value91",
-          processSteps: [],
-          processedData: [],
-        },
-      },
+      name: "data name",
+      chartvalues: chartvalues,
       col: { hex: "#78322e", alpha: 0.5 },
     });
     $graphs = $graphs;
@@ -53,6 +66,7 @@
   }
 
   function removeGraphData(srcID) {
+    console.log(srcID);
     graphs.update((currentData) => {
       const newData = [...currentData];
       const currentGraphID = newData[$activeGraphTab].id;
@@ -70,20 +84,37 @@
     });
   }
 
-  function createContext(where, id, fieldName) {
+  function createProcessContext(where, id, fieldName) {
     $contextMenu.labels = Object.keys(componentMap);
     for (let i = 0; i < $contextMenu.labels.length; i++) {
       $contextMenu.funcs[i] = () =>
         addProcess($contextMenu.labels[i], where, id, fieldName);
     }
   }
+
+  function getData(source, key) {
+    if (
+      $data[$data.findIndex((d) => d.id === source.tableID)].data[
+        source.chartvalues[key].field
+      ].type === "time"
+    ) {
+      return $data[$data.findIndex((d) => d.id === source.tableID)].data[
+        source.chartvalues[key].field
+      ].timeData;
+    }
+
+    return $data[$data.findIndex((d) => d.id === source.tableID)].data[
+      source.chartvalues[key].field
+    ].data;
+  }
 </script>
 
+<h1>Graph Data</h1>
 <div class="graphDataTree">
   {#each $graphs[$activeGraphTab].sourceData as source, sourceIndex}
     <details open class="dataTable">
       <summary
-        >{$data.find((entry) => entry.id === source.tableID).displayName}
+        >{source.name}
 
         <div
           class="deleteTable hoverbutton"
@@ -96,6 +127,10 @@
         </div>
       </summary>
 
+      <div class="tableLabel">
+        Table: {$data.find((entry) => entry.id === source.tableID).displayName}
+      </div>
+
       {#each Object.keys(source.chartvalues) as key}
         <details
           open
@@ -105,6 +140,13 @@
         >
           <summary
             >{key}:
+            <span
+              class="addbutton hoverbutton showContextMenu"
+              on:click={(e) => {
+                e.preventDefault();
+                createProcessContext("graph", sourceIndex, key);
+              }}>+</span
+            >
             <span
               ><select
                 class="selectField"
@@ -121,14 +163,7 @@
                 {/each}
               </select></span
             >
-            <span
-              class="addbutton hoverbutton showContextMenu"
-              on:click={(e) => {
-                e.preventDefault();
-                createContext("graph", sourceIndex, key);
-              }}>+</span
-            ></summary
-          >
+          </summary>
           {#each source.chartvalues[key].processSteps as ps, psIndex}
             <details open class="process">
               <summary
@@ -146,8 +181,7 @@
               <div class="processDetails">
                 <svelte:component
                   this={componentMap[ps.process].component}
-                  dataIN={$data[$data.findIndex((d) => d.id === source.tableID)]
-                    .data[source.chartvalues[key].field].data}
+                  dataIN={getData(source, key)}
                   paramsStart={ps.parameters}
                   on:update={(event) => {
                     updateProcess(
@@ -218,6 +252,10 @@
   .dataTable > summary {
     font-size: 1.2em;
     font-weight: bold;
+  }
+
+  .tableLabel {
+    margin: 1em 1em 0.5em;
   }
 
   .field {
@@ -316,6 +354,7 @@
     display: flex;
     align-items: center;
     margin-left: 1em;
+    margin-right: 1em;
   }
   .colourPicker {
     border-radius: 25px;
@@ -334,5 +373,12 @@
     width: calc(100% - 3.5em);
   }
   .selectField {
+    height: 1.5rem;
+    align-self: center;
+    border-radius: 0.5rem;
+    width: 50%;
+    float: right;
+    margin-right: calc(0.5em + 2px);
+    margin-top: -2px;
   }
 </style>

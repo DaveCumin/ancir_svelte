@@ -60,8 +60,7 @@
     width: 40%; /* Adjust the width as needed */
     max-width: 6em;
     float: right;
-    height: 1rem;
-    font-size: 0.75rem;
+    height: 1.1rem;
     border-radius: 0.5rem;
     margin-left: auto;
     align-self: center;
@@ -80,10 +79,11 @@
   }
 
   .sliderLabel {
-    font-size: 0.75rem;
     line-height: 1rem;
-    align-self: center;
     display: flex;
+  }
+  .sliderLabel > span {
+    align-self: center;
   }
   .processItem {
     padding: 5px 0px;

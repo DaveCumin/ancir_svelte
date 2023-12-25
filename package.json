@@ -15,12 +15,10 @@
     "autoprefixer": "^10.4.16",
     "d3-axis": "^3.0.0",
     "d3-selection": "^3.0.0",
-    "daisyui": "^3.9.1",
     "postcss": "^8.4.31",
     "svelte": "^4.0.5",
     "svelte-awesome-color-picker": "^2.4.7",
     "svelte-splitpanes": "^0.8.0",
-    "tailwindcss": "^3.3.3",
     "vite": "^4.4.5"
   },
   "dependencies": {
@@ -30,6 +28,8 @@
     "d3-scale": "^4.0.2",
     "daisyUI": "npm:daisyui@^3.9.2",
     "esbuild": "^0.19.10",
+    "luxon": "^3.4.4",
+    "moment-guess": "^1.2.4",
     "svelte-awesome-color-picker": "^2.4.7",
     "svelte-color-picker": "^1.0.7"
   }

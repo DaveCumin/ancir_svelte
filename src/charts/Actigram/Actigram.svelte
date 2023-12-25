@@ -3,7 +3,6 @@
 
   import { data, graphs, activeGraphTab } from "../../store";
   import { tooltip } from "../../utils/Tooltip/Tooltip";
-  import { rgbaTorgba } from "../../utils/Color";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
 
@@ -31,52 +30,60 @@
     let xVals;
     let yVals;
 
-    $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
-      const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
-      if (plotData.chartvalues.x.processedData.length > 0) {
-        //check for processed graph data
-        xVals = plotData.chartvalues.x.processedData;
-      } else {
-        if (
-          //check for processed data
-          $data[theDataIndex].data[plotData.chartvalues.x.field].processedData
-            .length > 0
-        ) {
-          xVals =
-            $data[theDataIndex].data[plotData.chartvalues.x.field]
-              .processedData;
-        } else {
-          xVals = $data[theDataIndex].data[plotData.chartvalues.x.field].data;
+    if ($graphs[$activeGraphTab].graph === "actigram") {
+      $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
+        const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+        if (plotData.chartvalues.time.field != "") {
+          if (plotData.chartvalues.time.processedData.length > 0) {
+            //check for processed graph data
+            xVals = plotData.chartvalues.time.processedData;
+          } else {
+            if (
+              //check for processed data
+              $data[theDataIndex].data[plotData.chartvalues.time.field]
+                .processedData.length > 0
+            ) {
+              xVals =
+                $data[theDataIndex].data[plotData.chartvalues.time.field]
+                  .processedData;
+            } else {
+              xVals =
+                $data[theDataIndex].data[plotData.chartvalues.time.field].data;
+            }
+          }
         }
-      }
 
-      if (plotData.chartvalues.y.processedData.length > 0) {
-        //check for processed graph data
-        yVals = plotData.chartvalues.y.processedData;
-      } else {
-        if (
-          $data[theDataIndex].data[plotData.chartvalues.y.field].processedData
-            .length > 0
-        ) {
-          yVals =
-            $data[theDataIndex].data[plotData.chartvalues.y.field]
-              .processedData;
-        } else {
-          yVals = $data[theDataIndex].data[plotData.chartvalues.y.field].data;
+        if (plotData.chartvalues.values.field != "") {
+          if (plotData.chartvalues.values.processedData.length > 0) {
+            //check for processed graph data
+            yVals = plotData.chartvalues.values.processedData;
+          } else {
+            if (
+              $data[theDataIndex].data[plotData.chartvalues.values.field]
+                .processedData.length > 0
+            ) {
+              yVals =
+                $data[theDataIndex].data[plotData.chartvalues.values.field]
+                  .processedData;
+            } else {
+              yVals =
+                $data[theDataIndex].data[plotData.chartvalues.values.field]
+                  .data;
+            }
+          }
         }
-      }
+        xValsToPlot.push(xVals);
+        yValsToPlot.push(yVals);
+      });
 
-      xValsToPlot.push(xVals);
-      yValsToPlot.push(yVals);
-    });
-
-    xScale = scaleLinear().domain([0, 20]).range([0, innerWidth]);
-    yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
+      xScale = scaleLinear().domain([0, 20]).range([0, innerWidth]);
+      yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
+    }
   }
 </script>
 
 {#if $graphs[$activeGraphTab].graph === "actigram"}
-  <div class="actigramGraph" style="overflow:auto;">
+  <div class="actigramGraph">
     <svg {width} height={totalHeight} style="border: 1px solid #000;">
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#if yValsToPlot.length > 0}

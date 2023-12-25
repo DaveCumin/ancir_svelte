@@ -18,7 +18,7 @@
   <Splitpanes
     theme="modern-theme"
     horizontal
-    style="height: calc(100vh - 3em); width: calc(100vw - 15px);"
+    style="height: calc(100vh - 3.4em); width: calc(100vw - 1em);"
     pushOtherPanes={false}
   >
     <Pane minSize={30}>
@@ -29,11 +29,6 @@
         dblClickSplitter={true}
       >
         <Pane size={25}>
-          <h1
-            style="min-width: 200px; padding: 6px 6px 0px 6px; font-weight:bold; font-size: 1.4em; text-decoration: underline;"
-          >
-            Data Tables
-          </h1>
           <DataTree />
         </Pane>
         <Pane>

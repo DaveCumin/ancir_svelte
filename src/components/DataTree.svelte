@@ -28,7 +28,6 @@
   }
 
   function updateProcess(dataID, datakey, processindex, processParams) {
-    console.log(JSON.stringify($graphs[0]));
     let dataIndex = $data.findIndex((d) => d.id === dataID);
     $data[dataIndex].data[datakey].processSteps[processindex].parameters =
       processParams;
@@ -79,9 +78,18 @@
         addProcess($contextMenu.labels[i], where, id, fieldName);
     }
   }
+
+  function getData(datum) {
+    if (datum.type === "time") {
+      return datum.timeData;
+    } else {
+      return datum.data;
+    }
+  }
 </script>
 
-<div class="dataTree">
+<h1>Data Tables</h1>
+<div class="dataTree scroll-shadows">
   {#each $data as datum, datumID}
     <details open class="dataTable">
       <summary
@@ -141,7 +149,7 @@
               <div class="processDetails">
                 <svelte:component
                   this={componentMap[ps.process].component}
-                  dataIN={$data[datumID].data[key].data}
+                  dataIN={getData($data[datumID].data[key])}
                   paramsStart={ps.parameters}
                   on:update={(event) =>
                     updateProcess(datum.id, key, psID, event.detail.params)}
@@ -157,9 +165,9 @@
 
 <style>
   .dataTree {
-    width: calc(100% - 12px);
+    width: calc(100% - 6px);
     border-radius: 0;
-    margin-left: 6px;
+    margin-left: 1px;
     min-width: 200px;
   }
 

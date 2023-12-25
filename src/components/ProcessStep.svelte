@@ -2,6 +2,7 @@
   // @ts-nocheck
   import { data, graphs, activeGraphTab } from "../store.js";
   import { get } from "svelte/store";
+  import { makeTimeProcessedData } from "../utils/TimeUtils.js";
 
   //---------------------------------------------------------------------
   // ----- ADD NEW PROCESSING FUNCTIONS BELOW
@@ -21,16 +22,6 @@
   let selectedSettings = null;
 
   export function addProcess(PROCESS, WHEREP, ID, FIELDNAME) {
-    console.log(
-      "running addProcess: " +
-        PROCESS +
-        ", " +
-        WHEREP +
-        ", " +
-        ID +
-        ", " +
-        FIELDNAME
-    );
     // Update your data array with the result
     selectedSettings = {
       process: PROCESS,
@@ -80,10 +71,18 @@
     let field = get(graphs)[graph].sourceData[sourcei].chartvalues[xy].field;
 
     let result;
-    if (get(data)[tableindex].data[field].processedData.length > 0) {
+
+    //If there are processes
+    if (get(data)[tableindex].data[field].processSteps.length > 0) {
       result = get(data)[tableindex].data[field].processedData;
+      //Else, if there are no processes
     } else {
-      result = [].concat(get(data)[tableindex].data[field].data);
+      //deal with time data
+      if (get(data)[tableindex].data[field].type === "time") {
+        result = get(data)[tableindex].data[field].timeData;
+      } else {
+        result = [].concat(get(data)[tableindex].data[field].data);
+      }
     }
 
     // Iterate through the JSON array and execute the processes
@@ -118,9 +117,20 @@
       .processSteps;
 
     // Initial values, from store
-    let result = [].concat(
-      get(data).find((entry) => entry.id === dataID).data[datakey].data
-    );
+    let result = [];
+    if (
+      get(data).find((entry) => entry.id === dataID).data[datakey].type ===
+      "time"
+    ) {
+      result = [].concat(
+        get(data).find((entry) => entry.id === dataID).data[datakey].timeData
+      );
+    } else {
+      result = [].concat(
+        get(data).find((entry) => entry.id === dataID).data[datakey].data
+      );
+    }
+
     // Iterate through the JSON array and execute the processes
     if (processes.length > 0) {
       for (const processObj of processes) {

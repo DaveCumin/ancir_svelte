@@ -28,62 +28,68 @@
     let xVals;
     let yVals;
 
-    $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
-      const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
-      if (plotData.chartvalues.x.processedData.length > 0) {
-        //check for processed graph data
-        xVals = plotData.chartvalues.x.processedData;
-      } else {
-        if (
-          //check for processed data
-          $data[theDataIndex].data[plotData.chartvalues.x.field].processedData
-            .length > 0
-        ) {
-          xVals =
-            $data[theDataIndex].data[plotData.chartvalues.x.field]
-              .processedData;
-        } else {
-          xVals = $data[theDataIndex].data[plotData.chartvalues.x.field].data;
+    if ($graphs[$activeGraphTab].graph === "raw") {
+      $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
+        const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+        if (plotData.chartvalues.x.field != "") {
+          if (plotData.chartvalues.x.processedData.length > 0) {
+            //check for processed graph data
+            xVals = plotData.chartvalues.x.processedData;
+          } else {
+            if (
+              //check for processed data
+              $data[theDataIndex].data[plotData.chartvalues.x.field]
+                .processedData.length > 0
+            ) {
+              xVals =
+                $data[theDataIndex].data[plotData.chartvalues.x.field]
+                  .processedData;
+            } else {
+              xVals =
+                $data[theDataIndex].data[plotData.chartvalues.x.field].data;
+            }
+          }
         }
-      }
-
-      if (plotData.chartvalues.y.processedData.length > 0) {
-        //check for processed graph data
-        yVals = plotData.chartvalues.y.processedData;
-      } else {
-        if (
-          $data[theDataIndex].data[plotData.chartvalues.y.field].processedData
-            .length > 0
-        ) {
-          yVals =
-            $data[theDataIndex].data[plotData.chartvalues.y.field]
-              .processedData;
-        } else {
-          yVals = $data[theDataIndex].data[plotData.chartvalues.y.field].data;
+        if (plotData.chartvalues.y.field != "") {
+          if (plotData.chartvalues.y.processedData.length > 0) {
+            //check for processed graph data
+            yVals = plotData.chartvalues.y.processedData;
+          } else {
+            if (
+              $data[theDataIndex].data[plotData.chartvalues.y.field]
+                .processedData.length > 0
+            ) {
+              yVals =
+                $data[theDataIndex].data[plotData.chartvalues.y.field]
+                  .processedData;
+            } else {
+              yVals =
+                $data[theDataIndex].data[plotData.chartvalues.y.field].data;
+            }
+          }
         }
-      }
+        xValsToPlot.push(xVals);
+        yValsToPlot.push(yVals);
+      });
 
-      xValsToPlot.push(xVals);
-      yValsToPlot.push(yVals);
-    });
-
-    xScale = scaleLinear()
-      .domain([
-        $graphs[$activeGraphTab].params.xDomainMin,
-        $graphs[$activeGraphTab].params.xDomainMax,
-      ])
-      .range([0, innerWidth]);
-    yScale = scaleLinear()
-      .domain([
-        $graphs[$activeGraphTab].params.yDomainMin,
-        $graphs[$activeGraphTab].params.yDomainMax,
-      ])
-      .range([innerHeight, 0]);
+      xScale = scaleLinear()
+        .domain([
+          $graphs[$activeGraphTab].params.xDomainMin,
+          $graphs[$activeGraphTab].params.xDomainMax,
+        ])
+        .range([0, innerWidth]);
+      yScale = scaleLinear()
+        .domain([
+          $graphs[$activeGraphTab].params.yDomainMin,
+          $graphs[$activeGraphTab].params.yDomainMax,
+        ])
+        .range([innerHeight, 0]);
+    }
   }
 </script>
 
 {#if $graphs[$activeGraphTab].graph === "raw"}
-  <div class="rawGraph" style="overflow:auto;">
+  <div class="rawGraph">
     <svg {width} {height} style="border: 1px solid #000;">
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#each yValsToPlot as ys, sourceI}

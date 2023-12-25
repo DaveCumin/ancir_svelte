@@ -58,12 +58,17 @@
 
   onMount(() => {
     const handleClickOutside = (event) => {
-      if (
-        event.srcElement &&
-        event.srcElement.className.includes("dontclose")
-      ) {
-      } else {
+      try {
+        if (
+          event.srcElement &&
+          event.srcElement.className.includes("dontclose")
+        ) {
+        } else {
+          hideAllMenus();
+        }
+      } catch (error) {
         hideAllMenus();
+        //console.log(error)
       }
     };
 
@@ -148,7 +153,6 @@
     list-style-type: none;
   }
   button {
-    font-size: 1rem;
     border: 0px #000 solid;
     color: #222;
     height: 30px;

@@ -10,13 +10,15 @@ export var data = writable([
     datalength: 3,
     data: {
       time: {
-        name: "time",
+        name: "t",
         type: "time",
         data: [
           "10/1/2023, 10:35:00 AM",
           "10/1/2023, 10:40:00 AM",
           "10/1/2023, 10:45:00 AM",
         ],
+        timeFormat: "DD/MM/YYY, hh:mm:ss A",
+        timeData: [0, 0.08333, 0.1666],
         processSteps: [],
         processedData: [],
       },
@@ -55,6 +57,9 @@ export var data = writable([
           "10/2/2023, 11:40:00 AM",
           "10/2/2023, 11:45:00 AM",
         ],
+        timeFormat: "DD/MM/YYY, hh:mm:ss A",
+
+        timeData: [0, 0.08333, 0.1666],
         processSteps: [],
         processedData: [],
       },
@@ -86,12 +91,14 @@ export var activeGraphTab = writable(0);
 export var graphs = writable([
   {
     graph: "actigram",
+    id: 0,
     sourceData: [
       {
         tableID: 9,
+        name: "My first Actigram data here",
         chartvalues: {
-          x: { field: "value91", processSteps: [], processedData: [] },
-          y: {
+          time: { field: "value91", processSteps: [], processedData: [] },
+          values: {
             field: "value90",
             processSteps: [{ process: "add", parameters: { val: 15 } }],
             processedData: [16, 17, 18],
@@ -101,9 +108,10 @@ export var graphs = writable([
       },
       {
         tableID: 6,
+        name: "More data",
         chartvalues: {
-          x: { field: "value60", processSteps: [], processedData: [] },
-          y: {
+          time: { field: "value60", processSteps: [], processedData: [] },
+          values: {
             field: "value61",
             processSteps: [{ process: "add", parameters: { val: 5 } }],
             processedData: [10, 11, 13],
@@ -116,9 +124,12 @@ export var graphs = writable([
   },
   {
     graph: "raw",
+    id: 1,
+    name: "Playing raw",
     sourceData: [
       {
         tableID: 6,
+        name: "test data",
         chartvalues: {
           x: {
             field: "value60",

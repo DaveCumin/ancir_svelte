@@ -34,10 +34,16 @@
   function onPageClick(e) {
     // To make context menu disappear when
     // mouse is clicked outside context menu
-    if (e.srcElement.className.includes("showContextMenu")) {
-      rightClickContextMenu(e, "a", "b", "c");
-    } else {
+
+    try {
+      if (e.srcElement.className.includes("showContextMenu")) {
+        rightClickContextMenu(e, "a", "b", "c");
+      } else {
+        showMenu = false;
+      }
+    } catch (error) {
       showMenu = false;
+      //console.log(error);
     }
   }
 
@@ -56,7 +62,7 @@
 {#if showMenu}
   <nav
     use:getContextMenuDimension
-    style="position: absolute; top:{pos.y}px; left:{pos.x}px; z-index:2;"
+    style="position: absolute; top:{pos.y}px; left:{pos.x}px; z-index:999;"
   >
     <div class="navbar" id="navbar">
       <ul>
@@ -99,7 +105,7 @@
     width: 1fr;
   }
   ul li button {
-    font-size: 1rem;
+    font-size: 0.75rem;
     color: #222;
     width: 100%;
     height: 30px;

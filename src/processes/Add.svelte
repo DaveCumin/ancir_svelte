@@ -34,4 +34,6 @@
 
 {#if typeof dataIN[0] === "number"}
   <Slider min={-20} max={20} bind:value={params.val} label="Add:" />
+{:else}
+  <div>{dataIN[0]}</div>
 {/if}
