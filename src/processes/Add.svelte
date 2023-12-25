@@ -33,17 +33,7 @@
 </script>
 
 {#if typeof dataIN[0] === "number"}
-
-  <div class="form-control flex justify-left items-center w-full max-w-md ">
-     <label for='val' class="label  min-w-[130px]">
-       <span class="label-text text-xs">Value:</span>
-     </label>
-      <input type="number" id="val" bind:value={params.val} class="input input-xs input-bordered input-neutral focus:outline-none  w-20  max-w-xs bg-base-100 shadow-md"  />
-     <Slider min={1} max={100} bind:value={params.val} />
-   </div>
-
-
+  <Slider min={-20} max={20} bind:value={params.val} label="Add:" />
+{:else}
+  <div>{dataIN[0]}</div>
 {/if}
-
-
- 
