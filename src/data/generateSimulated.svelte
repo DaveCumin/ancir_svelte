@@ -43,7 +43,6 @@
       name: "time",
       type: "time",
       data: timeData,
-      timeData = [],
       processSteps: [],
       processedData: [],
     };

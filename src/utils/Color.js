@@ -36,16 +36,3 @@ export function rgbaTorgba(color) {
     "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")"
   );
 }
-
-export function hexToRgb(hex) {
-  // Remove the hash if it exists
-  hex = hex.replace(/^#/, "");
-
-  // Parse the hex value into separate RGB components
-  const bigint = parseInt(hex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-
-  return { r, g, b };
-}

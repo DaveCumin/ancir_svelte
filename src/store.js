@@ -10,15 +10,13 @@ export var data = writable([
     datalength: 3,
     data: {
       time: {
-        name: "t",
+        name: "time",
         type: "time",
         data: [
           "10/1/2023, 10:35:00 AM",
           "10/1/2023, 10:40:00 AM",
           "10/1/2023, 10:45:00 AM",
         ],
-        timeFormat: "DD/MM/YYY, hh:mm:ss A",
-        timeData: [0, 0.08333, 0.1666],
         processSteps: [],
         processedData: [],
       },
@@ -57,9 +55,6 @@ export var data = writable([
           "10/2/2023, 11:40:00 AM",
           "10/2/2023, 11:45:00 AM",
         ],
-        timeFormat: "DD/MM/YYY, hh:mm:ss A",
-
-        timeData: [0, 0.08333, 0.1666],
         processSteps: [],
         processedData: [],
       },
@@ -70,10 +65,10 @@ export var data = writable([
         processSteps: [
           {
             process: "limit",
-            parameters: { min: 11, max: 12 },
+            parameters: { min: 10, max: 10 },
           },
         ],
-        processedData: [11, 11, 12],
+        processedData: [10, 10, 10],
       },
       value61: {
         name: "value4",
@@ -91,88 +86,55 @@ export var activeGraphTab = writable(0);
 export var graphs = writable([
   {
     graph: "actigram",
-    id: 0,
     sourceData: [
       {
         tableID: 9,
-        name: "My first Actigram data here",
-        chartvalues: {
-          time: { field: "value91", processSteps: [], processedData: [] },
-          values: {
-            field: "value90",
-            processSteps: [{ process: "add", parameters: { val: 15 } }],
-            processedData: [16, 17, 18],
-          },
+        x: { field: "value91", processSteps: [], processedData: [] },
+        y: {
+          field: "value90",
+          processSteps: [{ process: "add", parameters: { val: 15 } }],
+          processedData: [],
         },
-        col: { hex: "#19ff25", alpha: 0.7 },
+        col: { r: 24, g: 251, b: 251, a: 1 },
       },
       {
         tableID: 6,
-        name: "More data",
-        chartvalues: {
-          time: { field: "value60", processSteps: [], processedData: [] },
-          values: {
-            field: "value61",
-            processSteps: [{ process: "add", parameters: { val: 5 } }],
-            processedData: [10, 11, 13],
-          },
+        x: { field: "value60", processSteps: [], processedData: [] },
+        y: {
+          field: "value61",
+          processSteps: [{ process: "add", parameters: { val: 5 } }],
+          processedData: [],
         },
-        col: { hex: "#891211", alpha: 0.6 },
+        col: { r: 21, g: 21, b: 251, a: 1 },
       },
     ],
     params: { width: 600, dayHeight: 100, betweenHeight: 5 },
   },
   {
-    graph: "raw",
-    id: 1,
-    name: "Playing raw",
+    graph: "plotXYZ",
     sourceData: [
       {
         tableID: 6,
-        name: "test data",
-        chartvalues: {
-          x: {
-            field: "value60",
-            processSteps: [],
-            processedData: [],
-          },
-          y: {
-            field: "value61",
-            processSteps: [{ process: "add", parameters: { val: 10 } }],
-            processedData: [15, 16, 18],
-          },
+        x: {
+          field: "value60",
+          processSteps: [],
+          processedData: [],
         },
-        col: { hex: "#3469ff", alpha: 1 },
+        y: {
+          field: "value61",
+          processSteps: [{ process: "add", parameters: { val: 10 } }],
+          processedData: [],
+        },
+        col: { r: 251, g: 251, b: 25, a: 1 },
       },
     ],
-    params: {
-      width: 600,
-      height: 200,
-      yDomainMin: 0,
-      yDomainMax: 20,
-      xDomainMin: 0,
-      xDomainMax: 20,
-      yAxisLabel: "y-axis",
-      xAxisLabel: "x-axis title here",
-    },
+    params: { width: 600 },
   },
 ]);
 
 export var dataIDsforTables = writable([]);
 export var activeTableTab = writable(-1);
 
+export var processModalActive = writable(false);
 export var menuModalActive = writable(false);
-export var contextMenu = writable({
-  labels: ["test", "test2"],
-  funcs: [
-    function a() {
-      console.log("a");
-    },
-    function b() {
-      console.log("b");
-      console.log("C");
-    },
-  ],
-});
-
 export let selectedTheme = writable("light");

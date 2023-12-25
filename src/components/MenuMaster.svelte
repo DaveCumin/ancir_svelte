@@ -1,191 +1,152 @@
 <script>
+  // @ts-nocheck
   import { onMount } from "svelte";
 
-  function createMenuItem(displayText, onClick) {
-    return { displayText, onClick, visibleState: false };
+  import GenerateSimulated from "../data/GenerateSimulated.svelte";
+
+  import { menuModalActive, selectedTheme } from "../store";
+
+  import { createEventDispatcher } from "svelte"; // Import createEventDispatcher
+  const dispatch = createEventDispatcher();
+
+  function closeModal() {
+    $menuModalActive = false;
+    // Emit the 'close' event when the modal is closed
+    dispatch("close");
   }
 
-  let menuItems = [
-    {
-      displayText: "Data",
-      items: [
-        createMenuItem("Import Data", () => console.log("Import...")),
-        createMenuItem("Simulate Data", () => console.log("Simulate Data")),
-        { displayText: "--hr" },
-        createMenuItem("Exit", () => console.log("Exit")),
-      ],
-    },
-    {
-      displayText: "Edit",
-      items: [
-        createMenuItem("Insert", () => console.log("Insert...")),
-        createMenuItem("Copy", () => console.log("Copy...")),
-        createMenuItem("Paste", () => console.log("Paste...")),
-      ],
-    },
-    {
-      displayText: "Help",
-      items: [createMenuItem("About", () => console.log("JUST A MENU"))],
-    },
-  ];
-
-  function hideMenus(currentMenuItem) {
-    menuItems.forEach((menuItem) => {
-      if (menuItem !== currentMenuItem && menuItem.visibleState) {
-        menuItem.visibleState = false;
-      }
-    });
-    menuItems = menuItems;
+  function handleItemClick(itemLabel) {
+    // You can perform any actions you want here
+    console.log(`Clicked on menu: "${itemLabel}"`);
+    activeMenuItem = "";
+    if (itemLabel === "Simulate Data") {
+      $menuModalActive = true;
+    }
   }
 
-  function hideAllMenus() {
-    menuItems.forEach((menuItem) => {
-      menuItem.visibleState = false;
-    });
-    menuItems = menuItems;
-  }
+  let activeMenuItem = "";
 
-  function changeOpenMenu(currentMenuItem) {
-    menuItems.forEach((menuItem) => {
-      if (menuItem !== currentMenuItem && menuItem.visibleState) {
-        menuItem.visibleState = false;
-      } else if (menuItem === currentMenuItem) {
-        menuItem.visibleState = true;
-      }
-    });
-    menuItems = menuItems;
+  function setActiveMenuItem(menuItem) {
+    activeMenuItem = menuItem;
   }
 
   onMount(() => {
-    const handleClickOutside = (event) => {
-      try {
-        if (
-          event.srcElement &&
-          event.srcElement.className.includes("dontclose")
-        ) {
-        } else {
-          hideAllMenus();
-        }
-      } catch (error) {
-        hideAllMenus();
-        //console.log(error)
+    document.getElementById("menu-bar").addEventListener("click", (event) => {
+      const menuBar = document.querySelector("#menu-bar");
+      if (!menuBar.contains(event.target)) {
+        setActiveMenuItem("");
       }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-
-    return () => {
-      // Cleanup the event listener on component unmount
-      document.removeEventListener("click", handleClickOutside);
-    };
+    });
   });
+
+  const themes = [
+    "light",
+    "dark",
+    "cupcake",
+    "bumblebee",
+    "emerald",
+    "corporate",
+    "synthwave",
+    "retro",
+    "cyberpunk",
+    "valentine",
+    "halloween",
+    "garden",
+    "forest",
+    "aqua",
+    "lofi",
+    "pastel",
+    "fantasy",
+    "wireframe",
+    "black",
+    "luxury",
+    "dracula",
+    "cmyk",
+    "autumn",
+    "business",
+    "acid",
+    "lemonade",
+    "night",
+    "coffee",
+    "winter",
+  ];
+
+  // Define your menu items as an array of objects
+  const menuItems = [
+    {
+      label: "File",
+      subMenu: [
+        {
+          label: "Import Data",
+        },
+        {
+          label: "Simulate Data",
+        },
+      ],
+    },
+    {
+      label: "Plot",
+      subMenu: [
+        {
+          label: "Raw",
+        },
+        {
+          label: "Actigram",
+        },
+      ],
+    },
+    {
+      label: "About",
+      subMenu: [
+        {
+          label: "About Us",
+        },
+      ],
+    },
+  ];
 </script>
 
-<nav>
-  <div class="applicationmenu">
-    <ul class="topmenu">
-      {#each menuItems as menuItem}
-        <li>
-          <button
-            class="dontclose"
-            on:click={() => {
-              menuItem.visibleState = !menuItem.visibleState;
-              hideMenus(menuItem);
-            }}
-            on:mouseover={() => {
-              if (menuItems.some((item) => item.visibleState)) {
-                changeOpenMenu(menuItem);
-              }
-            }}
-          >
-            {menuItem.displayText}
-          </button>
-          {#if menuItem.visibleState}
-            <ul class="secondmenu dontclose">
-              {#each menuItem.items as item}
-                {#if item.displayText === "--hr"}
-                  <hr />
-                {:else}
-                  <li>
-                    <button
-                      on:click={(e) => {
-                        item.onClick();
-                        hideAllMenus();
-                      }}
-                    >
-                      {item.displayText}
-                    </button>
-                  </li>
-                {/if}
+<div class="flex items-center">
+  <nav class="mx-2" id="menu-bar">
+    <ul class="flex">
+      {#each menuItems as item (item.label)}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <li
+          class="pr-4 cursor-pointer"
+          on:click={() => setActiveMenuItem(item.label)}
+        >
+          {item.label}
+          {#if activeMenuItem === item.label}
+            <ul
+              class="none absolute t-0 l-0 p-2 mt-2 min-w-[100px] cursor-pointer rounded shadow-lg bg-cyan-500 text-white text-sm z-[1000]"
+            >
+              {#each item.subMenu as subItem (subItem.label)}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <li
+                  class="py-2"
+                  on:click={() => handleItemClick(subItem.label)}
+                >
+                  {subItem.label}
+                </li>
               {/each}
             </ul>
           {/if}
         </li>
       {/each}
     </ul>
+  </nav>
+  <div class="flex">
+    <select
+      class="inline-flex select select-xs h-9 focus:outline-none w-24 bg-base-100"
+      bind:value={$selectedTheme}
+    >
+      {#each themes as theme}
+        <option value={theme}>{theme}</option>
+      {/each}
+    </select>
   </div>
-</nav>
+</div>
 
-<style>
-  nav {
-    position: sticky;
-    height: 2em;
-  }
-  .applicationmenu {
-    border: 1px #eee solid;
-    background-color: #fff;
-    height: 2em;
-    z-index: 3;
-    padding: 3px;
-    position: fixed;
-    width: 100%;
-    margin: -8px -8px;
-  }
-  ul {
-    padding: 0px;
-  }
-  ul.topmenu {
-    display: flex;
-    flex-direction: row;
-    margin-top: 0px;
-  }
-  ul.topmenu li {
-    list-style-type: none;
-  }
-  button {
-    border: 0px #000 solid;
-    color: #222;
-    height: 30px;
-    background-color: #fff;
-    padding: 0px 10px;
-  }
-  ul li button:hover {
-    background-color: #eee;
-  }
-  ul li ul.secondmenu {
-    display: flex;
-    align-items: stretch;
-    flex-direction: column;
-    position: absolute; /* with respect to parent */
-    box-shadow: 1px 1px 5px #888888;
-  }
-  ul li ul.secondmenu li button {
-    width: 100%;
-    min-width: 150px;
-    text-align: left;
-  }
-  ul li ul.secondmenu li button span.shortcut {
-    padding-left: 100px;
-    padding-right: 8px;
-    float: right;
-  }
-  ul li button i {
-    padding: 0px 20px 0px 8px;
-  }
-
-  hr {
-    border: none;
-    border-bottom: 1px solid #ccc;
-    margin: 0px 0px;
-  }
-</style>
+<GenerateSimulated />

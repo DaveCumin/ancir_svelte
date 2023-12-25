@@ -23,7 +23,7 @@
 
       case "left":
         axis = axisLeft(scale).tickSizeOuter(0);
-        transform = `translate(0, 0)`;
+        transform = `translate(${margin}, 0)`;
     }
     select(g).call(axis);
   }
