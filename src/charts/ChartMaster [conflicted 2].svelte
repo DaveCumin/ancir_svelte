@@ -40,7 +40,7 @@
     // use graphMap prototypechartvalues
     let chartvalues = {};
 
-    // Iterate over the keys of the original object, make the fields
+    // Iterate over the keys of the original object
     Object.keys(prototypechartvalues).forEach((key) => {
       // Create a new object structure for each key
       chartvalues[key] = {
@@ -50,20 +50,15 @@
       };
     });
 
-    // every graph has a tableID and a name; then add chartvalues
     $graphs[$activeGraphTab].sourceData.push({
       tableID: tableID_IN,
       name: "Data " + (1 + $graphs[$activeGraphTab].sourceData.length),
       chartvalues: chartvalues,
     });
 
-    //Add in the other items
-    $graphs[$activeGraphTab].sourceData = {
-      ...$graphs[$activeGraphTab].sourceData,
-      ...prototypeother,
-    };
-
-    //To refresh in svelte
+    Object(prototypeother).forEach((key) => {
+      $graphs[$activeGraphTab].sourceData.push(prototypeother)]
+    })
     $graphs = $graphs;
   }
 

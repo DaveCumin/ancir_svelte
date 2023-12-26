@@ -41,7 +41,7 @@ function guessDateofArray(dates) {
     }
   }
   //if there is still a choice, then take the one where the differences in time are most uniform
-  console.log(guesses);
+  //TODO: remove those with -ve values first!
   let sdEach = [];
   guesses.forEach((g) => {
     console.log(
@@ -66,6 +66,22 @@ function calculateTimeDifference(start, end, dateFormat) {
   end = DateTime.fromFormat(end, dateFormat);
   var diffTime = end.diff(start, "hours");
   return diffTime.hours;
+}
+
+// Takes in an inputted value (ISO format) and the first time and format of
+//data. Calculates the offset for actigrams (and other plots).
+export function getstartTimeOffset(inputTime, firstTime, timeFormat) {
+  let start = DateTime.fromISO(inputTime);
+  let end = DateTime.fromFormat(firstTime, convertFormat(timeFormat));
+  console.log(inputTime);
+  console.log(firstTime);
+  console.log(start);
+  console.log(end);
+  console.log(end.ts - start.ts);
+  console.log(end.diff(start, "hours"));
+  console.log(end.diff(start, "hours").hours);
+  console.log("-------");
+  return end.diff(start, "hours").hours;
 }
 
 export function makeTimeProcessedData(rawData) {
@@ -94,6 +110,8 @@ export function forceFornat(dataIN, formatIN) {
   return dataout;
 }
 
+///----------------
+console.log(DateTime.fromFormatExplain("2023-10-2T11:35", "yyyy-L-dTHH:mm"));
 const testRawData = [
   "10/11/2023, 10:35:00 AM",
   "10/11/2023, 15:35:00 AM",
@@ -113,6 +131,9 @@ const testRawData2 = [
   "10/12/2023 15:35:00",
 ];
 console.log(makeTimeProcessedData(testRawData2));
+
+console.log(guessDateFormat("2023-06-14T10:00"));
+console.log(convertFormat(guessDateFormat("2023-06-14T10:00")));
 
 /*
 let now = DateTime.now();

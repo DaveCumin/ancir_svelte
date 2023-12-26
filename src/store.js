@@ -17,7 +17,7 @@ export var data = writable([
           "10/1/2023, 10:40:00 AM",
           "10/1/2023, 10:45:00 AM",
         ],
-        timeFormat: "DD/MM/YYY, hh:mm:ss A",
+        timeFormat: "M/D/YYYY, hh:mm:ss A",
         timeData: [0, 0.08333, 0.1666],
         processSteps: [],
         processedData: [],
@@ -57,7 +57,7 @@ export var data = writable([
           "10/2/2023, 11:40:00 AM",
           "10/2/2023, 11:45:00 AM",
         ],
-        timeFormat: "DD/MM/YYY, hh:mm:ss A",
+        timeFormat: "M/D/YYYY, hh:mm:ss A",
 
         timeData: [0, 0.08333, 0.1666],
         processSteps: [],
@@ -120,7 +120,13 @@ export var graphs = writable([
         col: { hex: "#891211", alpha: 0.6 },
       },
     ],
-    params: { width: 600, dayHeight: 100, betweenHeight: 5 },
+    params: {
+      startTime: "2023-10-02T11:35",
+      periodHrs: 24,
+      width: 400,
+      dayHeight: 100,
+      betweenHeight: 5,
+    },
   },
   {
     graph: "raw",

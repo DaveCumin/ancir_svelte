@@ -17,6 +17,7 @@
       graph: Actigram,
       controls: ActigramControls,
       prototypechartvalues: { time: "time", values: "values" },
+      prototypeother:{col:}
     },
     raw: {
       graph: Raw,
