@@ -5,7 +5,7 @@
   import { tooltip } from "../../utils/Tooltip/Tooltip";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
-  import { getstartTimeOffset } from "../../utils/TimeUtils";
+  import { getstartTimeOffset } from "../../utils/time/TimeUtils";
 
   let days = 1;
   let startTime;
@@ -32,7 +32,11 @@
 
   // Set the start time
   $: {
-    if ($graphs[$activeGraphTab].graph === "actigram") {
+    // Make sure the plot is correct and there is data
+    if (
+      $graphs[$activeGraphTab].graph === "actigram" &&
+      $graphs[$activeGraphTab].sourceData.length > 0
+    ) {
       const plotData = $graphs[$activeGraphTab].sourceData[0];
       const theDataIndex = $data.findIndex(
         (d) => d.id === $graphs[$activeGraphTab].sourceData[0].tableID
@@ -49,6 +53,8 @@
         console.log(
           $data[theDataIndex].data[plotData.chartvalues.time.field].timeFormat
         );
+
+        console.log($graphs[$activeGraphTab]);
 
         startOffset = getstartTimeOffset(
           startTime,
@@ -130,9 +136,7 @@
                 use:tooltip
                 cx={xScale(xValsToPlot[sourceI][yi])}
                 cy={yScale(y)}
-                r="10"
-                stroke="black"
-                stroke-width="3"
+                r="2"
                 fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
                 fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
                   .alpha}
@@ -140,9 +144,7 @@
             {/each}
           {/each}
         {:else}
-          <text x="50%" y="50%" text-anchor="middle" fill="red">
-            No data available for the selected tab.
-          </text>
+          <text x="50%" y="50%" text-anchor="middle" fill="red"> </text>
         {/if}
 
         <!-- axis stuff-->

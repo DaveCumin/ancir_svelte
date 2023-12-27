@@ -17,12 +17,13 @@
       graph: Actigram,
       controls: ActigramControls,
       prototypechartvalues: { time: "time", values: "values" },
-      prototypeother:{col:}
+      prototypeother: { col: { hex: "#78322e", alpha: 0.5 } },
     },
     raw: {
       graph: Raw,
       controls: RawControls,
       prototypechartvalues: { x: "any", y: "any" },
+      prototypeother: { col: { hex: "#78322e", alpha: 0.5 } },
     },
   };
   //---------------------------------------------------------------------

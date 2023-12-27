@@ -3,6 +3,7 @@
 
   import { data, menuModalActive } from "../store";
   import Slider from "../utils/Slider.svelte";
+  import { forceFornat, guessDateofArray } from "../utils/time/TimeUtils";
 
   function generateData(Ndays, fs_min, start, periods, maxheights) {
     // Create an empty data object for the new entry
@@ -38,14 +39,18 @@
       timeData.push(time);
     }
 
+    const timefmt = guessDateofArray(timeData);
+    const processedTimeData = forceFornat(timeData, timefmt);
+
     // Create time entry in newDataEntry.data
     newDataEntry.data.time = {
       name: "time",
       type: "time",
       data: timeData,
-      timeData = [],
+      timeData: processedTimeData,
       processSteps: [],
       processedData: [],
+      timeFormat: timefmt,
     };
 
     // Generate value data (value0 and value1)
@@ -53,12 +58,15 @@
       const valueKey = `value${i}`;
       const valueData = [];
       const max = maxheights[i];
-      const periodMultiplier = periods[i];
-
+      const period = periods[i];
+      const periodL = period * (60 / fs_min); //the length of the period
       for (let j = 0; j < newDataEntry.datalength; j++) {
-        const mult =
-          j % (periodMultiplier * (60 / fs_min)) < 144 ? max * 0.05 : max;
-        valueData.push(Math.round(Math.random() * mult));
+        const isLowPeriod = j % periodL < periodL / 2;
+        const mult = isLowPeriod ? max * 0.05 : max;
+
+        // Generate random value between 0 and mult
+        const randomValue = Math.random() * mult;
+        valueData.push(Math.round(randomValue));
       }
 
       // Create value entry in newDataEntry.data
@@ -99,78 +107,48 @@
 </script>
 
 {#if $menuModalActive}
-  <dialog
-    id="modal_simulated_data"
-    class="menu-bar modal pointer-events-auto pointer-cursor"
-  >
-    <div class="modal-box bg-base-100">
-      <h5 class="font-bold text-center text-2xl mb-6">
-        GENERATE SIMULATED DATA
-      </h5>
+  <dialog id="modal_simulated_data" class="dialog">
+    <div class="modal-box">
+      <h1>GENERATE SIMULATED DATA</h1>
       <div>
-        <label class="flex text-lg font-semibold pr-2" for="val">Days:</label>
-        <input
-          class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
-          type="number"
-          id="val"
-          bind:value={Ndays}
-        />
-        <Slider min={1} max={100} bind:value={Ndays} />
+        <Slider min={1} max={100} bind:value={Ndays} label="Days:" />
       </div>
       <div>
-        <label class="flex text-lg font-semibold pr-2" for="val"
-          >Sampling period (minutes):</label
-        >
-        <input
-          class="input input-bordered input-neutral focus:outline-noneh-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
-          type="number"
-          id="val"
+        <Slider
+          min={1}
+          max={100}
           bind:value={fs_min}
+          label="Sampling period (minutes):"
         />
-        <Slider min={1} max={100} bind:value={fs_min} />
       </div>
       <div>
-        <label class="flex text-lg font-semibold pr-2" for="val"
-          >Start time:</label
-        >
-        <input
-          class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
-          type="datetime-local"
-          name="start"
-          bind:value={start}
-        />
+        <label for="val">Start time:</label>
+        <input type="datetime-local" name="start" bind:value={start} />
       </div>
       <hr />
       <hr />
       {#each Array.from({ length: N_simulated }) as _, i}
         <div>value{i}:</div>
-        <button class="btn bg-base-100" on:click={() => removeSimData(i)}>
+        <button on:click={() => removeSimData(i)}>
           🗑️ <!-- Trash bin symbol -->
         </button>
         <div>
           <div>
-            <label class="flex text-lg font-semibold pr-2" for="val"
-              >Rhythm period (hours):</label
-            >
-            <input
-              class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
-              type="number"
-              id="val"
+            <Slider
+              min={21}
+              max={26}
+              step="0.1"
               bind:value={periods[i]}
+              label="Rhythm period (hours):"
             />
-            <Slider min={21} max={26} step="0.1" bind:value={periods[i]} />
           </div>
           <div>
-            <label class="flex text-lg font-semibold pr-2" for="val"
-              >Max values:</label
-            >
-            <input
-              class="input input-bordered input-neutral focus:outline-none h-10 w-24 mr-2 max-w-xs mb-1 bg-base-100 shadow-md"
-              type="number"
-              id="val"
+            <Slider
+              min={1}
+              max={100}
               bind:value={maxheights[i]}
+              label="Max values:"
             />
-            <Slider min={1} max={100} bind:value={maxheights[i]} />
           </div>
         </div>
         <hr />
@@ -179,24 +157,29 @@
         ➕ <!-- Plus sign symbol -->
       </button>
       <button
-        class="btn text-base hover:bg-base-300"
         on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
         >Generate</button
       >
-      <button
-        class="btn text-base hover:bg-base-300"
-        on:click={() => ($menuModalActive = false)}>Close</button
-      >
+      <button on:click={() => ($menuModalActive = false)}>Close</button>
     </div>
   </dialog>
 {/if}
 
 <style>
+  dialog {
+    display: block;
+    position: absolute;
+    top: 10vh;
+    z-index: 1000;
+    max-height: 80vh;
+    overflow: auto;
+  }
   .modal {
-    z-index: 1;
+    z-index: 1000;
     opacity: 1;
+    max-height: 75%;
   }
   .modal-box {
-    z-index: 2;
+    z-index: 1000;
   }
 </style>

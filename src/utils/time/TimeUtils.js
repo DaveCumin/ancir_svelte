@@ -1,6 +1,6 @@
+// @ts-nocheck
 import { DateTime } from "luxon";
-import guessFormat from "moment-guess";
-import { calculateStandardDeviation } from "./MathsStats.js";
+import { guessFormat } from "./guessTimeFormat";
 
 function convertFormat(formatIN) {
   //moment format string to luxon format string (https://moment.github.io/luxon/#/parsing?id=table-of-tokens)
@@ -20,48 +20,45 @@ function convertFormat(formatIN) {
 
   return formatOUT;
 }
+
 function guessDateFormat(dateString) {
-  return guessFormat(dateString);
-}
-
-function guessDateofArray(dates) {
-  //make the first guess on the first date
-  let guesses = guessDateFormat(dates[0]);
-  //if there is only one guess (type is string, not array) then return that
-  if (typeof guesses === "string") {
-    return guesses;
-  } else {
-    // try more values until there is only one guess
-    for (let i = 1; i < dates.length; i++) {
-      guesses = guessDateFormat(dates[i]);
-      if (typeof guesses === "string") {
-        console.log(guesses);
-        return guesses;
-      }
-    }
+  const theGuess = guessFormat(dateString);
+  if (typeof theGuess === "string") {
+    return [theGuess]; //force the output to be an array
   }
-  //if there is still a choice, then take the one where the differences in time are most uniform
-  //TODO: remove those with -ve values first!
-  let sdEach = [];
-  guesses.forEach((g) => {
-    console.log(
-      "testing " +
-        g +
-        " -> " +
-        calculateTimeDifference(dates[0], dates[1], convertFormat(g))
-    );
-    let tdiffs = dates.map((date) =>
-      calculateTimeDifference(dates[0], date, convertFormat(g))
-    );
-    console.log("TDIFFS: " + tdiffs);
-    sdEach.push(calculateStandardDeviation(tdiffs));
-  });
-  console.log(sdEach);
-  //return the first guess if there is always a choice
-  return guesses[0];
+  return theGuess;
 }
 
-function calculateTimeDifference(start, end, dateFormat) {
+// return a format string that's the best guess for the daata
+export function guessDateofArray(dates) {
+  // get the guess of the first date
+  let guessedlist = guessDateFormat(dates[0]);
+  console.log(guessedlist);
+  //create a complete set of guesses
+  for (let i = 1; i < dates.length; i++) {
+    guessedlist = [...new Set([...guessedlist, ...guessDateFormat(dates[i])])];
+  }
+
+  //Keep only those that work for all dates
+  const guessedlistWorkAll = guessedlist.filter((guessedFormat) =>
+    dates.every(
+      (date) =>
+        DateTime.fromFormat(date, convertFormat(guessedFormat)).invalid === null
+    )
+  );
+
+  //if there is only one return it
+  if (guessedlistWorkAll.length == 1) {
+    return guessedlistWorkAll[0];
+  }
+
+  //TODO
+  //otherwise reduce to only those that have non-negative differences in time (assume times are in order!)
+
+  return guessedlist[0];
+}
+
+export function calculateTimeDifference(start, end, dateFormat) {
   start = DateTime.fromFormat(start, dateFormat);
   end = DateTime.fromFormat(end, dateFormat);
   var diffTime = end.diff(start, "hours");
@@ -73,25 +70,14 @@ function calculateTimeDifference(start, end, dateFormat) {
 export function getstartTimeOffset(inputTime, firstTime, timeFormat) {
   let start = DateTime.fromISO(inputTime);
   let end = DateTime.fromFormat(firstTime, convertFormat(timeFormat));
-  console.log(inputTime);
-  console.log(firstTime);
-  console.log(start);
-  console.log(end);
-  console.log(end.ts - start.ts);
-  console.log(end.diff(start, "hours"));
-  console.log(end.diff(start, "hours").hours);
-  console.log("-------");
   return end.diff(start, "hours").hours;
 }
 
 export function makeTimeProcessedData(rawData) {
-  let guessedFormat = getGuessedFormat(rawData);
-  //convert for Luxon
-  guessedFormat = convertFormat(guessedFormat);
-  //Make the output
-  const dataout = rawData.map((date) =>
-    calculateTimeDifference(rawData[0], date, guessedFormat)
-  );
+  let guessedFormat = guessDateofArray(rawData);
+  const dataout = rawData.map((date) => {
+    calculateTimeDifference(rawData[0], date, convertFormat(guessedFormat)); //convert for Luxon
+  });
   return dataout;
 }
 
@@ -103,15 +89,22 @@ export function getGuessedFormat(dataIN) {
 }
 
 export function forceFornat(dataIN, formatIN) {
-  formatIN = convertFormat(formatIN);
   const dataout = dataIN.map((date) =>
-    calculateTimeDifference(dataIN[0], date, formatIN)
+    calculateTimeDifference(dataIN[0], date, convertFormat(formatIN))
   );
   return dataout;
 }
 
+/*
 ///----------------
-console.log(DateTime.fromFormatExplain("2023-10-2T11:35", "yyyy-L-dTHH:mm"));
+console.log(DateTime.fromFormatExplain("2023-10-2T11:35", "yyyy-LL-ddTHH:mm"));
+console.log(DateTime.fromFormatExplain("2023-10-2T11:35", "yyyy-LL-ddTHH:mm"));
+console.log(DateTime.fromFormat("2023-10-2T11:35", "yyyy-L-dTHH:mm"));
+console.log(DateTime.fromFormat("2023-10-2 11:35", "yyyy-LL-dd HH:mm").invalid);
+console.log(DateTime.fromFormat("2023-10-2 11:35", "yyyy-LL-d HH:mm").invalid);
+console.log(
+  DateTime.fromFormat("2023-10-2 11:35", "yyyy-LL-d HH:mm").invalid === null
+);
 const testRawData = [
   "10/11/2023, 10:35:00 AM",
   "10/11/2023, 15:35:00 AM",
@@ -133,7 +126,21 @@ const testRawData2 = [
 console.log(makeTimeProcessedData(testRawData2));
 
 console.log(guessDateFormat("2023-06-14T10:00"));
-console.log(convertFormat(guessDateFormat("2023-06-14T10:00")));
+console.log(guessDateFormat("1/1/2024, 11:10:00 AM"));
+
+console.log(convertFormat(guessDateFormat("2023-06-14T10:00")[0]));
+
+const testGen = [
+  "1/1/2024, 11:10:00 AM",
+  "1/1/2024, 11:25:00 AM",
+  "1/1/2024, 11:40:00 AM",
+  "1/1/2024, 11:55:00 AM",
+  "1/1/2024, 12:10:00 PM",
+  "1/1/2024, 12:25:00 PM",
+  "1/10/2024, 12:40:00 PM",
+  "1/11/2024, 3:40:00 PM",
+];
+console.log(makeTimeProcessedData(testGen));
 
 /*
 let now = DateTime.now();

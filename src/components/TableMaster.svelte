@@ -2,7 +2,7 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { dataIDsforTables, activeTableTab, data } from "../store.js";
   import TableTabs from "./TableTabs.svelte";
-  import { getGuessedFormat, forceFornat } from "../utils/TimeUtils.js";
+  import { getGuessedFormat, forceFornat } from "../utils/time/TimeUtils.js";
   import { updateDataProcess } from "../components/ProcessStep.svelte";
 
   $: showTableDetails = $activeTableTab >= 0 ? true : false;

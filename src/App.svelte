@@ -8,6 +8,7 @@
   import ProcessStep from "./components/ProcessStep.svelte";
   import { selectedTheme } from "./store";
   import ContextMenu from "./utils/ContextMenu.svelte";
+  import GenerateSimulated from "./data/GenerateSimulated.svelte";
 </script>
 
 <div data-theme={$selectedTheme}>
@@ -54,3 +55,4 @@
 </div>
 
 <ContextMenu />
+<GenerateSimulated />

@@ -17,7 +17,7 @@ export var data = writable([
           "10/1/2023, 10:40:00 AM",
           "10/1/2023, 10:45:00 AM",
         ],
-        timeFormat: "M/D/YYYY, hh:mm:ss A",
+        timeFormat: "M/D/YYYY, :ss A",
         timeData: [0, 0.08333, 0.1666],
         processSteps: [],
         processedData: [],

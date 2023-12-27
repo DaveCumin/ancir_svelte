@@ -22,6 +22,7 @@
 
   $: prototypechartvalues =
     graphMap[$graphs[$activeGraphTab].graph].prototypechartvalues;
+  $: prototypeother = graphMap[$graphs[$activeGraphTab].graph].prototypeother;
 
   function removeProcess(sourceID, xy, processindex) {
     $graphs[$activeGraphTab].sourceData[sourceID].chartvalues[
@@ -36,33 +37,40 @@
     );
   }
 
+  function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
   function addDataToGraph(tableID_IN) {
     // use graphMap prototypechartvalues
     let chartvalues = {};
 
     // Iterate over the keys of the original object, make the fields
-    Object.keys(prototypechartvalues).forEach((key) => {
+    Object.keys(prototypechartvalues).forEach((key, cdindex) => {
       // Create a new object structure for each key
       chartvalues[key] = {
-        field: "",
+        field: Object.keys(
+          $data[$data.findIndex((d) => d.id === tableID_IN)].data
+        )[cdindex], //{insert fieldnames in order},
         processSteps: [],
         processedData: [],
       };
     });
 
+    //TODO: make this more generic, in case there is one without colour, eg
+    const prototypeColor = deepCopy(prototypeother.col);
+
+    console.log(chartvalues);
     // every graph has a tableID and a name; then add chartvalues
     $graphs[$activeGraphTab].sourceData.push({
       tableID: tableID_IN,
       name: "Data " + (1 + $graphs[$activeGraphTab].sourceData.length),
       chartvalues: chartvalues,
+      col: prototypeColor,
     });
 
-    //Add in the other items
-    $graphs[$activeGraphTab].sourceData = {
-      ...$graphs[$activeGraphTab].sourceData,
-      ...prototypeother,
-    };
-
+    //TODO: put in the time format, if needed
+    console.log($graphs[$activeGraphTab]);
     //To refresh in svelte
     $graphs = $graphs;
   }
@@ -228,6 +236,7 @@
       <div class="colour">
         <input
           class="colourPicker"
+          id={sourceIndex}
           type="color"
           style="background: {$graphs[$activeGraphTab].sourceData[sourceIndex]
             .col.hex}"

@@ -2,7 +2,7 @@
   // @ts-nocheck
   import { data, graphs, activeGraphTab } from "../store.js";
   import { get } from "svelte/store";
-  import { makeTimeProcessedData } from "../utils/TimeUtils.js";
+  import { makeTimeProcessedData } from "../utils/time/TimeUtils.js";
 
   //---------------------------------------------------------------------
   // ----- ADD NEW PROCESSING FUNCTIONS BELOW
