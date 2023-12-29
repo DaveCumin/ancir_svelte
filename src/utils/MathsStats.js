@@ -15,3 +15,11 @@ export function calculateStandardDeviation(arr) {
 
   return standardDeviation;
 }
+
+export function createSequenceArray(start, end) {
+  const sequenceArray = [];
+  for (let i = start; i <= end; i++) {
+    sequenceArray.push(i);
+  }
+  return sequenceArray;
+}

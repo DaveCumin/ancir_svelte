@@ -4,7 +4,7 @@
   import { axisBottom, axisLeft } from "d3-axis";
 
   export let innerHeight;
-  export let margin;
+  export let yoffset;
   export let position;
   export let scale;
 
@@ -23,7 +23,7 @@
 
       case "left":
         axis = axisLeft(scale).tickSizeOuter(0);
-        transform = `translate(0, 0)`;
+        transform = `translate(0, ${yoffset})`;
     }
     select(g).call(axis);
   }

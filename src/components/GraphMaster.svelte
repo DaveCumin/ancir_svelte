@@ -40,7 +40,9 @@
       <GraphTabs />
 
       <div style="margin-left: 5px;">
-        {#if $graphs[$activeGraphTab].graph in graphMap}
+        {#if $activeGraphTab < 0}
+          <h3>Need to add a graph</h3>
+        {:else if $graphs[$activeGraphTab].graph in graphMap}
           <svelte:component
             this={graphMap[$graphs[$activeGraphTab].graph].graph}
           />

@@ -4,6 +4,8 @@
   import Slider from "../../utils/Slider.svelte";
   import { graphs, activeGraphTab } from "../../store";
 
+  let datePickVisible = true;
+
   function formatStartTime(timeString) {
     if (timeString) {
       const [datePart, timePart] = timeString.split("T");
@@ -31,16 +33,35 @@
       return "";
     }
   }
+
+  function toggleOpenDatePick() {
+    datePickVisible = !datePickVisible;
+
+    const datePickLabel = document.querySelector(".datepicklabel");
+    const dateInput = document.querySelector(".dateInput");
+
+    if (datePickVisible) {
+      datePickLabel.style.display = "inline-block";
+      dateInput.style.width = "18px"; // Set the width back to auto or any other desired value
+    } else {
+      datePickLabel.style.display = "none";
+      dateInput.style.width = "60%";
+    }
+  }
 </script>
 
 <div class="chartControls">
   <div class="sliderContainer">
     <span>Start time: </span>
     <div
+      class="datepicklabel datepicklabelshow"
       style="display: inline-block; 
       margin-right: 2px; 
       margin-left: auto;
       text-align: center;"
+      on:dblclick={(e) => {
+        toggleOpenDatePick();
+      }}
     >
       {formatStartTime($graphs[$activeGraphTab].params.startTime)}
     </div>
@@ -50,8 +71,10 @@
       id="startTime"
       name="startTime"
       bind:value={$graphs[$activeGraphTab].params.startTime}
-      on:change={(e) => {
-        console.log(e.target.value);
+      on:keydown={(e) => {
+        if (e.key === "Enter") {
+          toggleOpenDatePick();
+        }
       }}
     />
   </div>
@@ -104,6 +127,18 @@
     background: lightblue;
     cursor: pointer;
   }
+
+  .datepickshow {
+    width: 60%;
+  }
+
+  .datepicklabelshow {
+    display: inline-block;
+  }
+  .datepicklabel {
+    display: none;
+  }
+
   .dateInput:hover {
     background: #eee;
   }

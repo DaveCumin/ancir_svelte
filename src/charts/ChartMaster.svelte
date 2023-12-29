@@ -20,10 +20,17 @@
 
   import { graphMap } from "../components/GraphMaster.svelte";
 
-  $: prototypechartvalues =
-    graphMap[$graphs[$activeGraphTab].graph].prototypechartvalues;
-  $: prototypeother = graphMap[$graphs[$activeGraphTab].graph].prototypeother;
+  //TODO: deal with case of no graphs better
 
+  let prototypechartvalues = {};
+  let prototypeother = {};
+  $: {
+    if ($activeGraphTab >= 0) {
+      prototypechartvalues =
+        graphMap[$graphs[$activeGraphTab].graph].prototypechartvalues;
+      prototypeother = graphMap[$graphs[$activeGraphTab].graph].prototypeother;
+    }
+  }
   function removeProcess(sourceID, xy, processindex) {
     $graphs[$activeGraphTab].sourceData[sourceID].chartvalues[
       xy
@@ -53,14 +60,18 @@
           $data[$data.findIndex((d) => d.id === tableID_IN)].data
         )[cdindex], //{insert fieldnames in order},
         processSteps: [],
-        processedData: [],
+        processedData: getDataFromTable(
+          tableID_IN,
+          Object.keys($data[$data.findIndex((d) => d.id === tableID_IN)].data)[
+            cdindex
+          ]
+        ),
       };
     });
 
     //TODO: make this more generic, in case there is one without colour, eg
     const prototypeColor = deepCopy(prototypeother.col);
 
-    console.log(chartvalues);
     // every graph has a tableID and a name; then add chartvalues
     $graphs[$activeGraphTab].sourceData.push({
       tableID: tableID_IN,
@@ -69,8 +80,6 @@
       col: prototypeColor,
     });
 
-    //TODO: put in the time format, if needed
-    console.log($graphs[$activeGraphTab]);
     //To refresh in svelte
     $graphs = $graphs;
   }
@@ -108,6 +117,18 @@
     }
   }
 
+  function getDataFromTable(tableID_IN, key) {
+    if (
+      $data[$data.findIndex((d) => d.id === tableID_IN)].data[key].type ===
+      "time"
+    ) {
+      return $data[$data.findIndex((d) => d.id === tableID_IN)].data[key]
+        .timeData;
+    }
+
+    return $data[$data.findIndex((d) => d.id === tableID_IN)].data[key].data;
+  }
+
   function getData(source, key) {
     if (
       $data[$data.findIndex((d) => d.id === source.tableID)].data[
@@ -134,128 +155,134 @@
   }
 </script>
 
-<div style="margin: 1em 1em 0 0;">
-  <h1 style="display: inline;">{$graphTabs[$activeGraphTab].name} Data</h1>
-  <span
-    class="addbutton hoverbutton showContextMenu"
-    on:click={(e) => {
-      e.preventDefault();
-      createnewDataProcessContext();
-    }}>+</span
-  >
-</div>
+{#if $activeGraphTab < 0}
+  <!-- Empty -->
+{:else}
+  <div style="margin: 1em 1em 0 0;">
+    <h1 style="display: inline;">{$graphTabs[$activeGraphTab].name} Data</h1>
+    <span
+      class="addbutton hoverbutton showContextMenu"
+      on:click={(e) => {
+        e.preventDefault();
+        createnewDataProcessContext();
+      }}>+</span
+    >
+  </div>
 
-<div class="graphDataTree">
-  {#each $graphs[$activeGraphTab].sourceData as source, sourceIndex}
-    <details open class="dataTable">
-      <summary
-        ><InPlaceEdit bind:value={source.name} />
+  <div class="graphDataTree">
+    {#each $graphs[$activeGraphTab].sourceData as source, sourceIndex}
+      <details open class="dataTable">
+        <summary
+          ><InPlaceEdit bind:value={source.name} />
 
-        <div
-          class="deleteTable hoverbutton"
-          on:click={(e) => {
-            e.preventDefault();
-            removeGraphData(sourceIndex);
-          }}
-        >
-          🗑️
+          <div
+            class="deleteTable hoverbutton"
+            on:click={(e) => {
+              e.preventDefault();
+              removeGraphData(sourceIndex);
+            }}
+          >
+            🗑️
+          </div>
+        </summary>
+
+        <div class="tableLabel">
+          Table: {$data.find((entry) => entry.id === source.tableID)
+            .displayName}
         </div>
-      </summary>
 
-      <div class="tableLabel">
-        Table: {$data.find((entry) => entry.id === source.tableID).displayName}
-      </div>
-
-      {#each Object.keys(source.chartvalues) as key}
-        <details
-          open
-          class="field {source.chartvalues[key].processSteps.length > 0
-            ? ''
-            : 'no-arrow'}"
-        >
-          <summary
-            >{key}:
-            <span
-              class="addbutton hoverbutton showContextMenu"
-              on:click={(e) => {
-                e.preventDefault();
-                newData("graph", sourceIndex, key);
-              }}>+</span
-            >
-            <span
-              ><select
-                class="selectField"
-                bind:value={source.chartvalues[key].field}
-                on:change={(e) => {
-                  updateGraphProcess($activeGraphTab, sourceIndex, key);
-                }}
+        {#each Object.keys(source.chartvalues) as key}
+          <details
+            open
+            class="field {source.chartvalues[key].processSteps.length > 0
+              ? ''
+              : 'no-arrow'}"
+          >
+            <summary
+              >{key}:
+              <span
+                class="addbutton hoverbutton showContextMenu"
+                on:click={(e) => {
+                  e.preventDefault();
+                  newData("graph", sourceIndex, key);
+                }}>+</span
               >
-                {#each getFieldNames(source) as fields}
-                  <option value={fields}
-                    >{$data[$data.findIndex((d) => d.id === source.tableID)]
-                      .data[fields].name}</option
-                  >
-                {/each}
-              </select></span
-            >
-          </summary>
-          {#each source.chartvalues[key].processSteps as ps, psIndex}
-            <details open class="process">
-              <summary
-                >{ps.process}
-                <div
-                  class="deleteProcess hoverbutton"
-                  on:click={(e) => {
-                    e.preventDefault();
-                    removeProcess(sourceIndex, key, psIndex);
+              <span
+                ><select
+                  class="selectField"
+                  bind:value={source.chartvalues[key].field}
+                  on:change={(e) => {
+                    updateGraphProcess($activeGraphTab, sourceIndex, key);
                   }}
                 >
-                  🗑️
-                </div></summary
+                  {#each getFieldNames(source) as fields}
+                    <option value={fields}
+                      >{$data[$data.findIndex((d) => d.id === source.tableID)]
+                        .data[fields].name}</option
+                    >
+                  {/each}
+                </select></span
               >
-              <div class="processDetails">
-                <svelte:component
-                  this={componentMap[ps.process].component}
-                  dataIN={getData(source, key)}
-                  paramsStart={ps.parameters}
-                  on:update={(event) => {
-                    updateProcess(
-                      key,
-                      sourceIndex,
-                      psIndex,
-                      event.detail.params
-                    );
-                  }}
-                />
-              </div>
-            </details>
-          {/each}
-        </details>
-      {/each}
-      <!-- HSV PIRCKER -->
-      <div class="colour">
-        <input
-          class="colourPicker"
-          id={sourceIndex}
-          type="color"
-          style="background: {$graphs[$activeGraphTab].sourceData[sourceIndex]
-            .col.hex}"
-          bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col.hex}
-        />
-        <div class="sliderContainer">
-          <Slider
-            min="0"
-            max="1"
-            step="0.01"
-            label="Alpha: "
+            </summary>
+            {#each source.chartvalues[key].processSteps as ps, psIndex}
+              <details open class="process">
+                <summary
+                  >{ps.process}
+                  <div
+                    class="deleteProcess hoverbutton"
+                    on:click={(e) => {
+                      e.preventDefault();
+                      removeProcess(sourceIndex, key, psIndex);
+                    }}
+                  >
+                    🗑️
+                  </div></summary
+                >
+                <div class="processDetails">
+                  <svelte:component
+                    this={componentMap[ps.process].component}
+                    dataIN={getData(source, key)}
+                    paramsStart={ps.parameters}
+                    on:update={(event) => {
+                      updateProcess(
+                        key,
+                        sourceIndex,
+                        psIndex,
+                        event.detail.params
+                      );
+                    }}
+                  />
+                </div>
+              </details>
+            {/each}
+          </details>
+        {/each}
+        <!-- HSV PIRCKER -->
+        <div class="colour">
+          <input
+            class="colourPicker"
+            id={sourceIndex}
+            type="color"
+            style="background: {$graphs[$activeGraphTab].sourceData[sourceIndex]
+              .col.hex}"
             bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-              .alpha}
+              .hex}
           />
+          <div class="sliderContainer">
+            <Slider
+              min="0"
+              max="1"
+              step="0.01"
+              label="Alpha: "
+              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
+                .alpha}
+            />
+          </div>
         </div>
-      </div>
-    </details>
-  {/each}
-</div>
+      </details>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .graphDataTree {

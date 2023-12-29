@@ -6,10 +6,23 @@
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
   import { getstartTimeOffset } from "../../utils/time/TimeUtils";
+  import { createSequenceArray } from "../../utils/MathsStats";
 
-  let days = 1;
   let startTime;
-  let startOffset;
+  //TODO: The startOffsets isn't working that well
+  let startOffsets = Array.from(
+    { length: $graphs[$activeGraphTab].sourceData.length },
+    () => 0
+  );
+  let doublePlot = 2;
+  let halfbarwidth = 1 / 2;
+  let actPaths;
+  let days = 1;
+  let xValsToPlot = [];
+  let yValsToPlot = [];
+
+  let xScale;
+  let yScale;
 
   const margin = { top: 20, bottom: 50, left: 50, right: 20 };
   $: periodHrs = $graphs[$activeGraphTab].params.periodHrs;
@@ -17,54 +30,52 @@
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
   $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
-  $: totalHeight = (dayHeight + betweenHeight) * days;
+  $: totalHeight =
+    margin.top +
+    margin.bottom +
+    (dayHeight + betweenHeight) * days -
+    betweenHeight;
   $: innerHeight = totalHeight - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
+
   $: {
     startTime = $graphs[$activeGraphTab].params.startTime;
-  }
 
-  let xValsToPlot = [];
-  let yValsToPlot = [];
-
-  let xScale;
-  let yScale;
-
-  // Set the start time
-  $: {
     // Make sure the plot is correct and there is data
     if (
       $graphs[$activeGraphTab].graph === "actigram" &&
       $graphs[$activeGraphTab].sourceData.length > 0
     ) {
-      const plotData = $graphs[$activeGraphTab].sourceData[0];
+      updateOffsets();
+    } //the check
+  }
+
+  function updateOffsets() {
+    for (
+      let sinx = 0;
+      sinx < $graphs[$activeGraphTab].sourceData.length;
+      sinx++
+    ) {
+      const plotTimeField =
+        $graphs[$activeGraphTab].sourceData[sinx].chartvalues.time.field;
       const theDataIndex = $data.findIndex(
-        (d) => d.id === $graphs[$activeGraphTab].sourceData[0].tableID
+        (d) => d.id === $graphs[$activeGraphTab].sourceData[sinx].tableID
       );
 
-      //Do stuff for time
-      if (
-        $data[theDataIndex].data[plotData.chartvalues.time.field].type == "time"
-      ) {
-        const tempDate =
-          $data[theDataIndex].data[plotData.chartvalues.time.field].data[0];
-        console.log(startTime);
-        console.log(tempDate);
-        console.log(
-          $data[theDataIndex].data[plotData.chartvalues.time.field].timeFormat
-        );
+      //Do stuff for time to get the offset
+      if ($data[theDataIndex].data[plotTimeField].type == "time") {
+        const tempDate = $data[theDataIndex].data[plotTimeField].data[0];
 
-        console.log($graphs[$activeGraphTab]);
-
-        startOffset = getstartTimeOffset(
+        startOffsets[sinx] = getstartTimeOffset(
           startTime,
           tempDate,
-          $data[theDataIndex].data[plotData.chartvalues.time.field].timeFormat
+          $data[theDataIndex].data[plotTimeField].timeFormat
         );
-        console.log(startOffset);
       }
     }
+    return startOffsets;
   }
+
   //This makes the data required for the plot; reactive to any changes
   $: {
     xValsToPlot = [];
@@ -119,9 +130,98 @@
         yValsToPlot.push(yVals);
       });
 
-      xScale = scaleLinear().domain([0, periodHrs]).range([0, innerWidth]);
-      yScale = scaleLinear().domain([0, 20]).range([innerHeight, 0]);
+      // update the scale
+      xScale = scaleLinear()
+        .domain([0, periodHrs * doublePlot])
+        .range([0, innerWidth]);
+      yScale = scaleLinear()
+        .domain([
+          Math.min(...yValsToPlot.flat()),
+          Math.max(...yValsToPlot.flat()),
+        ])
+        .range([dayHeight, 0]);
+
+      //update the days
+      days = Math.ceil(Math.max(...xValsToPlot.flat()) / periodHrs);
+
+      //update the offsets
+      startOffsets = updateOffsets();
+
+      //make the paths
+      actPaths = createActipathArray(xValsToPlot, yValsToPlot);
     }
+  }
+
+  function createActipathArray(xin, yin) {
+    const halfbarwidthScaled = xScale(halfbarwidth);
+    //update the days
+    days = Math.ceil(Math.max(...xin.flat()) / periodHrs);
+
+    //force refresh
+    $graphs[$activeGraphTab].params.dayHeight =
+      $graphs[$activeGraphTab].params.dayHeight;
+    $graphs[$activeGraphTab].params.startTime =
+      $graphs[$activeGraphTab].params.startTime;
+
+    //the paths will be an array of arrays, length [days][sources]
+    let actPaths = Array.from({ length: days }, (d) =>
+      Array.from({ length: xin.length }, () => "")
+    );
+
+    //for each source
+    for (let srcIndex = 0; srcIndex < xin.length; srcIndex++) {
+      //for each day
+      for (let d = 0; d < days; d++) {
+        const ydayoffset = d * (dayHeight + betweenHeight);
+
+        // Set up the starting positions
+        const moveToStart = `M0,${d * (dayHeight + betweenHeight) + dayHeight}`;
+        actPaths[d][srcIndex] = actPaths[d][srcIndex] + moveToStart + " ";
+
+        // for each point, make the path proper
+        for (let i = 0; i < xin[srcIndex].length; i++) {
+          const yout = yScale(yin[srcIndex][i]) + ydayoffset;
+          const xout = xScale(
+            xin[srcIndex][i] - d * periodHrs + startOffsets[srcIndex]
+          );
+
+          //make the path
+          const theNextPathPart = `${xout - halfbarwidthScaled},${
+            ydayoffset + dayHeight
+          }  ${xout - halfbarwidthScaled},${yout} ${
+            xout + halfbarwidthScaled
+          },${yout} ${xout + halfbarwidthScaled},${ydayoffset + dayHeight}`;
+
+          //add the path if it should be added
+          if (
+            xin[srcIndex][i] + startOffsets[srcIndex] >= d * periodHrs &&
+            xin[srcIndex][i] + startOffsets[srcIndex] <=
+              d * periodHrs + periodHrs * doublePlot
+          ) {
+            actPaths[d][srcIndex] =
+              actPaths[d][srcIndex] + theNextPathPart + " ";
+          }
+        }
+
+        //make the ending
+        const moveToReturn = `${xScale(periodHrs * doublePlot)},${
+          d * (dayHeight + betweenHeight) + dayHeight
+        } 0,${d * (dayHeight + betweenHeight) + dayHeight}`;
+
+        actPaths[d][srcIndex] = actPaths[d][srcIndex] + moveToReturn + " Z";
+      }
+    }
+
+    for (let i = 0; i < xin.length; i++) {
+      actPaths[Math.floor(xin[i] / (periodHrs * doublePlot))] =
+        actPaths[Math.floor(xin[i] / (periodHrs * doublePlot))] +
+        xin[i] +
+        "," +
+        yin[i] +
+        " ";
+    }
+
+    return actPaths;
   }
 </script>
 
@@ -130,26 +230,28 @@
     <svg {width} height={totalHeight} style="border: 1px solid #000;">
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#if yValsToPlot.length > 0}
-          {#each yValsToPlot as ys, sourceI}
-            {#each ys as y, yi}
-              <circle
-                use:tooltip
-                cx={xScale(xValsToPlot[sourceI][yi])}
-                cy={yScale(y)}
-                r="2"
+          {#each createSequenceArray(0, days - 1) as d}
+            {#each yValsToPlot as ys, sourceI}
+              <path
+                d={actPaths[d][sourceI]}
                 fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
                 fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
                   .alpha}
               />
             {/each}
+            <!--  <Axis
+              {innerHeight}
+              yoffset={d * (dayHeight + betweenHeight)}
+              scale={yScale}
+              position="left"
+            /> -->
           {/each}
         {:else}
           <text x="50%" y="50%" text-anchor="middle" fill="red"> </text>
         {/if}
 
         <!-- axis stuff-->
-        <Axis {innerHeight} {margin} scale={xScale} position="bottom" />
-        <Axis {innerHeight} {margin} scale={yScale} position="left" />
+        <Axis {innerHeight} yoffset="0" scale={xScale} position="bottom" />
       </g>
     </svg>
   </div>
