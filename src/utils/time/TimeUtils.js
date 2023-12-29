@@ -31,34 +31,42 @@ function guessDateFormat(dateString) {
 
 // return a format string that's the best guess for the daata
 export function guessDateofArray(dates) {
-  // get the guess of the first date
-  let guessedlist = guessDateFormat(dates[0]);
-  console.log(guessedlist);
-  //create a complete set of guesses
-  for (let i = 1; i < dates.length; i++) {
-    guessedlist = [...new Set([...guessedlist, ...guessDateFormat(dates[i])])];
+  try {
+    // get the guess of the first date
+    let guessedlist = guessDateFormat(dates[0]);
+    //create a complete set of guesses
+    for (let i = 1; i < dates.length; i++) {
+      guessedlist = [
+        ...new Set([...guessedlist, ...guessDateFormat(dates[i])]),
+      ];
+    }
+
+    //Keep only those that work for all dates
+    const guessedlistWorkAll = guessedlist.filter((guessedFormat) =>
+      dates.every(
+        (date) =>
+          DateTime.fromFormat(date, convertFormat(guessedFormat)).invalid ===
+          null
+      )
+    );
+
+    //if there is only one return it
+    if (guessedlistWorkAll.length == 1) {
+      return guessedlistWorkAll[0];
+    }
+
+    //TODO
+    //otherwise reduce to only those that have non-negative differences in time (assume times are in order!)
+    return guessedlist[0];
+  } catch (error) {
+    return -1;
   }
-
-  //Keep only those that work for all dates
-  const guessedlistWorkAll = guessedlist.filter((guessedFormat) =>
-    dates.every(
-      (date) =>
-        DateTime.fromFormat(date, convertFormat(guessedFormat)).invalid === null
-    )
-  );
-
-  //if there is only one return it
-  if (guessedlistWorkAll.length == 1) {
-    return guessedlistWorkAll[0];
-  }
-
-  //TODO
-  //otherwise reduce to only those that have non-negative differences in time (assume times are in order!)
-
-  return guessedlist[0];
 }
 
 export function calculateTimeDifference(start, end, dateFormat) {
+  if (start === null || end === null) {
+    return null;
+  }
   start = DateTime.fromFormat(start, dateFormat);
   end = DateTime.fromFormat(end, dateFormat);
   var diffTime = end.diff(start, "hours");
@@ -105,6 +113,10 @@ console.log(DateTime.fromFormat("2023-10-2 11:35", "yyyy-LL-d HH:mm").invalid);
 console.log(
   DateTime.fromFormat("2023-10-2 11:35", "yyyy-LL-d HH:mm").invalid === null
 );
+
+console.log(guessDateofArray(["something else"]));
+
+
 const testRawData = [
   "10/11/2023, 10:35:00 AM",
   "10/11/2023, 15:35:00 AM",

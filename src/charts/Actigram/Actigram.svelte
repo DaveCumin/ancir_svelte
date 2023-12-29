@@ -9,13 +9,13 @@
   import { createSequenceArray } from "../../utils/MathsStats";
 
   let startTime;
-  //TODO: The startOffsets isn't working that well
+  //TODO: The startOffsets isn't working that well for some reason
   let startOffsets = Array.from(
     { length: $graphs[$activeGraphTab].sourceData.length },
     () => 0
   );
   let doublePlot = 2;
-  let halfbarwidth = 1 / 2;
+  let halfbarwidth = 0.08 / 2;
   let actPaths;
   let days = 1;
   let xValsToPlot = [];
@@ -39,6 +39,7 @@
   $: innerWidth = width - margin.left - margin.right;
 
   $: {
+    //TODO: Change the start time when new data is added; to be the 00:00 of the first day of the data (to do here or in ChartMaster?)
     startTime = $graphs[$activeGraphTab].params.startTime;
 
     // Make sure the plot is correct and there is data
@@ -136,13 +137,15 @@
         .range([0, innerWidth]);
       yScale = scaleLinear()
         .domain([
-          Math.min(...yValsToPlot.flat()),
-          Math.max(...yValsToPlot.flat()),
+          Math.min(...yValsToPlot.flat().filter((num) => !isNaN(num))),
+          Math.max(...yValsToPlot.flat().filter((num) => !isNaN(num))),
         ])
         .range([dayHeight, 0]);
 
       //update the days
-      days = Math.ceil(Math.max(...xValsToPlot.flat()) / periodHrs);
+      days = Math.ceil(
+        Math.max(...xValsToPlot.flat().filter((num) => !isNaN(num))) / periodHrs
+      );
 
       //update the offsets
       startOffsets = updateOffsets();
@@ -155,7 +158,9 @@
   function createActipathArray(xin, yin) {
     const halfbarwidthScaled = xScale(halfbarwidth);
     //update the days
-    days = Math.ceil(Math.max(...xin.flat()) / periodHrs);
+    days = Math.ceil(
+      Math.max(...xin.flat().filter((num) => !isNaN(num))) / periodHrs
+    );
 
     //force refresh
     $graphs[$activeGraphTab].params.dayHeight =
@@ -185,7 +190,7 @@
             xin[srcIndex][i] - d * periodHrs + startOffsets[srcIndex]
           );
 
-          //make the path
+          //make the path if the value is not null
           const theNextPathPart = `${xout - halfbarwidthScaled},${
             ydayoffset + dayHeight
           }  ${xout - halfbarwidthScaled},${yout} ${
@@ -196,7 +201,9 @@
           if (
             xin[srcIndex][i] + startOffsets[srcIndex] >= d * periodHrs &&
             xin[srcIndex][i] + startOffsets[srcIndex] <=
-              d * periodHrs + periodHrs * doublePlot
+              d * periodHrs + periodHrs * doublePlot &&
+            xin[srcIndex][i] != null &&
+            xin[srcIndex][i] != undefined
           ) {
             actPaths[d][srcIndex] =
               actPaths[d][srcIndex] + theNextPathPart + " ";
@@ -225,7 +232,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab].graph === "actigram"}
+{#if $graphs[$activeGraphTab].graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="actigramGraph">
     <svg {width} height={totalHeight} style="border: 1px solid #000;">
       <g transform={`translate(${margin.left},${margin.right})`}>

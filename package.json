@@ -30,6 +30,7 @@
     "esbuild": "^0.19.10",
     "luxon": "^3.4.4",
     "moment-guess": "^1.2.4",
+    "papaparse": "^5.4.1",
     "svelte-awesome-color-picker": "^2.4.7",
     "svelte-color-picker": "^1.0.7"
   }

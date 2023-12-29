@@ -9,6 +9,7 @@
   import { selectedTheme } from "./store";
   import ContextMenu from "./utils/ContextMenu.svelte";
   import GenerateSimulated from "./data/GenerateSimulated.svelte";
+  import ImportData from "./data/importData.svelte";
 </script>
 
 <div data-theme={$selectedTheme}>
@@ -56,3 +57,4 @@
 
 <ContextMenu />
 <GenerateSimulated />
+<ImportData />

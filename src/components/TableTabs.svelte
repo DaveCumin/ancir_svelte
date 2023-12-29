@@ -2,6 +2,13 @@
   import { dataIDsforTables, activeTableTab, data } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
 
+  let showalldata = false;
+  let minrowstoshow = 100;
+
+  function doshowalldata() {
+    showalldata = true;
+  }
+
   function changeActiveNav(ind) {
     $activeTableTab = ind;
   }
@@ -125,20 +132,44 @@
         </tr></thead
       >
       <tbody>
-        {#each tableData[0] as tdr, row}
-          <tr>
-            {#each tableData as tdc, col}
-              {#if tableHeadings.processed[col]}
-                <td><i>{tableData[col][row]}</i></td>
-              {:else}
-                <td>{tableData[col][row]}</td>
-              {/if}
-            {/each}
-          </tr>
-        {/each}
+        <!-- only show the whole table if showalldata is true-->
+        {#if showalldata}
+          {#each tableData[0] as tdr, row}
+            <tr>
+              {#each tableData as tdc, col}
+                {#if tableHeadings.processed[col]}
+                  <td><i>{tableData[col][row]}</i></td>
+                {:else}
+                  <td>{tableData[col][row]}</td>
+                {/if}
+              {/each}
+            </tr>
+          {/each}
+          <!-- otherwise only show minrowstoshow rows-->
+        {:else}
+          {#each { length: minrowstoshow } as _, row}
+            <tr>
+              {#each tableData as tdc, col}
+                {#if tableHeadings.processed[col]}
+                  <td><i>{tableData[col][row]}</i></td>
+                {:else}
+                  <td>{tableData[col][row]}</td>
+                {/if}
+              {/each}
+            </tr>
+          {/each}
+        {/if}
       </tbody>
     </table>
   </main>
+  <!-- have a button to show all rows-->
+  {#if !showalldata}
+    <button
+      class="showmorebutton"
+      style="display: {showalldata ? 'none' : 'block'};"
+      on:click={(e) => doshowalldata()}>...</button
+    >
+  {/if}
 {/if}
 
 <style>
@@ -230,5 +261,13 @@
 
   thead th {
     background-color: #eee;
+  }
+
+  .showmorebutton {
+    display: flex;
+    padding: 0px 10px 5px;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 </style>

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { menuModalActive } from "../store";
+  import { menuModalActive, importFileOpen } from "../store";
 
   function createMenuItem(displayText, onClick) {
     return { displayText, onClick, visibleState: false };
@@ -10,7 +10,7 @@
     {
       displayText: "Data",
       items: [
-        createMenuItem("Import Data", () => console.log("Import...")),
+        createMenuItem("Import Data", () => ($importFileOpen = true)),
         createMenuItem("Simulate Data", () => {
           $menuModalActive = true;
         }),

@@ -1,7 +1,5 @@
 import { writable } from "svelte/store";
 
-export var counter = writable(0);
-
 export var data = writable([
   {
     id: 9,
@@ -211,3 +209,5 @@ export var contextMenu = writable({
 });
 
 export let selectedTheme = writable("light");
+
+export var importFileOpen = writable(false);
