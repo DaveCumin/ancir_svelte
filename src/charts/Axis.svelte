@@ -4,7 +4,7 @@
   import { axisBottom, axisLeft } from "d3-axis";
 
   export let innerHeight;
-  export let yoffset;
+  export let yoffset = 0;
   export let position;
   export let scale;
 

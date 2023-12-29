@@ -176,6 +176,7 @@ export var graphs = writable([
           },
         },
         col: { hex: "#3469ff", alpha: 1 },
+        size: 5,
       },
     ],
     params: {

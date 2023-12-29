@@ -85,6 +85,7 @@
         ])
         .range([innerHeight, 0]);
     }
+    console.log("height: " + innerHeight);
   }
 </script>
 
@@ -98,7 +99,7 @@
               use:tooltip
               cx={xScale(xValsToPlot[sourceI][yi])}
               cy={yScale(y)}
-              r="10"
+              r={$graphs[$activeGraphTab].sourceData[sourceI].size}
               stroke="black"
               stroke-width="3"
               fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}

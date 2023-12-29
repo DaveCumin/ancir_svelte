@@ -257,28 +257,45 @@
             {/each}
           </details>
         {/each}
-        <!-- HSV PIRCKER -->
-        <div class="colour">
-          <input
-            class="colourPicker"
-            id={sourceIndex}
-            type="color"
-            style="background: {$graphs[$activeGraphTab].sourceData[sourceIndex]
-              .col.hex}"
-            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-              .hex}
-          />
-          <div class="sliderContainer">
-            <Slider
-              min="0"
-              max="1"
-              step="0.01"
-              label="Alpha: "
+
+        <!-- Add colour picker if there is a colour variable -->
+        {#if $graphs[$activeGraphTab].sourceData[sourceIndex].col != undefined}
+          <div class="colour">
+            <input
+              class="colourPicker"
+              id={sourceIndex}
+              type="color"
+              style="background: {$graphs[$activeGraphTab].sourceData[
+                sourceIndex
+              ].col.hex}"
               bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-                .alpha}
+                .hex}
+            />
+            <div class="sliderContainer">
+              <Slider
+                min="0"
+                max="1"
+                step="0.01"
+                label="Alpha: "
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
+                  .alpha}
+              />
+            </div>
+          </div>
+        {/if}
+
+        <!-- Add size slider if there is a size variable -->
+        {#if $graphs[$activeGraphTab].sourceData[sourceIndex].size != undefined}
+          <div class="itemsliderContainer">
+            <Slider
+              min="0.5"
+              max="10"
+              step="0.5"
+              label="Size: "
+              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].size}
             />
           </div>
-        </div>
+        {/if}
       </details>
     {/each}
   </div>
@@ -429,6 +446,10 @@
   }
   .sliderContainer {
     width: calc(100% - 3.5em);
+  }
+  .itemsliderContainer {
+    width: calc(100% - 2em);
+    margin-left: 1em;
   }
   .selectField {
     height: 1.5rem;
