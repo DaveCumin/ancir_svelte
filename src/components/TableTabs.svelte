@@ -1,12 +1,16 @@
 <script>
-  import { dataIDsforTables, activeTableTab, data } from "../store";
+  import {
+    dataIDsforTables,
+    showalldata,
+    activeTableTab,
+    data,
+  } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
 
-  let showalldata = false;
   let minrowstoshow = 100;
 
   function doshowalldata() {
-    showalldata = true;
+    $showalldata[$activeTableTab] = true;
   }
 
   function changeActiveNav(ind) {
@@ -16,6 +20,10 @@
   function deleteTab(ind) {
     $dataIDsforTables.splice(ind, 1);
     $dataIDsforTables = $dataIDsforTables;
+
+    $showalldata.splice(ind, 1);
+    $showalldata = $showalldata;
+
     $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
   }
 
@@ -70,7 +78,18 @@
     }
   }
 
-  $: tableData = makeTableData(getActiveData($activeTableTab).data, $data);
+  let tableData;
+  $: {
+    tableData = makeTableData(getActiveData($activeTableTab).data, $data);
+    if (tableData.length > 0) {
+      if (tableData[0].length <= minrowstoshow) {
+        console.log(tableData[0].length);
+        console.log(tableData[0].length <= minrowstoshow);
+        $showalldata[$activeTableTab] = true;
+      }
+    }
+  }
+
   $: tableHeadings = makeTableHeadings(
     getActiveData($activeTableTab).data,
     $data
@@ -117,7 +136,7 @@
   {/if}
 </div>
 
-{#if $activeTableTab >= 0}
+{#if $activeTableTab >= 0 && tableData.length > 0}
   <main>
     <table>
       <thead
@@ -133,10 +152,10 @@
       >
       <tbody>
         <!-- only show the whole table if showalldata is true-->
-        {#if showalldata}
-          {#each tableData[0] as tdr, row}
+        {#if $showalldata[$activeTableTab]}
+          {#each tableData[0] as _, row}
             <tr>
-              {#each tableData as tdc, col}
+              {#each tableData as _, col}
                 {#if tableHeadings.processed[col]}
                   <td><i>{tableData[col][row]}</i></td>
                 {:else}
@@ -163,10 +182,10 @@
     </table>
   </main>
   <!-- have a button to show all rows-->
-  {#if !showalldata}
+  {#if !$showalldata[$activeTableTab]}
     <button
       class="showmorebutton"
-      style="display: {showalldata ? 'none' : 'block'};"
+      style="display: {$showalldata[$activeTableTab] ? 'none' : 'block'};"
       on:click={(e) => doshowalldata()}>...</button
     >
   {/if}

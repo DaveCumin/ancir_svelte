@@ -10,7 +10,13 @@
   import ContextMenu from "./utils/ContextMenu.svelte";
   import GenerateSimulated from "./data/GenerateSimulated.svelte";
   import ImportData from "./data/importData.svelte";
+
+  let version = 1.2;
 </script>
+
+<svelte:head>
+  <title>AnCiR v{version}</title>
+</svelte:head>
 
 <div data-theme={$selectedTheme}>
   <div style="max-width: 100vw;">

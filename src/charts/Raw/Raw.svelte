@@ -3,7 +3,6 @@
 
   import { data, graphs, activeGraphTab } from "../../store";
   import { tooltip } from "../../utils/Tooltip/Tooltip";
-  import { rgbaTorgba } from "../../utils/Color";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
 
@@ -85,11 +84,10 @@
         ])
         .range([innerHeight, 0]);
     }
-    console.log("height: " + innerHeight);
   }
 </script>
 
-{#if $graphs[$activeGraphTab].graph === "raw"}
+{#if $graphs[$activeGraphTab].graph === "raw" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="rawGraph">
     <svg {width} {height} style="border: 1px solid #000;">
       <g transform={`translate(${margin.left},${margin.right})`}>

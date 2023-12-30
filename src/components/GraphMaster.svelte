@@ -18,12 +18,14 @@
       controls: ActigramControls,
       prototypechartvalues: { time: "time", values: "values" },
       prototypeother: { col: { hex: "#78322e", alpha: 0.5 } },
+      othertypes: ["colour"],
     },
     raw: {
       graph: Raw,
       controls: RawControls,
       prototypechartvalues: { x: "any", y: "any" },
       prototypeother: { col: { hex: "#78322e", alpha: 0.5 }, size: 5 },
+      othertypes: ["colour", "slider"],
     },
   };
   //---------------------------------------------------------------------

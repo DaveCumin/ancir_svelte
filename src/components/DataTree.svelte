@@ -3,6 +3,7 @@
   import {
     data,
     dataIDsforTables,
+    showalldata,
     activeTableTab,
     graphs,
     contextMenu,
@@ -21,6 +22,10 @@
       //tab not there
       $dataIDsforTables.push(ID);
       $dataIDsforTables = $dataIDsforTables;
+
+      $showalldata.push(false);
+      $showalldata = $showalldata;
+
       $activeTableTab = $dataIDsforTables.length - 1;
     } else {
       //tab

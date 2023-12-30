@@ -20,8 +20,6 @@
 
   import { graphMap } from "../components/GraphMaster.svelte";
 
-  //TODO: deal with case of no graphs better
-
   let prototypechartvalues = {};
   let prototypeother = {};
   $: {
@@ -69,15 +67,12 @@
       };
     });
 
-    //TODO: make this more generic, in case there is one without colour, eg
-    const prototypeColor = deepCopy(prototypeother.col);
-
     // every graph has a tableID and a name; then add chartvalues
     $graphs[$activeGraphTab].sourceData.push({
       tableID: tableID_IN,
       name: "Data " + (1 + $graphs[$activeGraphTab].sourceData.length),
       chartvalues: chartvalues,
-      col: prototypeColor,
+      ...deepCopy(prototypeother),
     });
 
     //To refresh in svelte
@@ -258,44 +253,49 @@
           </details>
         {/each}
 
-        <!-- Add colour picker if there is a colour variable -->
-        {#if $graphs[$activeGraphTab].sourceData[sourceIndex].col != undefined}
-          <div class="colour">
-            <input
-              class="colourPicker"
-              id={sourceIndex}
-              type="color"
-              style="background: {$graphs[$activeGraphTab].sourceData[
-                sourceIndex
-              ].col.hex}"
-              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-                .hex}
-            />
-            <div class="sliderContainer">
-              <Slider
-                min="0"
-                max="1"
-                step="0.01"
-                label="Alpha: "
+        <!-- PUT IN THE OTHER CONTROLS-->
+        {#each Object.keys(graphMap[$graphs[$activeGraphTab].graph].prototypeother) as protoKey, keyIndex}
+          <!-- SLIDER -->
+          {#if graphMap[$graphs[$activeGraphTab].graph].othertypes[keyIndex] === "colour"}
+            <div class="colour">
+              <input
+                class="colourPicker"
+                id={sourceIndex}
+                type="color"
+                style="background: {$graphs[$activeGraphTab].sourceData[
+                  sourceIndex
+                ].col.hex}"
                 bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-                  .alpha}
+                  .hex}
+              />
+              <div class="sliderContainer">
+                <Slider
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  label="Alpha: "
+                  bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                    .col.alpha}
+                />
+              </div>
+            </div>
+          {/if}
+          <!-- SLIDER -->
+          {#if graphMap[$graphs[$activeGraphTab].graph].othertypes[keyIndex] === "slider"}
+            <div class="itemsliderContainer">
+              <Slider
+                min="0.5"
+                max="10"
+                step="0.5"
+                label={protoKey.charAt(0).toUpperCase() +
+                  protoKey.slice(1) +
+                  ":"}
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                  .size}
               />
             </div>
-          </div>
-        {/if}
-
-        <!-- Add size slider if there is a size variable -->
-        {#if $graphs[$activeGraphTab].sourceData[sourceIndex].size != undefined}
-          <div class="itemsliderContainer">
-            <Slider
-              min="0.5"
-              max="10"
-              step="0.5"
-              label="Size: "
-              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].size}
-            />
-          </div>
-        {/if}
+          {/if}
+        {/each}
       </details>
     {/each}
   </div>

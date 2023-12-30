@@ -193,6 +193,7 @@ export var graphs = writable([
 ]);
 
 export var dataIDsforTables = writable([]);
+export var showalldata = writable([]);
 export var activeTableTab = writable(-1);
 
 export var menuModalActive = writable(false);

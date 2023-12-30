@@ -39,7 +39,7 @@
   $: innerWidth = width - margin.left - margin.right;
 
   $: {
-    //TODO: Change the start time when new data is added; to be the 00:00 of the first day of the data (to do here or in ChartMaster?)
+    //TODO: Change the start time when new data is added; to be the 00:00 of the first day of the data (here or in ChartMaster?)
     startTime = $graphs[$activeGraphTab].params.startTime;
 
     // Make sure the plot is correct and there is data
@@ -48,6 +48,7 @@
       $graphs[$activeGraphTab].sourceData.length > 0
     ) {
       updateOffsets();
+      $graphs[$activeGraphTab].graph = $graphs[$activeGraphTab].graph;
     } //the check
   }
 
@@ -246,12 +247,12 @@
                   .alpha}
               />
             {/each}
-            <!--  <Axis
+            <Axis
               {innerHeight}
               yoffset={d * (dayHeight + betweenHeight)}
               scale={yScale}
               position="left"
-            /> -->
+            />
           {/each}
         {:else}
           <text x="50%" y="50%" text-anchor="middle" fill="red"> </text>
