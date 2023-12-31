@@ -157,6 +157,10 @@
                   this={componentMap[ps.process].component}
                   dataIN={getData($data[datumID].data[key])}
                   paramsStart={ps.parameters}
+                  typeTime={{
+                    type: $data[datumID].data[key].type,
+                    tocheck: { tableID: datum.id, key: key },
+                  }}
                   on:update={(event) =>
                     updateProcess(datum.id, key, psID, event.detail.params)}
                 />

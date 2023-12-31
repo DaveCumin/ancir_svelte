@@ -7,12 +7,16 @@
   //---------------------------------------------------------------------
   // ----- ADD NEW PROCESSING FUNCTIONS BELOW
   import Add, { add } from "../processes/Add.svelte";
-  import Limit, { limit } from "../processes/Limit.svelte";
+  import Filter, { filter } from "../processes/Filter.svelte";
 
   // Import functions and components here as needed and add to the maps below
   export const componentMap = {
     add: { component: Add, startParams: { val: 0 }, func: add },
-    limit: { component: Limit, startParams: { min: 0, max: 12 }, func: limit },
+    filter: {
+      component: Filter,
+      startParams: { min: 0, max: 12 },
+      func: filter,
+    },
     // Add more process functions here as needed
   };
 

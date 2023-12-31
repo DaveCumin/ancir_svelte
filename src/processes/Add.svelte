@@ -25,6 +25,7 @@
 
   export let dataIN;
   export let paramsStart;
+  export let typeTime;
 
   export let params = { val: 0 };
   if (Object.keys(paramsStart).length > 0) {
@@ -32,8 +33,8 @@
   }
 </script>
 
-{#if typeof dataIN[0] === "number"}
+{#if typeTime.type === "value"}
   <Slider min={-20} max={20} bind:value={params.val} label="Add:" />
 {:else}
-  <div>{dataIN[0]}</div>
+  <div>{JSON.stringify(typeTime.tocheck)}</div>
 {/if}

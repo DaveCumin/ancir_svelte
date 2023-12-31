@@ -238,6 +238,12 @@
                     this={componentMap[ps.process].component}
                     dataIN={getData(source, key)}
                     paramsStart={ps.parameters}
+                    typeTime={{
+                      type: $data[
+                        $data.findIndex((d) => d.id === source.tableID)
+                      ].data[source.chartvalues[key].field].type,
+                      tocheck: { tableID: source.tableID, key: key },
+                    }}
                     on:update={(event) => {
                       updateProcess(
                         key,

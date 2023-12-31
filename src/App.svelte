@@ -11,7 +11,7 @@
   import GenerateSimulated from "./data/GenerateSimulated.svelte";
   import ImportData from "./data/importData.svelte";
 
-  let version = 1.2;
+  let version = "Beta 2.8";
 </script>
 
 <svelte:head>

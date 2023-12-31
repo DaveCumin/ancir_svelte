@@ -1,15 +1,15 @@
 <script context="module">
   // Define the function
-  export function limit(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
+  export function filter(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
     const dataMin = Math.min(...startVals);
     const dataMax = Math.max(...startVals);
 
     var arr = startVals;
     for (let i = 0; i < arr.length; i++) {
       if (arr[i] < params.min) {
-        arr[i] = params.min;
+        arr[i] = NaN;
       } else if (arr[i] > params.max) {
-        arr[i] = params.max;
+        arr[i] = NaN;
       }
     }
     return arr;

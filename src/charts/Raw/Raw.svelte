@@ -71,6 +71,7 @@
         yValsToPlot.push(yVals);
       });
 
+      // set up the scales
       xScale = scaleLinear()
         .domain([
           $graphs[$activeGraphTab].params.xDomainMin,
@@ -93,17 +94,19 @@
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#each yValsToPlot as ys, sourceI}
           {#each ys as y, yi}
-            <circle
-              use:tooltip
-              cx={xScale(xValsToPlot[sourceI][yi])}
-              cy={yScale(y)}
-              r={$graphs[$activeGraphTab].sourceData[sourceI].size}
-              stroke="black"
-              stroke-width="3"
-              fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
-              fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
-                .alpha}
-            />
+            {#if y !== null && !isNaN(y) && xValsToPlot[sourceI][yi] !== null && !isNaN(xValsToPlot[sourceI][yi])}
+              <circle
+                use:tooltip
+                cx={xScale(xValsToPlot[sourceI][yi])}
+                cy={yScale(y)}
+                r={$graphs[$activeGraphTab].sourceData[sourceI].size}
+                stroke="black"
+                stroke-width="3"
+                fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
+                fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
+                  .alpha}
+              />
+            {/if}
           {/each}
         {/each}
 
