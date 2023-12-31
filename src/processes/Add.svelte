@@ -36,5 +36,6 @@
 {#if typeTime.type === "value"}
   <Slider min={-20} max={20} bind:value={params.val} label="Add:" />
 {:else}
+  <!-- TODO: make this work for dates-->
   <div>{JSON.stringify(typeTime.tocheck)}</div>
 {/if}
