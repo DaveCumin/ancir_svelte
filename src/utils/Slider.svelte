@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  //TODO: Make the min and max hard stops, if they are given.
   export let min = -100;
   export let max = 100;
   export let value;
@@ -67,11 +68,12 @@
     padding-left: 4px;
     border-width: 1px;
     text-align: end;
+    background: var(--bg-color);
   }
 
   .sliderInput {
     width: 100%;
-    accent-color: lightblue;
+    accent-color: var(--primary-color);
     cursor: pointer;
     box-sizing: border-box;
     border-width: 0;

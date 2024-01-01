@@ -7,6 +7,7 @@
   export let yoffset = 0;
   export let position;
   export let scale;
+  export let nticks = 5;
 
   let transform;
   let g;
@@ -17,12 +18,12 @@
     let axis;
     switch (position) {
       case "bottom":
-        axis = axisBottom(scale).tickSizeOuter(0);
+        axis = axisBottom(scale).tickSizeOuter(0).ticks(nticks);
         transform = `translate(0, ${innerHeight})`;
         break;
 
       case "left":
-        axis = axisLeft(scale).tickSizeOuter(0);
+        axis = axisLeft(scale).tickSizeOuter(0).ticks(nticks);
         transform = `translate(0, ${yoffset})`;
     }
     select(g).call(axis);

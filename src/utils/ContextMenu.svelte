@@ -85,7 +85,7 @@
     display: inline-flex;
     border: 1px #999 solid;
     width: fit-content;
-    background-color: #fff;
+    background-color: var(--bg-color);
     border-radius: 5px;
     overflow: hidden;
     flex-direction: column;
@@ -108,7 +108,7 @@
     height: 30px;
     text-align: left;
     border: 0px;
-    background-color: #fff;
+    background-color: var(--bg-color);
   }
   ul li button:hover {
     color: #000;
@@ -118,18 +118,6 @@
   }
   ul li button i {
     padding: 0px 15px 0px 10px;
-  }
-  ul li button i.fa-square {
-    color: #fff;
-  }
-  ul li button:hover > i.fa-square {
-    color: #eee;
-  }
-  ul li button:hover > i.warning {
-    color: crimson;
-  }
-  :global(ul li button.info:hover) {
-    color: navy;
   }
   hr {
     border: none;

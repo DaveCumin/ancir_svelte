@@ -1,6 +1,16 @@
 <script>
   import { onMount } from "svelte";
   import { menuModalActive, importFileOpen } from "../store";
+  import { exportSVG } from "./GraphMaster.svelte";
+  import { makeNewChart } from "../components/GraphMaster.svelte";
+
+  function switchTheme(e) {
+    if (e.target.checked) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  }
 
   function createMenuItem(displayText, onClick) {
     return { displayText, onClick, visibleState: false };
@@ -19,11 +29,17 @@
       ],
     },
     {
-      displayText: "Edit",
+      displayText: "Chart",
       items: [
-        createMenuItem("Insert", () => console.log("Insert...")),
-        createMenuItem("Copy", () => console.log("Copy...")),
-        createMenuItem("Paste", () => console.log("Paste...")),
+        {
+          displayText: "Insert Chart",
+          onClick: () => console.log("here"),
+          items: [
+            createMenuItem("Raw", () => makeNewChart("raw")),
+            createMenuItem("Actigram", () => makeNewChart("actigram")),
+          ],
+        },
+        createMenuItem("Export current chart", () => exportSVG()),
       ],
     },
     {
@@ -108,6 +124,25 @@
               {#each menuItem.items as item}
                 {#if item.displayText === "--hr"}
                   <hr />
+                {:else if item.items}
+                  <!-- Check if there are sub-items -->
+                  <li>
+                    <button>{item.displayText}</button>
+                    <ul class="thirdmenu dontclose">
+                      {#each item.items as subItem}
+                        <li>
+                          <button
+                            on:click={(e) => {
+                              subItem.onClick();
+                              hideAllMenus();
+                            }}
+                          >
+                            {subItem.displayText}
+                          </button>
+                        </li>
+                      {/each}
+                    </ul>
+                  </li>
                 {:else}
                   <li>
                     <button
@@ -125,6 +160,11 @@
           {/if}
         </li>
       {/each}
+      <input
+        type="checkbox"
+        id="switchtheme"
+        on:change={(e) => switchTheme(e)}
+      />
     </ul>
   </div>
 </nav>
@@ -133,10 +173,10 @@
   nav {
     position: sticky;
     height: 2em;
+    background-color: var(--bg-color);
   }
   .applicationmenu {
-    border: 1px #eee solid;
-    background-color: #fff;
+    border-bottom: 1px var(--hover-color) solid;
     height: 2em;
     z-index: 3;
     padding: 3px;
@@ -157,13 +197,14 @@
   }
   button {
     border: 0px #000 solid;
-    color: #222;
+    color: var(--font-color);
     height: 30px;
-    background-color: #fff;
     padding: 0px 10px;
+    background: var(--bg-color);
   }
   ul li button:hover {
-    background-color: #eee;
+    background-color: var(--hover-color);
+    cursor: pointer;
   }
   ul li ul.secondmenu {
     display: flex;
@@ -188,7 +229,7 @@
 
   hr {
     border: none;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--hover-color);
     margin: 0px 0px;
   }
 </style>

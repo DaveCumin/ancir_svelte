@@ -46,7 +46,7 @@
     return JSON.parse(JSON.stringify(obj));
   }
 
-  function addDataToGraph(tableID_IN) {
+  export function addDataToGraph(tableID_IN) {
     // use graphMap prototypechartvalues
     let chartvalues = {};
 
@@ -79,6 +79,7 @@
     $graphs = $graphs;
   }
 
+  //Update a process in the graph
   function updateProcess(xy, sourcei, processindex, processParams) {
     $graphs[$activeGraphTab].sourceData[sourcei].chartvalues[xy].processSteps[
       processindex
@@ -86,6 +87,7 @@
     updateGraphProcess($activeGraphTab, sourcei, xy);
   }
 
+  //remove data from a graph
   function removeGraphData(srcID) {
     graphs.update((currentData) => {
       const newData = [...currentData];
@@ -377,7 +379,7 @@
   }
 
   .addbutton:hover {
-    background: #eee;
+    background: var(--hover-color);
     padding: 0.2em 0.5em;
     margin-right: -0.5em;
     margin-top: -0.2em;

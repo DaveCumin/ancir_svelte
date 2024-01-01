@@ -90,7 +90,7 @@
 
 {#if $graphs[$activeGraphTab].graph === "raw" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="rawGraph">
-    <svg {width} {height} style="border: 1px solid #000;">
+    <svg {width} {height}>
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#each yValsToPlot as ys, sourceI}
           {#each ys as y, yi}

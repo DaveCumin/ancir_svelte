@@ -54,14 +54,14 @@
     top: 0px;
     left: 0px;
     z-index: 999;
-    background: white;
+    background: var(--bg-color);
     padding: 0px;
     margin: 0 2.2em 0 0 !important;
   }
 
   nav {
     margin: 0;
-    background-color: #fff;
+    background-color: var(--bg-color);
     z-index: 9;
     width: calc(100% + 2.2em);
   }
@@ -70,7 +70,7 @@
     display: flex;
     flex-wrap: wrap;
     list-style: none;
-    border-bottom: 3px solid #eee;
+    border-bottom: 3px solid var(--hover-color);
     margin-left: -2em;
     margin-top: 2px;
   }
@@ -79,7 +79,7 @@
     margin-right: 2px;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
-    background: #eee;
+    background: var(--hover-color);
   }
 
   span {
@@ -91,36 +91,37 @@
     cursor: pointer;
   }
 
-  span:hover,
-  span:hover + button {
-    border-color: #eee #eee white;
-    background: white;
+  li.active > span,
+  li.active > .closeButton,
+  li.active:hover > span {
+    border-color: var(--hover-color) var(--hover-color) var(--bg-color);
+    background: var(--bg-color);
   }
 
-  li.active > span,
-  li.active > button {
-    border-color: #eee #eee #fff;
-    background: white;
+  li:hover,
+  li:hover > span,
+  li:hover > .closeButton {
+    border-color: var(--hover-color) var(--hover-color) var(--hover-color);
+    background: var(--bg-color);
   }
-  li.active:hover > span {
+
+  li.active:hover > span,
+  li.active:hover > .closeButton {
     cursor: default;
-    background: white;
+    background: var(--bg-color);
   }
-  li.active:hover > button {
-    background: white;
-  }
+
   .closeButton {
     width: 15px;
     cursor: pointer;
     padding: 0;
     float: right;
     margin-right: 3px;
-    margin-top: -33px;
+    margin-top: -32px;
     border: none;
-    background: #eee;
+    background-color: var(--hover-color);
   }
-  .closeButton:hover {
-    color: red;
-    background: #eee;
+  svg:hover {
+    stroke: red;
   }
 </style>

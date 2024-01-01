@@ -78,10 +78,12 @@
   form {
     display: inline;
   }
+
   input {
     display: inherit;
     border: none;
-    background: none;
+    background: inherit;
+    background-color: inherit;
     font-size: inherit;
     color: inherit;
     font-weight: inherit;

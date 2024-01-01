@@ -100,6 +100,7 @@ export var data = writable([
   },
 ]);
 
+//GRAPHS
 export var graphTabs = writable([{ name: "tab1" }, { name: "secondTab" }]);
 export var activeGraphTab = writable(0);
 export var graphs = writable([
@@ -192,10 +193,12 @@ export var graphs = writable([
   },
 ]);
 
+//TABLES
 export var dataIDsforTables = writable([]);
 export var showalldata = writable([]);
 export var activeTableTab = writable(-1);
 
+//MENU MODAL
 export var menuModalActive = writable(false);
 export var contextMenu = writable({
   labels: ["test", "test2"],
@@ -210,6 +213,8 @@ export var contextMenu = writable({
   ],
 });
 
+//THEME
 export let selectedTheme = writable("light");
 
+//IMPORT
 export var importFileOpen = writable(false);

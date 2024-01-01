@@ -235,7 +235,7 @@
 
 {#if $graphs[$activeGraphTab].graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="actigramGraph">
-    <svg {width} height={totalHeight} style="border: 1px solid #000;">
+    <svg {width} height={totalHeight}>
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#if yValsToPlot.length > 0}
           {#each createSequenceArray(0, days - 1) as d}
@@ -252,6 +252,7 @@
               yoffset={d * (dayHeight + betweenHeight)}
               scale={yScale}
               position="left"
+              nticks="3"
             />
           {/each}
         {:else}
@@ -259,7 +260,13 @@
         {/if}
 
         <!-- axis stuff-->
-        <Axis {innerHeight} yoffset="0" scale={xScale} position="bottom" />
+        <Axis
+          {innerHeight}
+          yoffset="0"
+          scale={xScale}
+          position="bottom"
+          nticks="10"
+        />
       </g>
     </svg>
   </div>

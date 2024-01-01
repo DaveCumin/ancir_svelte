@@ -30,6 +30,7 @@
 
   export let dataIN;
   export let paramsStart;
+  export let typeTime;
 
   const dataMin = Math.min(...dataIN);
   const dataMax = Math.max(...dataIN);
