@@ -73,6 +73,22 @@ export function calculateTimeDifference(start, end, dateFormat) {
   return diffTime.hours;
 }
 
+//get the minimum period and if all the steps are the same
+export function getPeriod(timeData, timefmt) {
+  let diffs = new Array(timeData.length - 1);
+  for (let i = 1; i < timeData.length; i++) {
+    diffs[i - 1] = calculateTimeDifference(
+      timeData[i - 1],
+      timeData[i],
+      convertFormat(timefmt)
+    );
+  }
+  return {
+    minDiff: Math.min(...diffs),
+    constant: Math.min(...diffs) === Math.max(...diffs),
+  };
+}
+
 // Takes in an inputted value (ISO format) and the first time and format of
 //data. Calculates the offset for actigrams (and other plots).
 export function getstartTimeOffset(inputTime, firstTime, timeFormat) {

@@ -20,7 +20,7 @@ export var contextMenu = writable({
 });
 
 //THEME
-export let selectedTheme = writable("light");
+export var selectedTheme = writable("light");
 
 //IMPORT
 export var importFileOpen = writable(false);

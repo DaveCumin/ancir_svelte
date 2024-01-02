@@ -1,6 +1,6 @@
 <script context="module">
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { activeGraphTab, graphs, graphTabs, contextMenu } from "../store.js";
+  import { activeGraphTab, graphs, graphTabs } from "../store.js";
   import GraphTabs from "./GraphTabs.svelte";
   import ChartMaster from "../charts/ChartMaster.svelte";
   import { get } from "svelte/store";
@@ -27,6 +27,7 @@
           .toISO()
           .slice(0, 16),
         periodHrs: 24,
+        binSizeHrs: 0.25,
         width: 600,
         dayHeight: 10,
         betweenHeight: 2,

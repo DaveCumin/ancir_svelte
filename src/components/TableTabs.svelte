@@ -6,6 +6,7 @@
     data,
   } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
+  import { tooltip } from "../utils/Tooltip/Tooltip";
 
   let minrowstoshow = 100;
 
@@ -184,6 +185,8 @@
   <!-- have a button to show all rows-->
   {#if !$showalldata[$activeTableTab]}
     <button
+      tipcontent="Show more data"
+      use:tooltip
       class="showmorebutton"
       style="display: {$showalldata[$activeTableTab] ? 'none' : 'block'};"
       on:click={(e) => doshowalldata()}>...</button
@@ -289,5 +292,6 @@
     margin: auto;
     margin-top: 10px;
     margin-bottom: 10px;
+    background-color: var(--bg-color);
   }
 </style>

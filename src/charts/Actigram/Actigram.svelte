@@ -7,15 +7,14 @@
   import Axis from "../Axis.svelte";
   import { getstartTimeOffset } from "../../utils/time/TimeUtils";
   import { createSequenceArray } from "../../utils/MathsStats";
+  import { getDataData } from "../../data/handleData";
 
   let startTime;
-  //TODO: The startOffsets isn't working that well for some reason
   let startOffsets = Array.from(
     { length: $graphs[$activeGraphTab].sourceData.length },
     () => 0
   );
   let doublePlot = 2;
-  let halfbarwidth = 0.08 / 2;
   let actPaths;
   let days = 1;
   let xValsToPlot = [];
@@ -26,8 +25,9 @@
 
   let totalHeight;
 
-  const margin = { top: 20, bottom: 50, left: 50, right: 20 };
+  const margin = { top: 50, bottom: 20, left: 50, right: 20 };
   $: periodHrs = $graphs[$activeGraphTab].params.periodHrs;
+  $: binSize = $graphs[$activeGraphTab].params.binSizeHrs;
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
@@ -86,6 +86,36 @@
     return startOffsets;
   }
 
+  //Bin the data into binSize bins
+  function averageBinnedValues(xs, ys, binSize) {
+    let Nbins = Math.ceil((Math.max(...xs) + binSize) / binSize);
+    console.log(Math.max(...xs));
+    console.log(Nbins);
+    let xout = new Array(Nbins);
+    let yout = new Array(Nbins);
+
+    for (let b = 0; b < Nbins; b++) {
+      xout[b] = b * binSize + binSize / 2; // put in the mid-values for time
+      yout[b] = [];
+    }
+
+    //put values in bins
+    for (let i = 0; i < xs.length; i++) {
+      const binIndex = Math.floor(xs[i] / binSize);
+      yout[binIndex].push(ys[i]);
+    }
+
+    //get the average of the values
+    const averageY = yout.map((arr) => {
+      if (arr.length === 0) {
+        return NaN; // Handle empty arrays if needed
+      }
+      const sum = arr.reduce((acc, val) => acc + val, 0);
+      return sum / arr.length;
+    });
+    return { time: xout, values: averageY };
+  }
+
   //This makes the data required for the plot; reactive to any changes
   $: {
     xValsToPlot = [];
@@ -96,48 +126,26 @@
 
     if ($graphs[$activeGraphTab].graph === "actigram") {
       $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
-        const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+        //Get the time (x-axis) data
         if (plotData.chartvalues.time.field != "") {
-          if (plotData.chartvalues.time.processedData.length > 0) {
-            //check for processed graph data
-            xVals = plotData.chartvalues.time.processedData;
-          } else {
-            if (
-              //check for processed data
-              $data[theDataIndex].data[plotData.chartvalues.time.field]
-                .processedData.length > 0
-            ) {
-              xVals =
-                $data[theDataIndex].data[plotData.chartvalues.time.field]
-                  .processedData;
-            } else {
-              xVals =
-                $data[theDataIndex].data[plotData.chartvalues.time.field].data;
-            }
-          }
+          xVals = getDataData(
+            plotData.tableID,
+            plotData.chartvalues.time.field
+          );
         }
 
+        //Get the values (y-axis) data
         if (plotData.chartvalues.values.field != "") {
-          if (plotData.chartvalues.values.processedData.length > 0) {
-            //check for processed graph data
-            yVals = plotData.chartvalues.values.processedData;
-          } else {
-            if (
-              $data[theDataIndex].data[plotData.chartvalues.values.field]
-                .processedData.length > 0
-            ) {
-              yVals =
-                $data[theDataIndex].data[plotData.chartvalues.values.field]
-                  .processedData;
-            } else {
-              yVals =
-                $data[theDataIndex].data[plotData.chartvalues.values.field]
-                  .data;
-            }
-          }
+          yVals = getDataData(
+            plotData.tableID,
+            plotData.chartvalues.values.field
+          );
         }
-        xValsToPlot.push(xVals);
-        yValsToPlot.push(yVals);
+
+        const test = averageBinnedValues(xVals, yVals, binSize);
+
+        xValsToPlot.push(test.time);
+        yValsToPlot.push(test.values);
       });
 
       // update the scale
@@ -165,7 +173,7 @@
   }
 
   function createActipathArray(xin, yin) {
-    const halfbarwidthScaled = xScale(halfbarwidth);
+    const halfbarwidthScaled = xScale(binSize / 2);
     //update the days
     days = Math.ceil(
       Math.max(...xin.flat().filter((num) => !isNaN(num))) / periodHrs
@@ -212,7 +220,11 @@
             xin[srcIndex][i] + startOffsets[srcIndex] <=
               d * periodHrs + periodHrs * doublePlot &&
             xin[srcIndex][i] != null &&
-            xin[srcIndex][i] != undefined
+            xin[srcIndex][i] != undefined &&
+            !isNaN(xin[srcIndex][i]) &&
+            yin[srcIndex][i] != null &&
+            yin[srcIndex][i] != undefined &&
+            !isNaN(yin[srcIndex][i])
           ) {
             actPaths[d][srcIndex] =
               actPaths[d][srcIndex] + theNextPathPart + " ";
@@ -272,8 +284,8 @@
           {innerHeight}
           yoffset="0"
           scale={xScale}
-          position="bottom"
-          nticks="10"
+          position="top"
+          nticks="13"
         />
       </g>
     </svg>

@@ -2,7 +2,11 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { dataIDsforTables, activeTableTab, data } from "../store.js";
   import TableTabs from "./TableTabs.svelte";
-  import { getGuessedFormat, forceFornat } from "../utils/time/TimeUtils.js";
+  import {
+    getGuessedFormat,
+    forceFornat,
+    getPeriod,
+  } from "../utils/time/TimeUtils.js";
   import { updateDataProcess } from "../components/ProcessStep.svelte";
 
   $: showTableDetails = $activeTableTab >= 0 ? true : false;
@@ -10,9 +14,17 @@
     $data[$data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])];
 
   function updateTimeFormat(k) {
+    //Update the timeData
     $data[
       $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
     ].data[k].timeData = forceFornat(
+      currentTableData.data[k].data,
+      currentTableData.data[k].timeFormat
+    );
+    //Update the recordPeriod
+    $data[
+      $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
+    ].data[k].recordPeriod = getPeriod(
       currentTableData.data[k].data,
       currentTableData.data[k].timeFormat
     );
@@ -64,6 +76,12 @@
                   }}>🔦</button
                 >
               </div>
+              <div style="display: flex; margin: 5px; margin-left:1em;">
+                Sampling freq (min): {currentTableData.data[k].recordPeriod
+                  .minDiff} hrs, {currentTableData.data[k].recordPeriod.constant
+                  ? "equal"
+                  : "unequal"}
+              </div>
             {/if}
           {/each}
         </div>
@@ -71,3 +89,9 @@
     {/if}
   </Splitpanes>
 </Pane>
+
+<style>
+  .guessFmtBtn {
+    margin-right: 10px;
+  }
+</style>

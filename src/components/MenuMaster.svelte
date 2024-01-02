@@ -187,12 +187,8 @@
           {/if}
         </li>
       {/each}
-      <input
-        type="checkbox"
-        id="switchtheme"
-        on:change={(e) => switchTheme(e)}
-      />
     </ul>
+    <input type="checkbox" id="switchtheme" on:change={(e) => switchTheme(e)} />
   </div>
 </nav>
 
@@ -272,5 +268,67 @@
     border: none;
     border-bottom: 1px solid var(--hover-color);
     margin: 0px 0px;
+  }
+
+  #switchtheme {
+    float: right;
+    margin-right: 10px;
+    margin-top: -3em;
+  }
+  :root {
+    --theme-toggle-width: 3rem;
+    --theme-toggle-height: 1.5rem;
+    --theme-toggle-circle-width: 0;
+    --theme-toggle-circle-dimensions: calc(var(--theme-toggle-height) - 0.5rem);
+  }
+  #switchtheme {
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+    height: var(--theme-toggle-height);
+    width: var(--theme-toggle-width);
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border: 1px solid var(--hover-color);
+    position: relative;
+    border-radius: var(--theme-toggle-circle-dimensions);
+    padding: 0.2rem;
+    background-color: var(--bg-color);
+    transition: background-color 0.5s;
+  }
+  #switchtheme:before {
+    content: "";
+    width: var(--theme-toggle-circle-dimensions);
+    height: var(--theme-toggle-circle-dimensions);
+    background-color: var(--primary-color);
+    position: absolute;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%) translateX(0%);
+    transition: transform 0.5s;
+  }
+  #switchtheme:after {
+    content: "Light mode";
+    white-space: nowrap;
+    color: var(--bg-color);
+    position: absolute;
+    left: calc(100% + 1.5rem);
+    font-size: 1.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  #switchtheme:checked {
+    background-color: var(--primary-color);
+    border: none;
+  }
+  #switchtheme:checked:before {
+    background-color: #fff;
+    transform: translateY(-50%)
+      translateX(calc(var(--theme-toggle-width) - var(--theme-toggle-height)));
+  }
+  #switchtheme:checked:after {
+    content: "Dark mode";
+    color: var(--bg-color);
   }
 </style>

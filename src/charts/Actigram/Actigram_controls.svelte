@@ -91,6 +91,17 @@
 
   <div class="sliderContainer">
     <Slider
+      min={0.05}
+      max={1}
+      step="0.05"
+      limits={[0.05, $graphs[$activeGraphTab].params.periodHrs]}
+      label="Bin size (hrs):"
+      bind:value={$graphs[$activeGraphTab].params.binSizeHrs}
+    />
+  </div>
+
+  <div class="sliderContainer">
+    <Slider
       min={100}
       max={1000}
       limits={[5, Infinity]}
@@ -128,7 +139,7 @@
     margin-bottom: 5px;
     margin-top: -3px;
     padding-top: 2px;
-    background: lightblue;
+    background: var(--primary-color);
     cursor: pointer;
   }
 

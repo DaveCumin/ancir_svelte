@@ -1,5 +1,4 @@
 <script>
-  import { createEventDispatcher } from "svelte";
   //for the slider
   export let min = -100;
   export let max = 100;
@@ -12,14 +11,6 @@
   export let label = "Label:";
 
   function update() {
-    // Keep within the hard limits
-    if (value < limits[0]) {
-      value = limits[0];
-    }
-    if (value > limits[1]) {
-      value = limits[1];
-    }
-
     //calculate new slider values, if needed
     const range = Math.abs(max - min);
     const bottom20 = Math.max(limits[0], min + range * 0.2);
@@ -37,9 +28,17 @@
         min = value - range / 2;
       }
     }
-  }
 
-  const dispatch = createEventDispatcher();
+    // Keep within the hard limits
+    if (value < limits[0]) {
+      value = limits[0];
+      min = value;
+    }
+    if (value > limits[1]) {
+      value = limits[1];
+      max = value;
+    }
+  }
 </script>
 
 <div class="processItem">
@@ -49,10 +48,12 @@
       class="numberInput"
       type="number"
       id="val"
-      on:change={update}
+      {min}
+      {max}
+      {step}
+      on:change={() => update()}
       on:input={() => {
         update();
-        dispatch("change", { value });
       }}
       bind:value
     />
@@ -63,10 +64,9 @@
     {min}
     {max}
     {step}
-    on:change={update}
+    on:change={() => update()}
     on:input={() => {
       update();
-      dispatch("change", { value });
     }}
     bind:value
   />

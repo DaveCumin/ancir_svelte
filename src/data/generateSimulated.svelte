@@ -3,12 +3,30 @@
 
   import { data, menuModalActive } from "../store";
   import Slider from "../utils/Slider.svelte";
-  import { forceFornat, guessDateofArray } from "../utils/time/TimeUtils";
+  import {
+    forceFornat,
+    guessDateofArray,
+    getPeriod,
+  } from "../utils/time/TimeUtils";
+  import { DateTime } from "luxon";
   import { onMount } from "svelte";
 
   //create the first set of generated data on startup
   onMount(() => {
-    generateData(28, 15, new Date(), [24, 28], [100, 150]);
+    generateData(
+      28,
+      15,
+      DateTime.now()
+        .set({
+          hour: 0,
+          minute: 0,
+          second: 0,
+          millisecond: 0,
+        })
+        .toJSDate(),
+      [24, 28],
+      [100, 150]
+    );
   });
 
   function generateData(Ndays, fs_min, start, periods, maxheights) {
@@ -22,8 +40,17 @@
       data: {},
     };
 
-    // Generate time data
-    const startDate = new Date(start);
+    // Generate time data, from the start of today
+    const startDate = DateTime.now()
+      .set({
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+      })
+      .toJSDate();
+
+    //Make the time data
     const timeData = [];
     for (let i = 0; i < newDataEntry.datalength; i++) {
       const time = new Date(
@@ -34,6 +61,7 @@
 
     const timefmt = guessDateofArray(timeData);
     const processedTimeData = forceFornat(timeData, timefmt);
+    const timePeriod = getPeriod(timeData, timefmt);
 
     // Create time entry in newDataEntry.data
     newDataEntry.data.time = {
@@ -44,6 +72,7 @@
       processSteps: [],
       processedData: [],
       timeFormat: timefmt,
+      recordPeriod: timePeriod,
     };
 
     // Generate value data (value0 and value1)
@@ -71,7 +100,7 @@
         processedData: [],
       };
     }
-
+    console.log(newDataEntry);
     // Add the newDataEntry to the data array
     data.update((currentData) => [...currentData, newDataEntry]);
     //close the modal
@@ -80,7 +109,14 @@
 
   let Ndays = 28;
   let fs_min = 15;
-  let start = new Date("01/01/2024 11:10");
+  let start = DateTime.now()
+    .set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    })
+    .toJSDate();
 
   let N_simulated = 2;
   let periods = [24, 25];
@@ -115,7 +151,12 @@
       </div>
       <div>
         <label for="val">Start time:</label>
-        <input type="datetime-local" name="start" bind:value={start} />
+        <input
+          type="datetime-local"
+          name="start"
+          bind:value={start}
+          on:change={(value) => console.log(value)}
+        />
       </div>
       <hr />
       <hr />

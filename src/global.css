@@ -4,7 +4,7 @@
   --hover-color: #eee;
 
   --primary-color: lightblue;
-  --secondary-color: #536390;
+  --secondary-color: #888888;
   
 }
 
@@ -15,7 +15,7 @@
   --hover-color: #888888;
 
   --primary-color: #9A97F3;
-  --secondary-color: #818cab;
+  --secondary-color: #888888;
 
 }
 
@@ -42,6 +42,26 @@ h1{
 
 button{
   cursor: pointer;
+}
+
+
+/*SCROLLBAR*/
+.splitpanes__pane::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+.splitpanes__pane::-webkit-scrollbar
+{
+	width: 6px;
+  height: 6px;
+	background-color: var(--bg-color);
+}
+
+.splitpanes__pane::-webkit-scrollbar-thumb
+{
+	background-color: var(--secondary-color);
 }
 
 
