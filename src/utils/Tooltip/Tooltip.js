@@ -1,28 +1,15 @@
 import Tooltip from "./Tooltip.svelte";
 
 export function tooltip(element) {
-  let div;
-  let title;
   let tooltipComponent;
-  let xval;
-  let yval;
+  let tipcontent = element.getAttribute("tipcontent");
 
   function mouseOver(event) {
-    // NOTE: remove the `title` attribute, to prevent showing the default browser tooltip
-    // remember to set it back on `mouseleave`
-    title = element.getAttribute("title");
-    element.removeAttribute("title");
-
-    xval = element.getAttribute("cx");
-    yval = element.getAttribute("cy");
-
     tooltipComponent = new Tooltip({
       props: {
-        title: title,
+        tipcontent: tipcontent,
         x: event.clientX,
         y: event.clientY,
-        xval,
-        yval,
       },
       target: document.body,
     });
@@ -31,22 +18,17 @@ export function tooltip(element) {
   function mouseMove(event) {
     tooltipComponent.$set({
       props: {
-        x: event.clientX,
-        y: event.clientY,
+        tipcontent,
       },
     });
   }
 
   function mouseClick() {
     tooltipComponent.$destroy();
-    // NOTE: restore the `title` attribute
-    element.setAttribute("title", title);
   }
 
   function mouseLeave() {
     tooltipComponent.$destroy();
-    // NOTE: restore the `title` attribute
-    element.setAttribute("title", title);
   }
 
   element.addEventListener("mouseover", mouseOver);

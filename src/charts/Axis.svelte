@@ -3,7 +3,7 @@
   import { select, selectAll } from "d3-selection";
   import { axisBottom, axisLeft } from "d3-axis";
 
-  export let innerHeight;
+  export let innerHeight = 0;
   export let yoffset = 0;
   export let position;
   export let scale;

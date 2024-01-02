@@ -1,6 +1,5 @@
 <script>
   import { contextMenu } from "../store";
-  import { onMount } from "svelte";
 
   // pos is cursor position when right click occur
   let pos = { x: 0, y: 0 };

@@ -205,6 +205,7 @@
     margin: 0;
     z-index: 9;
     width: calc(100% + 2.2em);
+    background-color: var(--bg-color);
   }
 
   ul {

@@ -4,22 +4,15 @@
   import { data, menuModalActive } from "../store";
   import Slider from "../utils/Slider.svelte";
   import { forceFornat, guessDateofArray } from "../utils/time/TimeUtils";
+  import { onMount } from "svelte";
+
+  //create the first set of generated data on startup
+  onMount(() => {
+    generateData(28, 15, new Date(), [24, 28], [100, 150]);
+  });
 
   function generateData(Ndays, fs_min, start, periods, maxheights) {
     // Create an empty data object for the new entry
-
-    console.log(
-      "making sim data: " +
-        Ndays +
-        " " +
-        fs_min +
-        " " +
-        start +
-        " " +
-        periods +
-        " " +
-        maxheights
-    );
 
     const newDataEntry = {
       id: $data.length, // Assign a unique ID
@@ -81,7 +74,6 @@
 
     // Add the newDataEntry to the data array
     data.update((currentData) => [...currentData, newDataEntry]);
-    console.log(newDataEntry);
     //close the modal
     $menuModalActive = false;
   }

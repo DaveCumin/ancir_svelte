@@ -8,6 +8,7 @@
     <Slider
       min={100}
       max={1000}
+      limits={[5, Infinity]}
       label="Width:"
       bind:value={$graphs[$activeGraphTab].params.width}
     />
@@ -17,6 +18,7 @@
     <Slider
       min={10}
       max={3000}
+      limits={[5, Infinity]}
       label="Height: "
       bind:value={$graphs[$activeGraphTab].params.height}
     />

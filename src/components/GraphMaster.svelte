@@ -4,6 +4,7 @@
   import GraphTabs from "./GraphTabs.svelte";
   import ChartMaster from "../charts/ChartMaster.svelte";
   import { get } from "svelte/store";
+  import { DateTime } from "luxon";
 
   //---------------------------------------------------------------------
   // ----- ADD NEW GRAPHS BELOW
@@ -18,14 +19,17 @@
       graph: Actigram,
       controls: ActigramControls,
       prototypechartvalues: { time: "time", values: "values" },
-      prototypeother: { col: { hex: "#78322e", alpha: 0.5 } },
+      prototypeother: { col: { hex: "#1B1D50", alpha: 0.5 } },
       othertypes: ["colour"],
       params: {
-        startTime: "2023-10-02T11:35", //TODO: make this proper
+        startTime: DateTime.now()
+          .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+          .toISO()
+          .slice(0, 16),
         periodHrs: 24,
-        width: 400,
-        dayHeight: 100,
-        betweenHeight: 5,
+        width: 600,
+        dayHeight: 10,
+        betweenHeight: 2,
       },
     },
     raw: {
@@ -49,42 +53,56 @@
   //---------------------------------------------------------------------
 
   // MAKE A NEW CHART
-
+  //TODO: make this a popoup, like generate data
   export function makeNewChart(type) {
     let newchart = {
       graph: type,
       id: getID(),
       sourceData: [
         {
-          tableID: 1,
+          tableID: 0,
           name: "Placeholder",
           chartvalues: {
-            time: { field: "value12", processSteps: [], processedData: [] },
+            time: { field: "time", processSteps: [], processedData: [] },
             values: {
-              field: "value11",
+              field: "value0",
               processSteps: [],
               processedData: [],
             },
           },
-          col: { hex: "#19ff25", alpha: 0.7 },
+          col: { hex: "#1B1D50", alpha: 0.7 },
+        },
+        {
+          tableID: 0,
+          name: "Placeholder",
+          chartvalues: {
+            time: { field: "time", processSteps: [], processedData: [] },
+            values: {
+              field: "value1",
+              processSteps: [],
+              processedData: [],
+            },
+          },
+          col: { hex: "#A30F17", alpha: 0.7 },
         },
       ],
       params: { ...deepCopy(graphMap[type].params) },
     };
 
     get(graphs).push(newchart);
-    console.log(get(graphs));
 
     get(graphTabs).push({ name: "Chart " + getID() });
-    console.log(get(graphTabs));
-    //activeGraphTab.set(get(graphTabs).length - 1);
 
-    //TODO: make this a choice - probably a modal like the simulate data.
-    //addDataToGraph(1);
+    //make the updates
+    graphTabs.update((currenttabs) => [...currenttabs]);
+    activeGraphTab.update(() => get(graphTabs).length - 1);
   }
 
   //get the next highest id of graphs
   function getID() {
+    if (get(graphs).length === 0) {
+      return 0;
+    }
     let ids = [];
     get(graphs).forEach((d) => ids.push(d.id));
     return Math.max(...ids) + 1;
@@ -137,7 +155,7 @@
       </div>
     </Pane>
     <Pane size={30}>
-      {#if $graphs[$activeGraphTab].graph in graphMap}
+      {#if $activeGraphTab < 0}{:else if $graphs[$activeGraphTab].graph in graphMap}
         <div
           style="display: flex;
         min-width: 200px;"
@@ -153,7 +171,7 @@
           <button
             style="    float: right;
           margin: auto;
-          margin-right: 10px;"
+          margin-right: 10px; background: var(--bg-color"
             id="export"
             on:click={(e) => exportSVG()}>Export as SVG</button
           >

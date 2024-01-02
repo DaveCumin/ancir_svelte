@@ -83,6 +83,7 @@
     <Slider
       min={10}
       max={30}
+      limits={[1, Infinity]}
       label="Period (hrs):"
       bind:value={$graphs[$activeGraphTab].params.periodHrs}
     />
@@ -92,6 +93,7 @@
     <Slider
       min={100}
       max={1000}
+      limits={[5, Infinity]}
       label="Width: "
       bind:value={$graphs[$activeGraphTab].params.width}
     />
@@ -101,6 +103,7 @@
     <Slider
       min={10}
       max={30}
+      limits={[5, Infinity]}
       label="Day Height:"
       bind:value={$graphs[$activeGraphTab].params.dayHeight}
     />
@@ -110,6 +113,7 @@
     <Slider
       min={1}
       max={20}
+      limits={[-$graphs[$activeGraphTab].params.dayHeight, Infinity]}
       label="Between Height:"
       bind:value={$graphs[$activeGraphTab].params.betweenHeight}
     />

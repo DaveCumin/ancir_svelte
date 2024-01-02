@@ -24,17 +24,25 @@
   let xScale;
   let yScale;
 
+  let totalHeight;
+
   const margin = { top: 20, bottom: 50, left: 50, right: 20 };
   $: periodHrs = $graphs[$activeGraphTab].params.periodHrs;
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
   $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
-  $: totalHeight =
-    margin.top +
-    margin.bottom +
-    (dayHeight + betweenHeight) * days -
-    betweenHeight;
+  $: {
+    totalHeight =
+      margin.top +
+      margin.bottom +
+      (dayHeight + betweenHeight) * days -
+      betweenHeight;
+
+    if (totalHeight < margin.top + margin.bottom) {
+      totalHeight = margin.top + margin.bottom;
+    }
+  }
   $: innerHeight = totalHeight - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 

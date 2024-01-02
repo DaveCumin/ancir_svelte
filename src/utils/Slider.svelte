@@ -1,19 +1,29 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  //TODO: Make the min and max hard stops, if they are given.
+  //for the slider
   export let min = -100;
   export let max = 100;
-  export let value;
   export let step = 1;
+  //hard stops can be given here
+  export let limits = [-Infinity, Infinity];
+  //THE VALUE
+  export let value;
+  //the label
   export let label = "Label:";
-  export let number = false;
 
   function update() {
-    const dblValue = value * 2;
-    const range = Math.abs(max - min);
-    const bottom20 = min + range * 0.2;
-    const top20 = max - range * 0.2;
+    // Keep within the hard limits
+    if (value < limits[0]) {
+      value = limits[0];
+    }
+    if (value > limits[1]) {
+      value = limits[1];
+    }
 
+    //calculate new slider values, if needed
+    const range = Math.abs(max - min);
+    const bottom20 = Math.max(limits[0], min + range * 0.2);
+    const top20 = Math.min(limits[1], max - range * 0.2);
     if (Number.isInteger(step)) {
       // keep whole numbers
       if (value > top20 || value < bottom20) {
@@ -39,9 +49,12 @@
       class="numberInput"
       type="number"
       id="val"
-      bind:value
       on:change={update}
-      on:input={() => dispatch("change", { value })}
+      on:input={() => {
+        update();
+        dispatch("change", { value });
+      }}
+      bind:value
     />
   </label>
   <input
@@ -50,9 +63,12 @@
     {min}
     {max}
     {step}
-    bind:value
     on:change={update}
-    on:input={() => dispatch("change", { value })}
+    on:input={() => {
+      update();
+      dispatch("change", { value });
+    }}
+    bind:value
   />
 </div>
 

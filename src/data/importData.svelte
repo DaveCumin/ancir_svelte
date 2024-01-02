@@ -92,6 +92,9 @@
 
   //get the next highest id
   function getID() {
+    if ($data.length === 0) {
+      return 0;
+    }
     let ids = [];
     $data.forEach((d) => ids.push(d.id));
     return Math.max(...ids) + 1;

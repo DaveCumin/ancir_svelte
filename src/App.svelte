@@ -1,5 +1,6 @@
 <script>
   import { Pane, Splitpanes } from "svelte-splitpanes";
+  import GenerateSimulated from "./data/GenerateSimulated.svelte";
   import DataTree from "./components/DataTree.svelte";
   import GraphMaster from "./components/GraphMaster.svelte";
   import TableMaster from "./components/TableMaster.svelte";
@@ -8,15 +9,18 @@
   import ProcessStep from "./components/ProcessStep.svelte";
   import { selectedTheme } from "./store";
   import ContextMenu from "./utils/ContextMenu.svelte";
-  import GenerateSimulated from "./data/GenerateSimulated.svelte";
   import ImportData from "./data/importData.svelte";
 
-  let version = "Beta 2.9";
+  export let version = "Beta 2.11";
 </script>
 
 <svelte:head>
   <title>AnCiR v{version}</title>
 </svelte:head>
+
+<ContextMenu />
+<GenerateSimulated />
+<ImportData />
 
 <div data-theme={$selectedTheme}>
   <div style="max-width: 100vw;">
@@ -60,7 +64,3 @@
 
   <ProcessStep />
 </div>
-
-<ContextMenu />
-<GenerateSimulated />
-<ImportData />

@@ -96,6 +96,7 @@
           {#each ys as y, yi}
             {#if y !== null && !isNaN(y) && xValsToPlot[sourceI][yi] !== null && !isNaN(xValsToPlot[sourceI][yi])}
               <circle
+                tipcontent={xValsToPlot[sourceI][yi] + ", " + y}
                 use:tooltip
                 cx={xScale(xValsToPlot[sourceI][yi])}
                 cy={yScale(y)}

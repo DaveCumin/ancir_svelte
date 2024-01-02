@@ -2,7 +2,9 @@
   import { onMount } from "svelte";
   import { menuModalActive, importFileOpen } from "../store";
   import { exportSVG } from "./GraphMaster.svelte";
-  import { makeNewChart } from "../components/GraphMaster.svelte";
+  import { makeNewChart, graphMap } from "../components/GraphMaster.svelte";
+
+  let keepOpen = false;
 
   function switchTheme(e) {
     if (e.target.checked) {
@@ -14,6 +16,13 @@
 
   function createMenuItem(displayText, onClick) {
     return { displayText, onClick, visibleState: false };
+  }
+
+  function generateChartItems() {
+    const thecharts = Object.keys(graphMap).map((chartType) =>
+      createMenuItem(chartType, () => makeNewChart(chartType.toString()))
+    );
+    return thecharts;
   }
 
   let menuItems = [
@@ -33,18 +42,14 @@
       items: [
         {
           displayText: "Insert Chart",
-          onClick: () => console.log("here"),
-          items: [
-            createMenuItem("Raw", () => makeNewChart("raw")),
-            createMenuItem("Actigram", () => makeNewChart("actigram")),
-          ],
+          items: [generateChartItems()],
         },
         createMenuItem("Export current chart", () => exportSVG()),
       ],
     },
     {
       displayText: "Help",
-      items: [createMenuItem("About", () => console.log("JUST A MENU"))],
+      items: [createMenuItem("About", () => console.log("AnCiR v"))],
     },
   ];
 
@@ -76,6 +81,10 @@
   }
 
   onMount(() => {
+    //create new graph
+    makeNewChart("actigram");
+
+    //do click stuff
     const handleClickOutside = (event) => {
       try {
         if (
@@ -127,21 +136,39 @@
                 {:else if item.items}
                   <!-- Check if there are sub-items -->
                   <li>
-                    <button>{item.displayText}</button>
-                    <ul class="thirdmenu dontclose">
-                      {#each item.items as subItem}
-                        <li>
-                          <button
-                            on:click={(e) => {
-                              subItem.onClick();
-                              hideAllMenus();
-                            }}
-                          >
-                            {subItem.displayText}
-                          </button>
-                        </li>
-                      {/each}
-                    </ul>
+                    <button
+                      on:mouseover={() => (item.visibleState = true)}
+                      on:mouseleave={() =>
+                        setTimeout(() => {
+                          item.visibleState = false;
+                        }, 50)}
+                      >{item.displayText}
+                      <span style="float:right">▶</span></button
+                    >
+                    {#if item.visibleState || keepOpen}
+                      <ul
+                        class="thirdmenu dontclose"
+                        on:mouseover={() => {
+                          keepOpen = true;
+                        }}
+                        on:mouseleave={() => {
+                          setTimeout(() => (keepOpen = false), 50);
+                        }}
+                      >
+                        {#each item.items[0] as subItem}
+                          <li>
+                            <button
+                              on:click={(e) => {
+                                subItem.onClick();
+                                hideAllMenus();
+                              }}
+                            >
+                              {subItem.displayText}
+                            </button>
+                          </li>
+                        {/each}
+                      </ul>
+                    {/if}
                   </li>
                 {:else}
                   <li>
@@ -174,6 +201,7 @@
     position: sticky;
     height: 2em;
     background-color: var(--bg-color);
+    z-index: 1001;
   }
   .applicationmenu {
     border-bottom: 1px var(--hover-color) solid;
@@ -227,6 +255,19 @@
     padding: 0px 20px 0px 8px;
   }
 
+  ul li ul.thirdmenu {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    position: absolute; /* with respect to parent */
+    box-shadow: 1px 1px 5px #888888;
+    margin-left: calc(100% + 1px);
+    margin-top: -30px;
+  }
+
+  .hide {
+    display: none;
+  }
   hr {
     border: none;
     border-bottom: 1px solid var(--hover-color);

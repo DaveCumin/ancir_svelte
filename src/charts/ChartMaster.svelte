@@ -19,6 +19,13 @@
   } from "../components/ProcessStep.svelte";
 
   import { graphMap } from "../components/GraphMaster.svelte";
+  import { onMount } from "svelte";
+
+  //force the refresh from the start
+  onMount(() => {
+    updateGraphProcess($activeGraphTab, 0, "time");
+    updateGraphProcess($activeGraphTab, 1, "time");
+  });
 
   let prototypechartvalues = {};
   let prototypeother = {};
@@ -281,6 +288,7 @@
                   min="0"
                   max="1"
                   step="0.01"
+                  limits={[0, 1]}
                   label="Alpha: "
                   bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
                     .col.alpha}
@@ -467,5 +475,6 @@
     float: right;
     margin-right: calc(0.5em + 2px);
     margin-top: -2px;
+    background-color: var(--bg-color);
   }
 </style>
