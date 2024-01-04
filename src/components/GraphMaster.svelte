@@ -54,7 +54,7 @@
   //---------------------------------------------------------------------
 
   // MAKE A NEW CHART
-  //TODO: make this a popoup, like generate data
+  //TODO: make this a popoup, like generate data: currently only works for actigram
   export function makeNewChart(type) {
     let newchart = {
       graph: type,
@@ -112,25 +112,6 @@
   function deepCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
-
-  //EXPORT AS SVG
-  export function exportSVG() {
-    const svgString = document
-      .getElementById("thePlot")
-      .querySelector("svg").outerHTML;
-    const svgBlob = new Blob([svgString], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-    const svgUrl = URL.createObjectURL(svgBlob);
-
-    const link = document.createElement("a");
-    link.href = svgUrl;
-    link.download = get(graphTabs)[get(activeGraphTab)].name + ".svg";
-    document.body.appendChild(link);
-    link.click();
-
-    URL.revokeObjectURL(svgUrl);
-  }
 </script>
 
 <Pane size={80}>
@@ -142,8 +123,7 @@
   >
     <Pane>
       <GraphTabs />
-
-      <div id="thePlot" style="margin-left: 5px;">
+      <div id="thePlot" style="margin-top: 10px; margin-left: 5px;">
         {#if $activeGraphTab < 0}
           <h3>Need to add a graph</h3>
         {:else if $graphs[$activeGraphTab].graph in graphMap}
@@ -169,13 +149,6 @@
           >
             Controls
           </h1>
-          <button
-            style="    float: right;
-          margin: auto;
-          margin-right: 10px; background: var(--bg-color"
-            id="export"
-            on:click={(e) => exportSVG()}>Export as SVG</button
-          >
         </div>
         <svelte:component
           this={graphMap[$graphs[$activeGraphTab].graph].controls}

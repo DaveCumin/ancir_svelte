@@ -2,7 +2,11 @@
   // @ts-nocheck
 
   import { data, importFileOpen } from "../store";
-  import { guessDateofArray, forceFornat } from "../utils/time/TimeUtils";
+  import {
+    guessDateofArray,
+    forceFornat,
+    getPeriod,
+  } from "../utils/time/TimeUtils";
   import Papa from "papaparse";
 
   let specialValues = ["NaN", "NA", "null"];
@@ -57,15 +61,17 @@
         };
         console.log(dataOUT);
       } else if (guessDateofArray([datum]) != -1) {
+        const timefmt = guessDateofArray([datum]);
         dataOUT.data[f] = {
           name: f,
           type: "time",
           data: result.data.map((d) => d[f]),
-          timeFormat: guessDateofArray([datum]),
+          timeFormat: timefmt,
           timeData: forceFornat(
             result.data.map((d) => d[f]),
-            guessDateofArray([datum])
+            timefmt
           ),
+          recordPeriod: getPeriod(datum, timefmt),
           processSteps: [],
           processedData: [],
         };

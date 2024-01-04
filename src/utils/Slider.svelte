@@ -10,6 +10,25 @@
   //the label
   export let label = "Label:";
 
+  function keeptolimits() {
+    //Make sure min and max reflect the limits
+    if (min < limits[0]) {
+      min = limits[0];
+    }
+    if (max > limits[1]) {
+      max = limits[1];
+    }
+
+    // Keep value within the hard limits
+    if (value < limits[0]) {
+      value = limits[0];
+      min = value;
+    }
+    if (value > limits[1]) {
+      value = limits[1];
+      max = value;
+    }
+  }
   function update() {
     //calculate new slider values, if needed
     const range = Math.abs(max - min);
@@ -29,15 +48,7 @@
       }
     }
 
-    // Keep within the hard limits
-    if (value < limits[0]) {
-      value = limits[0];
-      min = value;
-    }
-    if (value > limits[1]) {
-      value = limits[1];
-      max = value;
-    }
+    keeptolimits();
   }
 </script>
 
@@ -53,7 +64,7 @@
       {step}
       on:change={() => update()}
       on:input={() => {
-        update();
+        keeptolimits();
       }}
       bind:value
     />
@@ -66,10 +77,12 @@
     {step}
     on:change={() => update()}
     on:input={() => {
-      update();
+      keeptolimits();
     }}
     bind:value
   />
+  <span class="min {min === limits[0] ? 'stop' : ''}">{min}</span>
+  <span class="max">{max}</span>
 </div>
 
 <style>
@@ -105,5 +118,23 @@
   }
   .processItem {
     padding: 5px 0px;
+  }
+
+  .min {
+    font-size: 0.7em;
+    display: block;
+    margin-top: -0.7em;
+    margin-left: 0.2em;
+  }
+  .max {
+    font-size: 0.7em;
+    display: block;
+    margin-top: -1.3em;
+    margin-left: 0.2em;
+    float: right;
+  }
+  .stop {
+    font-style: italic;
+    text-decoration: underline;
   }
 </style>

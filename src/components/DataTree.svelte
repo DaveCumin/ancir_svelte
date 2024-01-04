@@ -239,7 +239,7 @@
   }
 
   .addbutton:hover {
-    background: #eee;
+    background: var(--hover-color);
     padding: 0.2em 0.5em;
     margin-right: -0.5em;
     margin-top: -0.2em;
@@ -268,7 +268,7 @@
     z-index: 2;
   }
   .hoverbutton:hover {
-    background: #aaaaaa;
+    background: var(--hover-color);
     padding: 0.2em 0.5em;
     margin: -0.2em -0.5em;
     border-radius: 20%;

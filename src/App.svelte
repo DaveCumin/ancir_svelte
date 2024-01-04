@@ -11,7 +11,7 @@
   import ContextMenu from "./utils/ContextMenu.svelte";
   import ImportData from "./data/importData.svelte";
 
-  export let version = "Beta 2.11";
+  export let version = "Beta 2.12";
 </script>
 
 <svelte:head>

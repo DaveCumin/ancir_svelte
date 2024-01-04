@@ -135,16 +135,25 @@
 </script>
 
 {#if $menuModalActive}
+  <div class="backdrop"></div>
   <dialog id="modal_simulated_data" class="dialog">
     <div class="modal-box">
       <h1>GENERATE SIMULATED DATA</h1>
       <div>
-        <Slider min={1} max={100} bind:value={Ndays} label="Days:" />
+        <Slider
+          min={5}
+          max={30}
+          limits={[1, Infinity]}
+          bind:value={Ndays}
+          label="Days:"
+        />
       </div>
       <div>
         <Slider
           min={1}
-          max={100}
+          max={240}
+          step={1}
+          limits={[1, 240]}
           bind:value={fs_min}
           label="Sampling period (minutes):"
         />
@@ -159,36 +168,46 @@
         />
       </div>
       <hr />
-      <hr />
+      <h2>Data:</h2>
+      <span class="addSimDataButton" on:click={() => addSimData()}>
+        ➕ <!-- Plus sign symbol -->
+      </span>
       {#each Array.from({ length: N_simulated }) as _, i}
-        <div>value{i}:</div>
-        <button on:click={() => removeSimData(i)}>
-          🗑️ <!-- Trash bin symbol -->
-        </button>
-        <div>
-          <div>
-            <Slider
-              min={21}
-              max={26}
-              step="0.1"
-              bind:value={periods[i]}
-              label="Rhythm period (hours):"
-            />
-          </div>
-          <div>
-            <Slider
-              min={1}
-              max={100}
-              bind:value={maxheights[i]}
-              label="Max values:"
-            />
+        <div class="datum">
+          <div class="dataTitle">
+            <div>value{i}:</div>
+            <div
+              class="removeData hoverbutton"
+              on:click={() => removeSimData(i)}
+            >
+              🗑️ <!-- Trash bin symbol -->
+            </div>
+
+            <div>
+              <div>
+                <Slider
+                  min={21}
+                  max={26}
+                  limits={[6, 72]}
+                  step="0.1"
+                  bind:value={periods[i]}
+                  label="Rhythm period (hours):"
+                />
+              </div>
+              <div>
+                <Slider
+                  min={1}
+                  max={100}
+                  limits={[10, 10000]}
+                  bind:value={maxheights[i]}
+                  label="Max values:"
+                />
+              </div>
+            </div>
           </div>
         </div>
-        <hr />
       {/each}
-      <button class="addSimDataButton" on:click={() => addSimData()}>
-        ➕ <!-- Plus sign symbol -->
-      </button>
+
       <button
         on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
         >Generate</button
@@ -199,6 +218,16 @@
 {/if}
 
 <style>
+  .backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+  }
   dialog {
     display: block;
     position: absolute;
@@ -206,6 +235,11 @@
     z-index: 1000;
     max-height: 80vh;
     overflow: auto;
+    background: var(--bg-color);
+    z-index: 9998;
+    box-shadow: 5px 5px 15px var(--secondary-color);
+    border: none;
+    border-radius: 5px;
   }
   .modal {
     z-index: 1000;
@@ -214,5 +248,37 @@
   }
   .modal-box {
     z-index: 1000;
+  }
+  .addSimDataButton {
+    float: right;
+    margin-top: -2.2em;
+  }
+  .addSimDataButton:hover {
+    background: var(--hover-color);
+    padding: 0.2em 0.5em;
+    margin: -2.4em -0.5em;
+    border-radius: 20%;
+    cursor: pointer;
+  }
+  .dataTitle {
+    margin-top: 10px;
+  }
+  .datum {
+    box-shadow: 1px 1px 5px var(--secondary-color);
+    padding: 2px 10px;
+    margin: 0 0px 10px 0px;
+  }
+  .removeData {
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+    margin-top: -1.3em;
+  }
+  .hoverbutton:hover {
+    background: var(--hover-color);
+    padding: 0.2em 0.5em;
+    margin: -1.5em -0.5em;
+    border-radius: 20%;
+    cursor: pointer;
   }
 </style>

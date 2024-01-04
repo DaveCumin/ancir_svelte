@@ -22,5 +22,8 @@ export var contextMenu = writable({
 //THEME
 export var selectedTheme = writable("light");
 
-//IMPORT
+//IMPORT FLAG
 export var importFileOpen = writable(false);
+
+//STATUS DATA
+export var statusData = writable([]);

@@ -85,7 +85,7 @@
       if (get(data)[tableindex].data[field].type === "time") {
         result = get(data)[tableindex].data[field].timeData;
       } else {
-        result = [].concat(get(data)[tableindex].data[field].data);
+        result = get(data)[tableindex].data[field].data;
       }
     }
 

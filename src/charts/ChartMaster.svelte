@@ -416,7 +416,7 @@
     z-index: 2;
   }
   .hoverbutton:hover {
-    background: #aaaaaa;
+    background: var(--hover-color);
     padding: 0.2em 0.5em;
     margin: -0.2em -0.5em;
     border-radius: 20%;

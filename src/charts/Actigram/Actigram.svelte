@@ -1,13 +1,15 @@
 <script>
   // @ts-nocheck
 
-  import { data, graphs, activeGraphTab } from "../../store";
-  import { tooltip } from "../../utils/Tooltip/Tooltip";
+  import { data, graphs, activeGraphTab, statusData } from "../../store";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
   import { getstartTimeOffset } from "../../utils/time/TimeUtils";
   import { createSequenceArray } from "../../utils/MathsStats";
   import { getDataData } from "../../data/handleData";
+  import { averageBinnedValues } from "../../data/handleData";
+
+  let mousedown = false;
 
   let startTime;
   let startOffsets = Array.from(
@@ -20,8 +22,10 @@
   let xValsToPlot = [];
   let yValsToPlot = [];
 
-  let xScale;
-  let yScale;
+  let xScale = scaleLinear()
+    .domain([0, periodHrs * doublePlot])
+    .range([0, innerWidth]);
+  let yScale = scaleLinear().domain([0, 100]).range([dayHeight, 0]);
 
   let totalHeight;
 
@@ -46,6 +50,7 @@
   $: innerHeight = totalHeight - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
+  //UPDATE THE OFFSETS
   $: {
     //TODO: Change the start time when new data is added; to be the 00:00 of the first day of the data (here or in ChartMaster?)
     startTime = $graphs[$activeGraphTab].params.startTime;
@@ -86,36 +91,6 @@
     return startOffsets;
   }
 
-  //Bin the data into binSize bins
-  function averageBinnedValues(xs, ys, binSize) {
-    let Nbins = Math.ceil((Math.max(...xs) + binSize) / binSize);
-    console.log(Math.max(...xs));
-    console.log(Nbins);
-    let xout = new Array(Nbins);
-    let yout = new Array(Nbins);
-
-    for (let b = 0; b < Nbins; b++) {
-      xout[b] = b * binSize + binSize / 2; // put in the mid-values for time
-      yout[b] = [];
-    }
-
-    //put values in bins
-    for (let i = 0; i < xs.length; i++) {
-      const binIndex = Math.floor(xs[i] / binSize);
-      yout[binIndex].push(ys[i]);
-    }
-
-    //get the average of the values
-    const averageY = yout.map((arr) => {
-      if (arr.length === 0) {
-        return NaN; // Handle empty arrays if needed
-      }
-      const sum = arr.reduce((acc, val) => acc + val, 0);
-      return sum / arr.length;
-    });
-    return { time: xout, values: averageY };
-  }
-
   //This makes the data required for the plot; reactive to any changes
   $: {
     xValsToPlot = [];
@@ -124,6 +99,7 @@
     let xVals;
     let yVals;
 
+    //check the graph is correct
     if ($graphs[$activeGraphTab].graph === "actigram") {
       $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
         //Get the time (x-axis) data
@@ -142,13 +118,17 @@
           );
         }
 
-        const test = averageBinnedValues(xVals, yVals, binSize);
+        //do the binning
+        const binnedData = averageBinnedValues(xVals, yVals, binSize);
 
-        xValsToPlot.push(test.time);
-        yValsToPlot.push(test.values);
+        //set up the plot data
+        xValsToPlot.push(binnedData.time);
+        yValsToPlot.push(binnedData.values);
+
+        console.log(xValsToPlot);
       });
 
-      // update the scale
+      // update the scales
       xScale = scaleLinear()
         .domain([0, periodHrs * doublePlot])
         .range([0, innerWidth]);
@@ -174,10 +154,6 @@
 
   function createActipathArray(xin, yin) {
     const halfbarwidthScaled = xScale(binSize / 2);
-    //update the days
-    days = Math.ceil(
-      Math.max(...xin.flat().filter((num) => !isNaN(num))) / periodHrs
-    );
 
     //force refresh
     $graphs[$activeGraphTab].params.dayHeight =
@@ -251,12 +227,48 @@
 
     return actPaths;
   }
+
+  function mouseToPoint(e) {
+    const clickedDay = Math.floor(
+      (e.offsetY - margin.top) / (dayHeight + betweenHeight)
+    );
+    const clickedHrs =
+      ((e.offsetX - margin.left) / innerWidth) * periodHrs * doublePlot;
+
+    const clickedTime = clickedDay * periodHrs + clickedHrs;
+
+    $statusData.push({
+      display: clickedHrs + ", " + clickedDay + " -> " + clickedTime,
+    });
+    $statusData = $statusData;
+  }
 </script>
 
 {#if $graphs[$activeGraphTab].graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="actigramGraph">
-    <svg {width} height={totalHeight}>
-      <g transform={`translate(${margin.left},${margin.right})`}>
+    <svg
+      {width}
+      height={totalHeight}
+      on:mousedown={(e) => {
+        mousedown = true;
+        mouseToPoint(e);
+      }}
+      on:mousemove={(e) => {
+        if (mousedown) {
+          e.preventDefault();
+          mouseToPoint(e);
+        }
+      }}
+      on:mouseup={(e) => {
+        mousedown = false;
+        mouseToPoint(e);
+      }}
+      on:dblclick={(e) => {
+        e.preventDefault();
+        mouseToPoint(e);
+      }}
+    >
+      <g transform={`translate(${margin.left},${margin.top})`}>
         {#if yValsToPlot.length > 0}
           {#each createSequenceArray(0, days - 1) as d}
             {#each yValsToPlot as ys, sourceI}
@@ -272,7 +284,7 @@
               yoffset={d * (dayHeight + betweenHeight)}
               scale={yScale}
               position="left"
-              nticks="3"
+              nticks={dayHeight / 15}
             />
           {/each}
         {:else}
@@ -285,7 +297,7 @@
           yoffset="0"
           scale={xScale}
           position="top"
-          nticks="13"
+          nticks={periodHrs}
         />
       </g>
     </svg>

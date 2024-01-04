@@ -1,4 +1,5 @@
 <script>
+  import Charttools from "../charts/Charttools.svelte";
   import { graphTabs, graphs, activeGraphTab } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
 
@@ -45,6 +46,7 @@
         {/each}
       </ul>
     </nav>
+    <Charttools />
   {/if}
 </div>
 
@@ -56,7 +58,9 @@
     z-index: 999;
     background: var(--bg-color);
     padding: 0px;
-    margin: 0 2.2em 0 0 !important;
+    margin: 0 !important;
+    display: flow-root;
+    /*box-shadow: 1px 2px 5px var(--hover-color);*/
   }
 
   nav {
