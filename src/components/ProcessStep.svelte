@@ -2,7 +2,7 @@
   // @ts-nocheck
   import { data, graphs, activeGraphTab } from "../store.js";
   import { get } from "svelte/store";
-  import { makeTimeProcessedData } from "../utils/time/TimeUtils.js";
+  import { getDataFromTable } from "../data/handleData.js";
 
   //---------------------------------------------------------------------
   // ----- ADD NEW PROCESSING FUNCTIONS BELOW
@@ -25,6 +25,7 @@
 
   let selectedSettings = null;
 
+  //add a process when context menu is clicked clicked
   export function addProcess(PROCESS, WHEREP, ID, FIELDNAME) {
     // Update your data array with the result
     selectedSettings = {
@@ -44,6 +45,7 @@
         }
         return newData;
       });
+      //now update the data with the new process
       updateDataProcess(ID, FIELDNAME);
     }
 
@@ -60,49 +62,41 @@
 
         return newData;
       });
+      //now update the data with the new process
       updateGraphProcess(get(activeGraphTab), ID, FIELDNAME);
     }
   }
 
-  export function updateGraphProcess(graph, sourcei, xy) {
-    let processes =
-      get(graphs)[graph].sourceData[sourcei].chartvalues[xy].processSteps;
+  function processData(processes, dataIN) {
+    for (const processObj of processes) {
+      const processName = processObj.process;
+      const processFunction = componentMap[processName].func;
 
-    // Initial values, from store
-    let tableindex = get(data).findIndex(
-      (d) => d.id === get(graphs)[graph].sourceData[sourcei].tableID
-    );
-    let field = get(graphs)[graph].sourceData[sourcei].chartvalues[xy].field;
-
-    let result;
-
-    //If there are processes
-    if (get(data)[tableindex].data[field].processSteps.length > 0) {
-      result = get(data)[tableindex].data[field].processedData;
-      //Else, if there are no processes
-    } else {
-      //deal with time data
-      if (get(data)[tableindex].data[field].type === "time") {
-        result = get(data)[tableindex].data[field].timeData;
+      if (typeof processFunction === "function") {
+        // Check if the function exists in the processMap
+        dataIN = processFunction(dataIN, processObj.parameters); //CALL THE FUNCTION WITH PARAMS
       } else {
-        result = get(data)[tableindex].data[field].data;
+        // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
+        console.error(`Function '${processName}' does not exist.`);
       }
     }
+    return dataIN;
+  }
 
-    // Iterate through the JSON array and execute the processes
+  //Update the data with processes for graphs
+  export function updateGraphProcess(graph, sourcei, xy) {
+    // Initial values, from store
+    let tableID = get(graphs)[graph].sourceData[sourcei].tableID;
+    let field = get(graphs)[graph].sourceData[sourcei].chartvalues[xy].field;
+
+    let result = getDataFromTable(tableID, field);
+
+    //check for data processes and add them
+    //If there are graph processes, execute the processes
+    let processes =
+      get(graphs)[graph].sourceData[sourcei].chartvalues[xy].processSteps;
     if (processes.length > 0) {
-      for (const processObj of processes) {
-        const processName = processObj.process;
-        const processFunction = componentMap[processName].func;
-
-        if (typeof processFunction === "function") {
-          // Check if the function exists in the processMap
-          result = processFunction(result, processObj.parameters); //CALL THE FUNCTION WITH PARAMS
-        } else {
-          // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
-          console.error(`Function '${processName}' does not exist.`);
-        }
-      }
+      result = processData(processes, result);
     }
 
     //UPDATE THE STORE
@@ -115,61 +109,37 @@
   }
 
   // FUNCTION THAT UPDATES THE PROCESSED DATA, AND ANY GRAPHED DATA IF THERE ARE
-  export function updateDataProcess(dataID, datakey) {
-    // JSON data containing the functions to execute, from store
-    let processes = get(data).find((entry) => entry.id === dataID).data[datakey]
-      .processSteps;
-
+  export function updateDataProcess(tableID, field) {
     // Initial values, from store
-    let result = [];
-    if (
-      get(data).find((entry) => entry.id === dataID).data[datakey].type ===
-      "time"
-    ) {
-      result = [].concat(
-        get(data).find((entry) => entry.id === dataID).data[datakey].timeData
-      );
-    } else {
-      result = [].concat(
-        get(data).find((entry) => entry.id === dataID).data[datakey].data
-      );
-    }
+    let result = getDataFromTable(tableID, field, false);
 
     // Iterate through the JSON array and execute the processes
+    let processes = get(data).find((entry) => entry.id === tableID).data[field]
+      .processSteps;
     if (processes.length > 0) {
-      for (const processObj of processes) {
-        const processName = processObj.process;
-        const processFunction = componentMap[processName].func;
-
-        if (typeof processFunction === "function") {
-          // Check if the function exists in the processMap
-          result = processFunction(result, processObj.parameters); //CALL THE FUNCTION WITH PARAMS
-        } else {
-          // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
-          console.error(`Function '${processName}' does not exist.`);
-        }
-      }
+      result = processData(processes, result);
     }
 
     //UPDATE THE STORE
     data.update((currentData) => {
       // Find the data entry with the specified ID
       const newData = [...currentData];
-      const datum = newData.find((entry) => entry.id === dataID);
+      const datum = newData.find((entry) => entry.id === tableID);
 
       // Check if the data entry and key exist
-      if (datum && datum.data[datakey]) {
+      if (datum && datum.data[field]) {
         // Add a new process step to the selected key
-        datum.data[datakey].processedData = result;
+        datum.data[field].processedData = result;
       }
       return newData;
     });
+
     //Update any graphs that use the data
     get(graphs).forEach((graph, graphIndex) => {
       graph.sourceData.forEach((source, sourceIndex) => {
-        if (source.tableID === dataID) {
+        if (source.tableID === tableID) {
           Object.keys(source.chartvalues).forEach((key) => {
-            if (source.chartvalues[key].field === datakey) {
+            if (source.chartvalues[key].field === field) {
               updateGraphProcess(graphIndex, sourceIndex, key);
             }
           });

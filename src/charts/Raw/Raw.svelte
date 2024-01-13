@@ -2,6 +2,7 @@
   // @ts-nocheck
 
   import { data, graphs, activeGraphTab } from "../../store";
+  import { getDataFromSource } from "../../data/handleData";
   import { tooltip } from "../../utils/Tooltip/Tooltip";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
@@ -28,45 +29,19 @@
     let yVals;
 
     if ($graphs[$activeGraphTab].graph === "raw") {
-      $graphs[$activeGraphTab].sourceData.forEach((plotData) => {
+      $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
         const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+        //get the x data
         if (plotData.chartvalues.x.field != "") {
-          if (plotData.chartvalues.x.processedData.length > 0) {
-            //check for processed graph data
-            xVals = plotData.chartvalues.x.processedData;
-          } else {
-            if (
-              //check for processed data
-              $data[theDataIndex].data[plotData.chartvalues.x.field]
-                .processedData.length > 0
-            ) {
-              xVals =
-                $data[theDataIndex].data[plotData.chartvalues.x.field]
-                  .processedData;
-            } else {
-              xVals =
-                $data[theDataIndex].data[plotData.chartvalues.x.field].data;
-            }
-          }
+          xVals = getDataFromSource(sourceIndex, plotData.chartvalues.x);
         }
+
+        //get the y data
         if (plotData.chartvalues.y.field != "") {
-          if (plotData.chartvalues.y.processedData.length > 0) {
-            //check for processed graph data
-            yVals = plotData.chartvalues.y.processedData;
-          } else {
-            if (
-              $data[theDataIndex].data[plotData.chartvalues.y.field]
-                .processedData.length > 0
-            ) {
-              yVals =
-                $data[theDataIndex].data[plotData.chartvalues.y.field]
-                  .processedData;
-            } else {
-              yVals =
-                $data[theDataIndex].data[plotData.chartvalues.y.field].data;
-            }
-          }
+          yVals = getDataFromSource(sourceIndex, plotData.chartvalues.y);
         }
+
+        //put the data into the chart
         xValsToPlot.push(xVals);
         yValsToPlot.push(yVals);
       });
@@ -101,8 +76,12 @@
                 cx={xScale(xValsToPlot[sourceI][yi])}
                 cy={yScale(y)}
                 r={$graphs[$activeGraphTab].sourceData[sourceI].size}
-                stroke="black"
-                stroke-width="3"
+                stroke={$graphs[$activeGraphTab].sourceData[sourceI].strokeCol
+                  .hex}
+                stroke-opacity={$graphs[$activeGraphTab].sourceData[sourceI]
+                  .strokeCol.alpha}
+                stroke-width={$graphs[$activeGraphTab].sourceData[sourceI]
+                  .strokeWidth}
                 fill={$graphs[$activeGraphTab].sourceData[sourceI].col.hex}
                 fill-opacity={$graphs[$activeGraphTab].sourceData[sourceI].col
                   .alpha}

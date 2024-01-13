@@ -59,7 +59,6 @@
           processSteps: [],
           processedData: [],
         };
-        console.log(dataOUT);
       } else if (guessDateofArray([datum]) != -1) {
         const timefmt = guessDateofArray([datum]);
         dataOUT.data[f] = {
@@ -73,7 +72,7 @@
           ),
           recordPeriod: getPeriod(datum, timefmt),
           processSteps: [],
-          processedData: [],
+          rocessedData: [],
         };
       } else {
         //TODO: deal with categorical data

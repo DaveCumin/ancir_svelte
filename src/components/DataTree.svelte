@@ -37,7 +37,6 @@
     let dataIndex = $data.findIndex((d) => d.id === dataID);
     $data[dataIndex].data[datakey].processSteps[processindex].parameters =
       processParams;
-    dataID, datakey;
     updateDataProcess(dataID, datakey);
   }
 
@@ -45,6 +44,9 @@
     let dataIndex = $data.findIndex((d) => d.id === dataID);
     $data[dataIndex].data[datakey].processSteps.splice(processindex, 1);
     updateDataProcess(dataID, datakey);
+    if ($data[dataIndex].data[datakey].processSteps.length === 0) {
+      $data[dataIndex].data[datakey].processedData = [];
+    }
   }
 
   function removeData(dataID) {
@@ -82,14 +84,6 @@
     for (let i = 0; i < $contextMenu.labels.length; i++) {
       $contextMenu.funcs[i] = () =>
         addProcess($contextMenu.labels[i], where, id, fieldName);
-    }
-  }
-
-  function getData(datum) {
-    if (datum.type === "time") {
-      return datum.timeData;
-    } else {
-      return datum.data;
     }
   }
 </script>
@@ -155,7 +149,6 @@
               <div class="processDetails">
                 <svelte:component
                   this={componentMap[ps.process].component}
-                  dataIN={getData($data[datumID].data[key])}
                   paramsStart={ps.parameters}
                   typeTime={{
                     type: $data[datumID].data[key].type,

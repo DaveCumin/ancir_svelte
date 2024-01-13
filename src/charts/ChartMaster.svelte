@@ -12,7 +12,6 @@
   import { addProcess } from "../components/ProcessStep.svelte";
   import Slider from "../utils/Slider.svelte";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
-
   import {
     componentMap,
     updateGraphProcess,
@@ -36,11 +35,20 @@
       prototypeother = graphMap[$graphs[$activeGraphTab].graph].prototypeother;
     }
   }
-  function removeProcess(sourceID, xy, processindex) {
-    $graphs[$activeGraphTab].sourceData[sourceID].chartvalues[
+
+  //Update a process in the graph
+  function updateProcess(xy, sourcei, processindex, processParams) {
+    $graphs[$activeGraphTab].sourceData[sourcei].chartvalues[xy].processSteps[
+      processindex
+    ].parameters = processParams;
+    updateGraphProcess($activeGraphTab, sourcei, xy);
+  }
+  //Remove a process
+  function removeProcess(sourcei, xy, processindex) {
+    $graphs[$activeGraphTab].sourceData[sourcei].chartvalues[
       xy
     ].processSteps.splice(processindex, 1);
-    updateGraphProcess($activeGraphTab, sourceID, xy);
+    updateGraphProcess($activeGraphTab, sourcei, xy);
   }
 
   function getFieldNames(source) {
@@ -65,12 +73,7 @@
           $data[$data.findIndex((d) => d.id === tableID_IN)].data
         )[cdindex], //{insert fieldnames in order},
         processSteps: [],
-        processedData: getDataFromTable(
-          tableID_IN,
-          Object.keys($data[$data.findIndex((d) => d.id === tableID_IN)].data)[
-            cdindex
-          ]
-        ),
+        processedData: [],
       };
     });
 
@@ -84,14 +87,6 @@
 
     //To refresh in svelte
     $graphs = $graphs;
-  }
-
-  //Update a process in the graph
-  function updateProcess(xy, sourcei, processindex, processParams) {
-    $graphs[$activeGraphTab].sourceData[sourcei].chartvalues[xy].processSteps[
-      processindex
-    ].parameters = processParams;
-    updateGraphProcess($activeGraphTab, sourcei, xy);
   }
 
   //remove data from a graph
@@ -119,34 +114,6 @@
       $contextMenu.funcs[i] = () =>
         addProcess($contextMenu.labels[i], where, id, fieldName);
     }
-  }
-
-  function getDataFromTable(tableID_IN, key) {
-    if (
-      $data[$data.findIndex((d) => d.id === tableID_IN)].data[key].type ===
-      "time"
-    ) {
-      return $data[$data.findIndex((d) => d.id === tableID_IN)].data[key]
-        .timeData;
-    }
-
-    return $data[$data.findIndex((d) => d.id === tableID_IN)].data[key].data;
-  }
-
-  function getData(source, key) {
-    if (
-      $data[$data.findIndex((d) => d.id === source.tableID)].data[
-        source.chartvalues[key].field
-      ].type === "time"
-    ) {
-      return $data[$data.findIndex((d) => d.id === source.tableID)].data[
-        source.chartvalues[key].field
-      ].timeData;
-    }
-
-    return $data[$data.findIndex((d) => d.id === source.tableID)].data[
-      source.chartvalues[key].field
-    ].data;
   }
 
   function createnewDataProcessContext() {
@@ -245,7 +212,6 @@
                 <div class="processDetails">
                   <svelte:component
                     this={componentMap[ps.process].component}
-                    dataIN={getData(source, key)}
                     paramsStart={ps.parameters}
                     typeTime={{
                       type: $data[
@@ -279,9 +245,10 @@
                 type="color"
                 style="background: {$graphs[$activeGraphTab].sourceData[
                   sourceIndex
-                ].col.hex}"
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-                  .hex}
+                ][protoKey].hex}"
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex][
+                  protoKey
+                ].hex}
               />
               <div class="sliderContainer">
                 <Slider
@@ -290,8 +257,9 @@
                   step="0.01"
                   limits={[0, 1]}
                   label="Alpha: "
-                  bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
-                    .col.alpha}
+                  bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex][
+                    protoKey
+                  ].alpha}
                 />
               </div>
             </div>
@@ -306,8 +274,9 @@
                 label={protoKey.charAt(0).toUpperCase() +
                   protoKey.slice(1) +
                   ":"}
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
-                  .size}
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex][
+                  protoKey
+                ]}
               />
             </div>
           {/if}

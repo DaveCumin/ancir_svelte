@@ -2,17 +2,30 @@ import { data, graphs, activeGraphTab } from "../store";
 import { get } from "svelte/store";
 
 //Get data from the data structure
-export function getDataData(tableID, key) {
+export function getDataFromTable(tableID, key, getProcessed = true) {
   const tempData =
     get(data)[get(data).findIndex((d) => d.id === tableID)].data[key];
-
-  if (tempData.processedData.length > 0) {
+  //console.log(tempData);
+  if (tempData.processedData.length > 0 && getProcessed) {
     return tempData.processedData;
   }
+
   if (tempData.type === "time") {
     return tempData.timeData;
   }
   return tempData.data;
+}
+
+//get the data from graph source
+export function getDataFromSource(sourceIndex, vals) {
+  const sourceData = get(graphs)[get(activeGraphTab)].sourceData[sourceIndex];
+  if (vals.processedData.length > 0) {
+    return vals.processedData;
+  } else {
+    const tableID = sourceData.tableID;
+
+    return getDataFromTable(tableID, vals.field);
+  }
 }
 
 //Bin the data into binSize bins

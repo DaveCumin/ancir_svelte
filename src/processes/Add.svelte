@@ -23,7 +23,6 @@
     });
   }
 
-  export let dataIN;
   export let paramsStart;
   export let typeTime;
 

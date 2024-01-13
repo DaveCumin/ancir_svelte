@@ -29,7 +29,7 @@
     );
   });
 
-  function generateData(Ndays, fs_min, start, periods, maxheights) {
+  function generateData(Ndays, fs_min, startDate, periods, maxheights) {
     // Create an empty data object for the new entry
 
     const newDataEntry = {
@@ -39,16 +39,6 @@
       datalength: Ndays * 24 * (60 / fs_min),
       data: {},
     };
-
-    // Generate time data, from the start of today
-    const startDate = DateTime.now()
-      .set({
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-      })
-      .toJSDate();
 
     //Make the time data
     const timeData = [];

@@ -37,8 +37,13 @@
       graph: Raw,
       controls: RawControls,
       prototypechartvalues: { x: "any", y: "any" },
-      prototypeother: { col: { hex: "#78322e", alpha: 0.5 }, size: 5 },
-      othertypes: ["colour", "slider"],
+      prototypeother: {
+        col: { hex: "#78322e", alpha: 0.5 },
+        size: 5,
+        strokeWidth: 6,
+        strokeCol: { hex: "#000000", alpha: 0.9 },
+      },
+      othertypes: ["colour", "slider", "slider", "colour"],
       params: {
         width: 600,
         height: 200,
@@ -53,7 +58,23 @@
   };
   //---------------------------------------------------------------------
 
+  function getRandomHexColour() {
+    // Generate a random hex color
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  }
   // MAKE A NEW CHART
+  function putChartValues(keysIN, fieldsIN) {
+    const chartValues = {};
+    for (let i = 0; i < keysIN.length; i++) {
+      chartValues[keysIN[i]] = {
+        field: fieldsIN[i],
+        processSteps: [],
+        processedData: [],
+      };
+    }
+    return chartValues;
+  }
+
   //TODO: make this a popoup, like generate data: currently only works for actigram
   export function makeNewChart(type) {
     let newchart = {
@@ -62,38 +83,42 @@
       sourceData: [
         {
           tableID: 0,
-          name: "Placeholder",
-          chartvalues: {
-            time: { field: "time", processSteps: [], processedData: [] },
-            values: {
-              field: "value0",
-              processSteps: [],
-              processedData: [],
-            },
-          },
-          col: { hex: "#1B1D50", alpha: 0.7 },
+          name: "Data 0",
+          chartvalues: putChartValues(
+            Object.keys(graphMap[type].prototypechartvalues),
+            ["time", "value0"]
+          ),
+          ...deepCopy(graphMap[type].prototypeother),
         },
         {
           tableID: 0,
-          name: "Placeholder",
-          chartvalues: {
-            time: { field: "time", processSteps: [], processedData: [] },
-            values: {
-              field: "value1",
-              processSteps: [],
-              processedData: [],
-            },
-          },
-          col: { hex: "#A30F17", alpha: 0.7 },
+          name: "Data 1",
+          chartvalues: putChartValues(
+            Object.keys(graphMap[type].prototypechartvalues),
+            ["time", "value1"]
+          ),
+          ...deepCopy(graphMap[type].prototypeother),
         },
       ],
       params: { ...deepCopy(graphMap[type].params) },
     };
 
+    //change the colours if there are any
+    for (let p = 0; p < graphMap[type].othertypes.length; p++) {
+      if (graphMap[type].othertypes[p] === "colour") {
+        for (let s = 0; s < newchart.sourceData.length; s++) {
+          newchart.sourceData[s][
+            Object.keys(graphMap[type].prototypeother)[p]
+          ].hex = getRandomHexColour();
+        }
+      }
+    }
+
     get(graphs).push(newchart);
 
     get(graphTabs).push({ name: "Chart " + getID() });
 
+    console.log(get(graphs));
     //make the updates
     graphTabs.update((currenttabs) => [...currenttabs]);
     activeGraphTab.update(() => get(graphTabs).length - 1);
