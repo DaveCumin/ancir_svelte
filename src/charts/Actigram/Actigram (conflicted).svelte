@@ -53,11 +53,11 @@
     $graphs[$activeGraphTab].params.periodHrs
   );
   $: binSize = $graphs[$activeGraphTab].params.binSizeHrs;
-  $: width = $graphs[$activeGraphTab].params.width;
+  $: width = $graphs[$activeGraphTab].params.width + margin.left + margin.right;
   $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
   $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
   $: innerHeight = totalHeight - margin.top - margin.bottom;
-  $: innerWidth = width - margin.left - margin.right;
+  $: innerWidth = width;
 
   function calcTotalHeight(margin, dayHeight, betweenHeight, periodHrs) {
     if ($graphs[$activeGraphTab].graph === "actigram") {
@@ -520,7 +520,7 @@
                   {innerHeight}
                   yoffset={d * (dayHeight + betweenHeight)}
                   xoffset={15 * srcIndex}
-                  width={width - margin.left - margin.right - 15}
+                  width={width - margin.right - 15}
                   scale={$graphs[$activeGraphTab].chartData.yScales[srcIndex][
                     d
                   ]}

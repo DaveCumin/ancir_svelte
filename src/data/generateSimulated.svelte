@@ -90,7 +90,7 @@
         processedData: [],
       };
     }
-    console.log(newDataEntry);
+
     // Add the newDataEntry to the data array
     data.update((currentData) => [...currentData, newDataEntry]);
     //close the modal

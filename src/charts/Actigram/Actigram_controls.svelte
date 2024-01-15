@@ -3,36 +3,9 @@
 
   import Slider from "../../utils/Slider.svelte";
   import { graphs, activeGraphTab } from "../../store";
+  import { formatTimeFromISO } from "../../utils/time/TimeUtils";
 
   let datePickVisible = true;
-
-  function formatStartTime(timeString) {
-    if (timeString) {
-      const [datePart, timePart] = timeString.split("T");
-      const [year, month, day] = datePart.split("-");
-      const [hours, minutes] = timePart.split(":");
-
-      const monthLookup = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      const monthText = monthLookup[+month - 1];
-
-      return `${day} ${monthText} ${year} ${hours}:${minutes}`;
-    } else {
-      return "";
-    }
-  }
 
   function toggleOpenDatePick() {
     datePickVisible = !datePickVisible;
@@ -63,7 +36,7 @@
         toggleOpenDatePick();
       }}
     >
-      {formatStartTime($graphs[$activeGraphTab].params.startTime)}
+      {formatTimeFromISO($graphs[$activeGraphTab].params.startTime)}
     </div>
     <input
       class="dateInput"

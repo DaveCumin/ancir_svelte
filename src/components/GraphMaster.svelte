@@ -33,7 +33,7 @@
         betweenHeight: 2,
         doublePlot: 2,
         scaleAxes: "byPlot",
-        showAxes: true,
+        showAxes: false,
       },
     },
     raw: {

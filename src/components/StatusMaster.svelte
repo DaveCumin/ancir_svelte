@@ -12,7 +12,6 @@
   });
 
   const scrollToBottom = async (node) => {
-    console.log("GO GO GO");
     node.scroll({ top: node.scrollHeight, behavior: "smooth" });
   };
 </script>
@@ -22,6 +21,6 @@
   <Spinner size="1em" color="var(--primary-color)" />
 
   {#each $statusData as status}
-    <p>{status.display}</p>
+    <p>{@html status.display}</p>
   {/each}
 </div>

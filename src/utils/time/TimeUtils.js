@@ -119,8 +119,41 @@ export function forceFornat(dataIN, formatIN) {
   return dataout;
 }
 
+export function formatTimeFromISO(timeString) {
+  if (timeString) {
+    const [datePart, timePart] = timeString.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hours, minutes] = timePart.split(":");
+
+    const monthLookup = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const monthText = monthLookup[+month - 1];
+
+    return `${day} ${monthText} ${year} ${hours}:${minutes}`;
+  } else {
+    return "";
+  }
+}
 export function getISODate(stringIN, formatIN) {
   return DateTime.fromFormat(stringIN, convertFormat(formatIN)).toISO();
+}
+
+export function addTime(start, hoursIN) {
+  return formatTimeFromISO(
+    DateTime.fromISO(start).plus({ hours: hoursIN }).toISO()
+  );
 }
 
 /*

@@ -16,6 +16,13 @@ export function getDataFromTable(tableID, key, getProcessed = true) {
   return tempData.data;
 }
 
+//Gets the name of the field (for display purposes)
+export function getFieldName(tableID, field) {
+  const tempData =
+    get(data)[get(data).findIndex((d) => d.id === tableID)].data[field];
+  return tempData.name;
+}
+
 //get the data from graph source
 export function getDataFromSource(sourceIndex, vals) {
   const sourceData = get(graphs)[get(activeGraphTab)].sourceData[sourceIndex];
