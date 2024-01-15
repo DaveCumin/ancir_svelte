@@ -153,6 +153,16 @@ input[type="text"], input[type="datetime-local"]{
   width: 60%;
   background: var(--bg-color);;
 }
+select{
+  height: 1.5rem;
+    align-self: center;
+    border-radius: 0.5rem;
+    width: 50%;
+    float: right;
+    margin-right: calc(0.5em + 2px);
+    margin-top: -2px;
+    background-color: var(--bg-color);
+}
 .processItem{
   flex-basis: 100%;
   flex-grow: 0;

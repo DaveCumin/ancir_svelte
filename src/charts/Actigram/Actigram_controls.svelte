@@ -104,6 +104,7 @@
     <Slider
       min={100}
       max={1000}
+      step="1"
       limits={[5, Infinity]}
       label="Width: "
       bind:value={$graphs[$activeGraphTab].params.width}
@@ -114,6 +115,7 @@
     <Slider
       min={10}
       max={30}
+      step="1"
       limits={[5, Infinity]}
       label="Day Height:"
       bind:value={$graphs[$activeGraphTab].params.dayHeight}
@@ -124,10 +126,28 @@
     <Slider
       min={1}
       max={20}
+      step="1"
       limits={[-$graphs[$activeGraphTab].params.dayHeight, Infinity]}
       label="Between Height:"
       bind:value={$graphs[$activeGraphTab].params.betweenHeight}
     />
+  </div>
+
+  <div class="sliderContainer">
+    <a>y-Axes: </a>
+    <a>Show </a>
+    <input
+      type="checkbox"
+      bind:checked={$graphs[$activeGraphTab].params.showAxes}
+    />
+    <select
+      class="selectField"
+      style="margin-right:0 !important;"
+      bind:value={$graphs[$activeGraphTab].params.scaleAxes}
+    >
+      <option value="byPlot">byPlot</option>
+      <option value="overall">Overall</option>
+    </select>
   </div>
 </div>
 

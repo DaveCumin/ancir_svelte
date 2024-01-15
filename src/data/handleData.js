@@ -55,7 +55,7 @@ export function averageBinnedValues(xs, ys, binSize) {
 
   //get the average of the values
   const averageY = yout.map((sum, index) => {
-    return counts[index] > 0 ? sum / counts[index] : NaN;
+    return counts[index] > 0 ? sum / counts[index] : 0;
   });
 
   return { time: xout, values: averageY };

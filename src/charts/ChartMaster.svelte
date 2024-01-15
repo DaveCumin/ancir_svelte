@@ -24,6 +24,7 @@
   onMount(() => {
     updateGraphProcess($activeGraphTab, 0, "time");
     updateGraphProcess($activeGraphTab, 1, "time");
+    $graphs[$activeGraphTab].params.dayHeight = 15;
   });
 
   let prototypechartvalues = {};
@@ -435,15 +436,5 @@
   .itemsliderContainer {
     width: calc(100% - 2em);
     margin-left: 1em;
-  }
-  .selectField {
-    height: 1.5rem;
-    align-self: center;
-    border-radius: 0.5rem;
-    width: 50%;
-    float: right;
-    margin-right: calc(0.5em + 2px);
-    margin-top: -2px;
-    background-color: var(--bg-color);
   }
 </style>

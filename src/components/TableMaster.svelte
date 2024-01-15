@@ -77,8 +77,8 @@
                 >
               </div>
               <div style="display: flex; margin: 5px; margin-left:1em;">
-                Sampling freq (min): {currentTableData.data[k].recordPeriod
-                  .minDiff} hrs, {currentTableData.data[k].recordPeriod.constant
+                Sampling freq: {currentTableData.data[k].recordPeriod.minDiff} hrs,
+                {currentTableData.data[k].recordPeriod.constant
                   ? "equal"
                   : "unequal"}
               </div>

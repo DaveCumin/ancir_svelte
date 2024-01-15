@@ -11,7 +11,7 @@
   import ContextMenu from "./utils/ContextMenu.svelte";
   import ImportData from "./data/importData.svelte";
 
-  export let version = "Beta 2.12";
+  export let version = "Beta 2.14";
 </script>
 
 <svelte:head>
@@ -40,7 +40,7 @@
         pushOtherPanes={false}
         dblClickSplitter={true}
       >
-        <Pane size={25}>
+        <Pane size={18}>
           <DataTree />
         </Pane>
         <Pane>

@@ -4,10 +4,13 @@
   import { axisBottom, axisLeft, axisTop, axisRight } from "d3-axis";
 
   export let innerHeight = 0;
+  export let width = 0;
   export let yoffset = 0;
-  export let position;
+  export let xoffset = 0;
+  export let position = "left";
   export let scale;
   export let nticks = 5;
+  export let colour = "#000000";
 
   let transform;
   let g;
@@ -29,15 +32,16 @@
 
       case "left":
         axis = axisLeft(scale).tickSizeOuter(0).ticks(nticks);
-        transform = `translate(0, ${yoffset})`;
+        transform = `translate(${xoffset}, ${yoffset})`;
         break;
 
       case "right":
         axis = axisRight(scale).tickSizeOuter(0).ticks(nticks);
-        transform = `translate(0, ${yoffset})`;
+        transform = `translate(${xoffset + width}, ${yoffset})`;
         break;
     }
-    select(g).call(axis);
+    select(g).call(axis).selectAll("path").style("stroke", colour);
+    select(g).call(axis).selectAll("text").style("fill", colour);
   }
 </script>
 

@@ -119,6 +119,10 @@ export function forceFornat(dataIN, formatIN) {
   return dataout;
 }
 
+export function getISODate(stringIN, formatIN) {
+  return DateTime.fromFormat(stringIN, convertFormat(formatIN)).toISO();
+}
+
 /*
 ///----------------
 console.log(DateTime.fromFormatExplain("2023-10-2T11:35", "yyyy-LL-ddTHH:mm"));

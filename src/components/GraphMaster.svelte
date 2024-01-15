@@ -31,6 +31,9 @@
         width: 600,
         dayHeight: 10,
         betweenHeight: 2,
+        doublePlot: 2,
+        scaleAxes: "byPlot",
+        showAxes: true,
       },
     },
     raw: {
@@ -118,7 +121,6 @@
 
     get(graphTabs).push({ name: "Chart " + getID() });
 
-    console.log(get(graphs));
     //make the updates
     graphTabs.update((currenttabs) => [...currenttabs]);
     activeGraphTab.update(() => get(graphTabs).length - 1);
@@ -160,7 +162,7 @@
         {/if}
       </div>
     </Pane>
-    <Pane size={30}>
+    <Pane size={25}>
       {#if $activeGraphTab < 0}{:else if $graphs[$activeGraphTab].graph in graphMap}
         <div
           style="display: flex;
