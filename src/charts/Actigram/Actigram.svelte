@@ -61,7 +61,11 @@
 
   function calcTotalHeight(margin, dayHeight, betweenHeight, periodHrs) {
     if ($graphs[$activeGraphTab].graph === "actigram") {
-      if (($graphs[$activeGraphTab].chartData.startOffsets = [])) {
+      //TODO: something strange in here somewhere - make new actigram first thing after default start. Error re startoffsets
+      if (
+        $graphs[$activeGraphTab].chartData.startOffsets === undefined ||
+        $graphs[$activeGraphTab].chartData.startOffsets.length === 0
+      ) {
         makePlotData(
           $graphs[$activeGraphTab].sourceData,
           $graphs[$activeGraphTab].params.binSizeHrs,
@@ -70,6 +74,7 @@
           $graphs[$activeGraphTab].params.startTime
         );
       }
+      console.log($graphs[$activeGraphTab].chartData);
       const days = $graphs[$activeGraphTab].chartData.data.time[0].length;
 
       totalHeight =

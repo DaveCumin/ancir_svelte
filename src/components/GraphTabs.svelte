@@ -9,9 +9,7 @@
 
   function deleteTab(ind) {
     $graphs.splice(ind, 1);
-    $graphs = $graphs;
     $graphTabs.splice(ind, 1);
-    $graphTabs = $graphTabs;
     $activeGraphTab = $graphs.length > 0 ? 0 : -1;
   }
 </script>
