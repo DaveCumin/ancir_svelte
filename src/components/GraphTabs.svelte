@@ -11,6 +11,9 @@
     $graphs.splice(ind, 1);
     $graphTabs.splice(ind, 1);
     $activeGraphTab = $graphs.length > 0 ? 0 : -1;
+
+    $graphs = $graphs;
+    $graphTabs = $graphTabs;
   }
 </script>
 

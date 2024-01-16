@@ -1,6 +1,5 @@
 <script>
   // @ts-nocheck
-
   import { data, graphs, activeGraphTab, statusData } from "../../store";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
@@ -13,26 +12,11 @@
   import { getDataFromSource, getFieldName } from "../../data/handleData";
   import {
     averageBinnedValues,
+    bestFitOnsets,
     getDiffs,
-    getMeanSD,
   } from "../../data/handleData";
 
   let margin = { top: 50, bottom: 20, left: 100, right: 100 };
-
-  $graphs[$activeGraphTab].chartData = {
-    chartMins: [],
-    chartMaxs: [],
-    data: { time: [], values: [], mins: [], maxs: [] },
-    yScales: [],
-    xScale: scaleLinear()
-      .domain([
-        0,
-        $graphs[$activeGraphTab].params.periodHrs *
-          $graphs[$activeGraphTab].params.doublePlot,
-      ])
-      .range([0, innerWidth]),
-    startOffsets: [],
-  };
 
   //for highlighting and reporting
   let mousedown = false;
@@ -126,6 +110,8 @@
               $graphs[$activeGraphTab].params.doublePlot,
           ])
           .range([0, innerWidth]),
+        startOffsets: [],
+        onsets: [],
       };
 
       //for each source data
@@ -144,7 +130,7 @@
         const binnedData = averageBinnedValues(xVals, yVals, binSizeHrs);
 
         //update the offsets
-        updateOffsets(startTime, $activeGraphTab);
+        chartData.startOffsets = updateOffsets(startTime, $activeGraphTab);
 
         //set up the plot data
         const nonanValues = binnedData.values.filter((num) => !isNaN(num));
@@ -202,6 +188,7 @@
 
       //now set the data
       $graphs[$activeGraphTab].chartData = chartData;
+
       //and update the scales - do for each day
       updateScales($graphs[$activeGraphTab].params.scaleAxes);
     }
@@ -300,7 +287,10 @@
       //set the up to start with
       startOffsets = Array.from({ length: 1 }, () => 0);
     }
+
     $graphs[$activeGraphTab].chartData.startOffsets = startOffsets;
+
+    return startOffsets;
   }
 
   //----------------------------------------------------------------------------------------------------
@@ -313,7 +303,7 @@
   );
 
   function createActipathArray(chartData, dayHeight) {
-    if (chartData) {
+    if (chartData && $graphs[$activeGraphTab].graph === "actigram") {
       const days = $graphs[$activeGraphTab].chartData.data.time[0].length;
       const srcLength = $graphs[$activeGraphTab].chartData.data.time.length;
       const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
@@ -391,9 +381,9 @@
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
   function findOnOffsets(sourceIndex) {
     //Set up the parameters
-    const centile = 20;
-    const Nhrs = 6;
-    const Mhrs = 6;
+    const centile = 60;
+    const Nhrs = 3;
+    const Mhrs = 3;
     const binSize = $graphs[$activeGraphTab].params.binSizeHrs;
     const template = createTemplate(Nhrs, Mhrs, binSize);
 
@@ -417,10 +407,10 @@
     const dbl = $graphs[$activeGraphTab].params.doublePlot;
     let bestMatchIndex = [];
     let bestMatchTime = [];
-    for (let d = 0; d < aboveBelow.length / periodStep - (dbl - 1); d++) {
+    for (let d = 0; d < aboveBelow.length / periodStep; d++) {
       bestMatchIndex[d] =
         findBestMatchIndex(
-          aboveBelow.slice(d * periodStep, (d + dbl) * periodStep),
+          aboveBelow.slice(d * periodStep, (d + 1) * periodStep),
           template
         ) + Math.round(Nhrs / binSize); // add the Nhrs step to be the start of the jump
 
@@ -431,13 +421,9 @@
     }
 
     console.log("----- " + sourceIndex + " ------");
-    console.log(aboveBelow.slice(0, periodStep));
-    console.log(bestMatchIndex);
-    console.log("bestMatchTime = " + bestMatchTime);
-    const msd = getMeanSD(getDiffs(bestMatchTime));
-    console.log(
-      "mean (sd) diffs = " + msd.mean.toFixed(2) + "(" + msd.sd.toFixed(2) + ")"
-    );
+
+    console.log("estimate = " + bestFitOnsets(getDiffs(bestMatchTime)));
+    $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = bestMatchTime;
   }
 
   //create the template
@@ -660,6 +646,21 @@
           nticks={$graphs[$activeGraphTab].params.periodHrs}
         />
       </g>
+      <!-- OFFSETS -->
+      {#each $graphs[$activeGraphTab].chartData.onsets as onsets, srcIndex}
+        {#each $graphs[$activeGraphTab].chartData.onsets[srcIndex] as onset, d}
+          <circle
+            cx={$graphs[$activeGraphTab].chartData.xScale(
+              onset - d * $graphs[$activeGraphTab].params.periodHrs
+            ) + margin.left}
+            cy={d * (dayHeight + betweenHeight) + dayHeight + margin.top}
+            r="2"
+            fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+            stroke-width="1"
+            stroke="black"
+          />
+        {/each}
+      {/each}
     </svg>
   </div>
 {/if}

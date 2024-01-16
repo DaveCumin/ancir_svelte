@@ -5,6 +5,7 @@
   import ChartMaster from "../charts/ChartMaster.svelte";
   import { get } from "svelte/store";
   import { DateTime } from "luxon";
+  import { scaleLinear } from "d3-scale";
 
   //---------------------------------------------------------------------
   // ----- ADD NEW GRAPHS BELOW
@@ -35,6 +36,14 @@
         scaleAxes: "byPlot",
         showAxes: false,
       },
+      chartData: {
+        chartMins: [],
+        chartMaxs: [],
+        data: { time: [], values: [], mins: [], maxs: [] },
+        yScales: [],
+        xScale: scaleLinear().domain([0, 48]).range([0, innerWidth]),
+        startOffsets: [],
+      },
     },
     raw: {
       graph: Raw,
@@ -57,6 +66,7 @@
         yAxisLabel: "y-axis",
         xAxisLabel: "x-axis title here",
       },
+      chartData: {},
     },
   };
   //---------------------------------------------------------------------
@@ -104,6 +114,7 @@
         },
       ],
       params: { ...deepCopy(graphMap[type].params) },
+      chartData: { ...deepCopy(graphMap[type].chartData) },
     };
 
     //change the colours if there are any
