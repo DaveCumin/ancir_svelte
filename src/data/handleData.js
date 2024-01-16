@@ -67,3 +67,22 @@ export function averageBinnedValues(xs, ys, binSize) {
 
   return { time: xout, values: averageY };
 }
+
+export function getDiffs(data) {
+  let diffs = [];
+  for (let i = 1; i < data.length; i++) {
+    diffs[i - 1] = data[i] - data[i - 1];
+  }
+  return diffs;
+}
+// calculate the mean and sd of data
+export function getMeanSD(data) {
+  const mean = data.reduce((sum, value) => sum + value, 0) / data.length;
+
+  const sd = Math.sqrt(
+    data.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) /
+      data.length
+  );
+
+  return { mean, sd };
+}

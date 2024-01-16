@@ -11,7 +11,11 @@
   } from "../../utils/time/TimeUtils";
   import { createSequenceArray } from "../../utils/MathsStats";
   import { getDataFromSource, getFieldName } from "../../data/handleData";
-  import { averageBinnedValues } from "../../data/handleData";
+  import {
+    averageBinnedValues,
+    getDiffs,
+    getMeanSD,
+  } from "../../data/handleData";
 
   let margin = { top: 50, bottom: 20, left: 100, right: 100 };
 
@@ -37,7 +41,7 @@
   //for drawing
   let actPaths = "";
 
-  $: updateMargins($graphs[$activeGraphTab].params.showAxes);
+  $: updateMargins($graphs[$activeGraphTab].params);
   function updateMargins(show) {
     if (!show) {
       margin = { top: 50, bottom: 20, left: 50, right: 50 };
@@ -374,7 +378,114 @@
         }
       }
     }
+    console.log($graphs[$activeGraphTab]);
+    if ($graphs[$activeGraphTab].graph === "actigram") {
+      findOnOffsets(0);
+      findOnOffsets(1);
+    }
     return actPaths;
+  }
+
+  //----------------------------------------------------------------------------------------------------
+  //Code to find the onsets and offsets
+  // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
+  function findOnOffsets(sourceIndex) {
+    //Set up the parameters
+    const centile = 20;
+    const Nhrs = 6;
+    const Mhrs = 6;
+    const binSize = $graphs[$activeGraphTab].params.binSizeHrs;
+    const template = createTemplate(Nhrs, Mhrs, binSize);
+
+    //get the data
+    const values = getDataFromSource(
+      sourceIndex,
+      $graphs[$activeGraphTab].sourceData[sourceIndex].chartvalues.values
+    );
+
+    //find the centile
+    const centileValue = findCentileValue(values, centile);
+
+    //conver the data to -1s and 1s
+    const aboveBelow = values.map((value) =>
+      value <= centileValue || isNaN(value) ? -1 : 1
+    );
+
+    //get the best matching index for each day
+    const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
+    const periodStep = periodHrs / binSize;
+    const dbl = $graphs[$activeGraphTab].params.doublePlot;
+    let bestMatchIndex = [];
+    let bestMatchTime = [];
+    for (let d = 0; d < aboveBelow.length / periodStep - (dbl - 1); d++) {
+      bestMatchIndex[d] =
+        findBestMatchIndex(
+          aboveBelow.slice(d * periodStep, (d + dbl) * periodStep),
+          template
+        ) + Math.round(Nhrs / binSize); // add the Nhrs step to be the start of the jump
+
+      bestMatchTime[d] =
+        $graphs[$activeGraphTab].chartData.data.time[sourceIndex][d][
+          bestMatchIndex[d]
+        ];
+    }
+
+    console.log("----- " + sourceIndex + " ------");
+    console.log(aboveBelow.slice(0, periodStep));
+    console.log(bestMatchIndex);
+    console.log("bestMatchTime = " + bestMatchTime);
+    const msd = getMeanSD(getDiffs(bestMatchTime));
+    console.log(
+      "mean (sd) diffs = " + msd.mean.toFixed(2) + "(" + msd.sd.toFixed(2) + ")"
+    );
+  }
+
+  //create the template
+  function createTemplate(Nhrs, Mhrs, binSize) {
+    const N = Math.round(Nhrs / binSize);
+    const M = Math.round(Mhrs / binSize);
+    // Create an array with N -1s followed by M 1s
+    const resultArray = Array.from({ length: N }, () => -1).concat(
+      Array.from({ length: M }, () => 1)
+    );
+
+    return resultArray;
+  }
+
+  //get the centile
+  function findCentileValue(data, centile) {
+    const filteredData = data.filter((value) => !isNaN(value) && value !== 0);
+    // Sort the filtered data in ascending order
+    const sortedData = filteredData.slice().sort((a, b) => a - b);
+    // Calculate the index for the percentile
+    const indexPercentile = Math.ceil((centile / 100) * sortedData.length) - 1;
+    // Retrieve the value at the calculated index
+    const percentileValue = sortedData[indexPercentile];
+
+    return percentileValue;
+  }
+
+  // find best matching to template
+  function findBestMatchIndex(test, template) {
+    let bestMatchIndex = -1;
+    let bestCorrelation = -Infinity;
+
+    for (let i = 0; i <= test.length - template.length; i++) {
+      let correlation = 0;
+
+      // Calculate the cross-correlation at the current index
+      for (let j = 0; j < template.length; j++) {
+        correlation += test[i + j] * template[j];
+      }
+
+      // Update best match if the correlation is higher
+      if (correlation > bestCorrelation) {
+        bestCorrelation = correlation;
+        bestMatchIndex = i;
+      }
+    }
+
+    return bestMatchIndex;
   }
 
   //----------------------------------------------------------------------------------------------------
