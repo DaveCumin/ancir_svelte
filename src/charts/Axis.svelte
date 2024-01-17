@@ -4,19 +4,25 @@
   import { axisBottom, axisLeft, axisTop, axisRight } from "d3-axis";
 
   export let innerHeight = 0;
-  export let width = 0;
+  export let width = 0; // only needed for "right" - could be subsumed into xoffset
   export let yoffset = 0;
   export let xoffset = 0;
   export let position = "left";
   export let scale;
   export let nticks = 5;
-  export let colour = "#000000";
+  export let colour = "";
 
   let transform;
   let g;
 
   $: {
     select(g).selectAll("*").remove();
+
+    if (colour === "") {
+      colour = getComputedStyle(document.documentElement).getPropertyValue(
+        "--font-color"
+      );
+    }
 
     let axis;
     switch (position) {

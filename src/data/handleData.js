@@ -107,7 +107,7 @@ export function bestFitOnsets(data) {
   return mean;
 }
 
-function calculateMedian(data) {
+export function calculateMedian(data) {
   const sortedData = data.slice().sort((a, b) => a - b);
   const middle = Math.floor(sortedData.length / 2);
 
@@ -126,4 +126,31 @@ function calculateMAD(data, median) {
 function calculateMean(data) {
   const sum = data.reduce((acc, value) => acc + value, 0);
   return sum / data.length;
+}
+
+//--------
+// This is linear regression
+export function linearRegression(x, y) {
+  const n = x.length;
+
+  if (n !== y.length || n === 0) {
+    throw new Error("Input arrays must have the same non-zero length");
+  }
+
+  let sumX = 0;
+  let sumY = 0;
+  let sumXY = 0;
+  let sumXSquare = 0;
+
+  for (let i = 0; i < n; i++) {
+    sumX += x[i];
+    sumY += y[i];
+    sumXY += x[i] * y[i];
+    sumXSquare += x[i] * x[i];
+  }
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXSquare - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  return { slope, intercept };
 }

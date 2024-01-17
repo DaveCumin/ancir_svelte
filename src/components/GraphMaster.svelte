@@ -12,6 +12,9 @@
   import Actigram from "../charts/Actigram/Actigram.svelte";
   import ActigramControls from "../charts/Actigram/Actigram_controls.svelte";
 
+  import Periodogram from "../charts/Periodogram/Periodogram.svelte";
+  import PeriodogramControls from "../charts/Periodogram/Periodogram_controls.svelte";
+
   import Raw from "../charts/Raw/Raw.svelte";
   import RawControls from "../charts/Raw/Raw_controls.svelte";
 
@@ -44,6 +47,24 @@
         xScale: scaleLinear().domain([0, 48]).range([0, innerWidth]),
         startOffsets: [],
       },
+    },
+    periodogram: {
+      graph: Periodogram,
+      controls: PeriodogramControls,
+      prototypechartvalues: { time: "any", values: "any" },
+      prototypeother: {
+        col: { hex: "#78322e", alpha: 0.5 },
+      },
+      othertypes: ["colour"],
+      params: {
+        width: 600,
+        height: 200,
+        minPeriod: 4,
+        maxPeriod: 30,
+        stepPeriod: 0.25,
+        binSizeHrs: 0.25,
+      },
+      chartData: {},
     },
     raw: {
       graph: Raw,

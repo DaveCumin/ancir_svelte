@@ -50,6 +50,20 @@
 
     keeptolimits();
   }
+
+  //for formatting the min and max
+  function countDecimalPlaces(number) {
+    // Convert the number to a string and match the decimal part
+    const match = ("" + number).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+
+    // If there is no match, or the decimal part is not present, return 0
+    if (!match || !match[1]) {
+      return 0;
+    }
+
+    // Count the number of digits in the decimal part
+    return match[1].length;
+  }
 </script>
 
 <div class="processItem">
@@ -81,8 +95,10 @@
     }}
     bind:value
   />
-  <span class="min {min === limits[0] ? 'stop' : ''}">{min}</span>
-  <span class="max">{max}</span>
+  <span class="min {min === limits[0] ? 'stop' : ''}"
+    >{countDecimalPlaces(min) > 0 ? min.toFixed(2) : min}</span
+  >
+  <span class="max">{countDecimalPlaces(max) > 0 ? max.toFixed(2) : max}</span>
 </div>
 
 <style>

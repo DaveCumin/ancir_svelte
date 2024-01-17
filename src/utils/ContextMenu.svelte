@@ -102,7 +102,6 @@
   }
   ul li button {
     font-size: 0.75rem;
-    color: #222;
     width: 100%;
     height: 30px;
     text-align: left;
@@ -110,7 +109,7 @@
     background-color: var(--bg-color);
   }
   ul li button:hover {
-    color: #000;
+    color: var(--bg-color);
     text-align: left;
     border-radius: 5px;
     background-color: #eee;

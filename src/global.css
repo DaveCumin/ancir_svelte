@@ -170,15 +170,13 @@ select{
 }
 
 /* styles for the base charts */
-g.tick > text {
-  font-size: 8pt;
-  fill: var(--font-color);;
+g.axis > path {
+  font-size: 10pt;
+  stroke: var(--font-color) !important;
 }
 
-g>text, g.tick > text {
-  font-size: 10pt;
-  fill: var(--font-color);;
-}
+
+
 
 #thePlot svg{
  border: 1px solid var(--hover-color);
