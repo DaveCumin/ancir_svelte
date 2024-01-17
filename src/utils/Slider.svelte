@@ -52,17 +52,20 @@
   }
 
   //for formatting the min and max
-  function countDecimalPlaces(number) {
+  function truncateDecimalPlaces(number, maxDecimalPlaces = 2) {
     // Convert the number to a string and match the decimal part
     const match = ("" + number).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
 
-    // If there is no match, or the decimal part is not present, return 0
+    // If there is no match, or the decimal part is not present, return the original number
     if (!match || !match[1]) {
-      return 0;
+      return number;
     }
 
-    // Count the number of digits in the decimal part
-    return match[1].length;
+    // Truncate the decimal part to the specified maximum decimal places
+    const truncatedDecimal = match[1].slice(0, maxDecimalPlaces);
+
+    // Return the truncated value as a number
+    return parseFloat(match[0].replace(match[1], truncatedDecimal));
   }
 </script>
 
@@ -96,9 +99,9 @@
     bind:value
   />
   <span class="min {min === limits[0] ? 'stop' : ''}"
-    >{countDecimalPlaces(min) > 0 ? min.toFixed(2) : min}</span
+    >{truncateDecimalPlaces(min)}</span
   >
-  <span class="max">{countDecimalPlaces(max) > 0 ? max.toFixed(2) : max}</span>
+  <span class="max">{truncateDecimalPlaces(max)}</span>
 </div>
 
 <style>

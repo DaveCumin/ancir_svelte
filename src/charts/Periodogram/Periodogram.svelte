@@ -97,8 +97,6 @@
       //now set the data
       $graphs[$activeGraphTab].chartData = chartData;
 
-      console.log(thePaths);
-
       // set up the scales
       $graphs[$activeGraphTab].chartData.yScale = scaleLinear()
         .domain([yLims.ymin, yLims.ymax])
@@ -164,7 +162,7 @@
           {#each $graphs[$activeGraphTab].chartData.data.periods as src, srcIndex}
             {#each src as period, periodIndex}
               <circle
-                tipcontent={period +
+                tipcontent={period.toFixed(2) +
                   ", " +
                   $graphs[$activeGraphTab].chartData.data.power[srcIndex][
                     periodIndex
@@ -181,7 +179,7 @@
                     periodIndex
                   ]
                 )}
-                r="2"
+                r="3"
                 fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
                 fill-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
                   .alpha}
