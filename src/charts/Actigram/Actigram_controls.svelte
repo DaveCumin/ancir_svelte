@@ -55,7 +55,7 @@
   <div class="sliderContainer">
     <Slider
       min={10}
-      max={30}
+      max={40}
       limits={[1, Infinity]}
       label="Period (hrs):"
       bind:value={$graphs[$activeGraphTab].params.periodHrs}

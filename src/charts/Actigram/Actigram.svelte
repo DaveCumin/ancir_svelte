@@ -433,6 +433,15 @@
     }
     const estimate = bestFitOnsets(getDiffs(bestMatchTime));
 
+    $statusData.push({
+      display:
+        "Estimated period for " +
+        $graphs[$activeGraphTab].sourceData[sourceIndex].name +
+        " = " +
+        estimate.toFixed(3),
+    });
+    $statusData = $statusData;
+
     //calculate the estimated period
     let xs = [];
     let ys = [];

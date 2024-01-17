@@ -7,7 +7,7 @@
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
 
-  const margin = { top: 20, bottom: 50, left: 50, right: 20 };
+  const margin = { top: 20, bottom: 60, left: 60, right: 20 };
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: height = $graphs[$activeGraphTab].params.height;
