@@ -6,7 +6,7 @@
     data,
   } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
-  import { tooltip } from "../utils/Tooltip/Tooltip";
+  import Tooltip from "../utils/Tooltip/Tooltip.svelte";
 
   let minrowstoshow = 100;
 
@@ -44,7 +44,7 @@
       if (dataIN[key].type === "time") {
         out.push(dataIN[key].timeData);
       }
-      //Add processed data TODO
+      //Add processed data
       if (dataIN[key].processSteps.length > 0) {
         out.push(dataIN[key].processedData);
       }
@@ -184,13 +184,13 @@
   </main>
   <!-- have a button to show all rows-->
   {#if !$showalldata[$activeTableTab]}
-    <button
-      tipcontent="Show more data"
-      use:tooltip
-      class="showmorebutton"
-      style="display: {$showalldata[$activeTableTab] ? 'none' : 'block'};"
-      on:click={(e) => doshowalldata()}>...</button
-    >
+    <Tooltip tipcontent="Show more data">
+      <button
+        class="showmorebutton"
+        style="display: {$showalldata[$activeTableTab] ? 'none' : 'block'};"
+        on:click={(e) => doshowalldata()}>...</button
+      >
+    </Tooltip>
   {/if}
 {/if}
 

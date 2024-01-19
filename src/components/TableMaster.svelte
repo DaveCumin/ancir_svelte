@@ -47,43 +47,48 @@
     dblClickSplitter={false}
   >
     <Pane>
-      <TableTabs />
+      <div id="TableMain" style="height: 100%; width: auto; overflow: auto;">
+        <TableTabs />
+      </div>
     </Pane>
     {#if showTableDetails}
       <Pane size={30}>
-        <div class="tableData">
-          <div>
-            Data: {currentTableData.displayName}
+        <div id="TableMeta" style="height: 100%; width: auto; overflow: auto;">
+          <div class="tableData">
+            <div>
+              Data: {currentTableData.displayName}
+            </div>
+            <div>
+              Imported: {currentTableData.importedFrom}
+            </div>
+            {#each Object.keys(currentTableData.data) as k}
+              {#if currentTableData.data[k].type === "time"}
+                <div style="display: flex; margin: 5px;">
+                  {currentTableData.data[k].name}
+                  <input
+                    type="text"
+                    bind:value={currentTableData.data[k].timeFormat}
+                    on:input={(e) => {
+                      updateTimeFormat(k);
+                    }}
+                  />
+                  <button
+                    class="guessFmtBtn"
+                    on:click={(e) => {
+                      guessFormat(k);
+                    }}>🔦</button
+                  >
+                </div>
+                <div style="display: flex; margin: 5px; margin-left:1em;">
+                  Sampling freq: {currentTableData.data[k].recordPeriod.minDiff}
+                  hrs,
+                  {currentTableData.data[k].recordPeriod.constant
+                    ? "equal"
+                    : "unequal"}
+                </div>
+              {/if}
+            {/each}
           </div>
-          <div>
-            Imported: {currentTableData.importedFrom}
-          </div>
-          {#each Object.keys(currentTableData.data) as k}
-            {#if currentTableData.data[k].type === "time"}
-              <div style="display: flex; margin: 5px;">
-                {currentTableData.data[k].name}
-                <input
-                  type="text"
-                  bind:value={currentTableData.data[k].timeFormat}
-                  on:input={(e) => {
-                    updateTimeFormat(k);
-                  }}
-                />
-                <button
-                  class="guessFmtBtn"
-                  on:click={(e) => {
-                    guessFormat(k);
-                  }}>🔦</button
-                >
-              </div>
-              <div style="display: flex; margin: 5px; margin-left:1em;">
-                Sampling freq: {currentTableData.data[k].recordPeriod.minDiff} hrs,
-                {currentTableData.data[k].recordPeriod.constant
-                  ? "equal"
-                  : "unequal"}
-              </div>
-            {/if}
-          {/each}
         </div>
       </Pane>
     {/if}

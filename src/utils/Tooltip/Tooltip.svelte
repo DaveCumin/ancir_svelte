@@ -1,20 +1,48 @@
 <script>
-  export let x;
-  export let y;
-  export let tipcontent;
+  export let tipcontent = "";
+  let isHovered = false;
+  let x;
+  let y;
+
+  function mouseOver(event) {
+    isHovered = true;
+    x = event.clientX + 5;
+    y = event.clientY + 5;
+  }
+  function mouseMove(event) {
+    x = event.clientX + 5;
+    y = event.clientY + 5;
+    console.log(x + ", " + y);
+  }
+
+  function mouseLeave() {
+    isHovered = false;
+  }
 </script>
 
-<div class="tooltip" style="top: {y + 5}px;left: {x + 5}px;">
-  {tipcontent}
+<div
+  on:mouseover={mouseOver}
+  on:mouseleave={mouseLeave}
+  on:mousemove={mouseMove}
+>
+  <slot />
 </div>
+
+{#if isHovered}
+  <div style="top: {y}px; left: {x}px;" class="tooltip">
+    {tipcontent}
+  </div>
+{/if}
 
 <style>
   .tooltip {
+    border: 1px solid #ddd;
+    box-shadow: 1px 1px 1px #ddd;
+    background: white;
+    border-radius: 4px;
+    padding: 4px;
     position: absolute;
-    z-index: 10001;
-    background: var(--hover-color);
-    padding: 5px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px -5px var(--font-color);
+    margin: 0;
+    z-index: 9999;
   }
 </style>

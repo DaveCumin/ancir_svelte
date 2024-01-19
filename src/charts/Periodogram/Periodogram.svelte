@@ -2,13 +2,13 @@
   // @ts-nocheck
   import { data, graphs, activeGraphTab, statusData } from "../../store";
   import { scaleLinear } from "d3-scale";
-  import { tooltip } from "../../utils/Tooltip/Tooltip";
   import Axis from "../Axis.svelte";
   import {
     getDataFromSource,
     averageBinnedValues,
   } from "../../data/handleData";
-  import { pchisq, qchisq } from "../../utils/MathsStats";
+  import { mean, pchisq } from "../../utils/MathsStats";
+  import { tooltip } from "../../utils/Tooltip/tooltip";
 
   let margin = { top: 20, bottom: 40, left: 60, right: 20 };
 
@@ -62,7 +62,7 @@
 
         //do the binning
         const binnedData = averageBinnedValues(xVals, yVals, binSizeHrs);
-
+        console.log(binnedData.values);
         //set up the plot data
         chartData.data.periods[sourceIndex] = [];
         chartData.data.power[sourceIndex] = [];
@@ -94,9 +94,10 @@
           count++;
         }
       });
+
       //now set the data
       $graphs[$activeGraphTab].chartData = chartData;
-
+      console.log(chartData);
       // set up the scales
       $graphs[$activeGraphTab].chartData.yScale = scaleLinear()
         .domain([yLims.ymin, yLims.ymax])
@@ -133,12 +134,10 @@
       ).filter((value) => value !== undefined && !isNaN(value)); // only keep the true values
 
       //return the mean
-      return (
-        colValues.reduce((sum, value) => sum + value, 0) / colValues.length
-      );
+      return mean(colValues);
     });
 
-    const avgAll = data.reduce((sum, value) => sum + value, 0) / data.length;
+    const avgAll = mean(data);
 
     const numerator =
       avgP.reduce(
@@ -155,13 +154,19 @@
 </script>
 
 {#if $graphs[$activeGraphTab].graph === "periodogram" && $graphs[$activeGraphTab].sourceData.length > 0}
-  <div class="eriodogram">
-    <svg id="svgContainer" {width} {height}>
+  <div class="periodogram">
+    <svg
+      id="svgContainer"
+      {width}
+      {height}
+      style="transform-origin: top left; transform:scale(1);"
+    >
       <g transform={`translate(${margin.left},${margin.top})`}>
         {#if $graphs[$activeGraphTab].chartData.data.periods.length > 0}
           {#each $graphs[$activeGraphTab].chartData.data.periods as src, srcIndex}
             {#each src as period, periodIndex}
               <circle
+                use:tooltip
                 tipcontent={period.toFixed(2) +
                   ", " +
                   $graphs[$activeGraphTab].chartData.data.power[srcIndex][
@@ -172,7 +177,6 @@
                     periodIndex
                   ].toFixed(2) +
                   ")"}
-                use:tooltip
                 cx={$graphs[$activeGraphTab].chartData.xScale(period)}
                 cy={$graphs[$activeGraphTab].chartData.yScale(
                   $graphs[$activeGraphTab].chartData.data.power[srcIndex][
@@ -184,15 +188,15 @@
                 fill-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
                   .alpha}
               />
-              <path
-                d={thePaths[srcIndex]}
-                fill="none"
-                stroke={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-                stroke-opacity={$graphs[$activeGraphTab].sourceData[srcIndex]
-                  .col.alpha}
-                stroke-width="2px"
-              />
             {/each}
+            <path
+              d={thePaths[srcIndex]}
+              fill="none"
+              stroke={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+              stroke-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
+                .alpha}
+              stroke-width="2px"
+            />
           {/each}
         {:else}
           <text x="50%" y="50%" text-anchor="middle" fill="red">No Data </text>

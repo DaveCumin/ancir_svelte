@@ -88,82 +88,84 @@
   }
 </script>
 
-<h1>Data Tables</h1>
-<div class="dataTree scroll-shadows">
-  {#each $data as datum, datumID}
-    <details open class="dataTable">
-      <summary
-        ><InPlaceEdit bind:value={datum.displayName} />
+<div id="dataTreeContainer" style="overflow: auto; height: 100%; width: auto;">
+  <h1>Data Tables</h1>
+  <div class="dataTree scroll-shadows">
+    {#each $data as datum, datumID}
+      <details open class="dataTable">
+        <summary
+          ><InPlaceEdit bind:value={datum.displayName} />
 
-        <div
-          class="deleteTable hoverbutton"
-          on:click={(e) => {
-            e.preventDefault();
-            removeData(datum.id);
-          }}
-        >
-          🗑️
-        </div>
-        <div
-          class="viewTable hoverbutton"
-          on:click={(e) => {
-            e.preventDefault();
-            showDataTable(datum.id);
-          }}
-        >
-          🔎
-        </div></summary
-      >
-
-      {#each Object.entries(datum.data) as [key, value] (key)}
-        <details
-          open
-          class="field {datum.data[key].processSteps.length > 0
-            ? ''
-            : 'no-arrow'}"
-        >
-          <summary
-            ><InPlaceEdit bind:value={datum.data[key].name} /><span
-              class="addbutton hoverbutton showContextMenu"
-              on:click={(e) => {
-                e.preventDefault();
-                createContext("data", datum.id, key);
-              }}>+</span
-            ></summary
+          <div
+            class="deleteTable hoverbutton"
+            on:click={(e) => {
+              e.preventDefault();
+              removeData(datum.id);
+            }}
           >
-          {#each datum.data[key].processSteps as ps, psID}
-            <details open class="process">
-              <summary
-                >{ps.process}
-                <div
-                  class="deleteProcess hoverbutton"
-                  on:click={(e) => {
-                    e.preventDefault();
-                    removeProcess(datum.id, key, psID);
-                  }}
-                >
-                  🗑️
-                </div></summary
-              >
+            🗑️
+          </div>
+          <div
+            class="viewTable hoverbutton"
+            on:click={(e) => {
+              e.preventDefault();
+              showDataTable(datum.id);
+            }}
+          >
+            🔎
+          </div></summary
+        >
 
-              <div class="processDetails">
-                <svelte:component
-                  this={componentMap[ps.process].component}
-                  paramsStart={ps.parameters}
-                  typeTime={{
-                    type: $data[datumID].data[key].type,
-                    tocheck: { tableID: datum.id, key: key },
-                  }}
-                  on:update={(event) =>
-                    updateProcess(datum.id, key, psID, event.detail.params)}
-                />
-              </div>
-            </details>
-          {/each}
-        </details>
-      {/each}
-    </details>
-  {/each}
+        {#each Object.entries(datum.data) as [key, value] (key)}
+          <details
+            open
+            class="field {datum.data[key].processSteps.length > 0
+              ? ''
+              : 'no-arrow'}"
+          >
+            <summary
+              ><InPlaceEdit bind:value={datum.data[key].name} /><span
+                class="addbutton hoverbutton showContextMenu"
+                on:click={(e) => {
+                  e.preventDefault();
+                  createContext("data", datum.id, key);
+                }}>+</span
+              ></summary
+            >
+            {#each datum.data[key].processSteps as ps, psID}
+              <details open class="process">
+                <summary
+                  >{ps.process}
+                  <div
+                    class="deleteProcess hoverbutton"
+                    on:click={(e) => {
+                      e.preventDefault();
+                      removeProcess(datum.id, key, psID);
+                    }}
+                  >
+                    🗑️
+                  </div></summary
+                >
+
+                <div class="processDetails">
+                  <svelte:component
+                    this={componentMap[ps.process].component}
+                    paramsStart={ps.parameters}
+                    typeTime={{
+                      type: $data[datumID].data[key].type,
+                      tocheck: { tableID: datum.id, key: key },
+                    }}
+                    on:update={(event) =>
+                      updateProcess(datum.id, key, psID, event.detail.params)}
+                  />
+                </div>
+              </details>
+            {/each}
+          </details>
+        {/each}
+      </details>
+    {/each}
+  </div>
 </div>
 
 <style>

@@ -308,3 +308,7 @@ function bisection(f, x1, x2, releps, abseps, maxIterations = 1000) {
 
   return x;
 }
+
+export function mean(data) {
+  return data.reduce((sum, value) => sum + value, 0) / data.length;
+}

@@ -11,11 +11,12 @@
   import ContextMenu from "./utils/ContextMenu.svelte";
   import ImportData from "./data/importData.svelte";
 
-  export let version = "Beta 2.17";
+  import { version } from "../package.json";
+  console.log(version);
 </script>
 
 <svelte:head>
-  <title>AnCiR v{version}</title>
+  <title>AnCiR v β.{version}</title>
 </svelte:head>
 
 <ContextMenu />

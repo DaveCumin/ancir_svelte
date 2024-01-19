@@ -18,7 +18,7 @@
     calculateMedian,
   } from "../../data/handleData";
 
-  let margin = { top: 50, bottom: 20, left: 100, right: 100 };
+  let margin = { top: 50, bottom: 20, left: 80, right: 80 };
 
   //for highlighting and reporting
   let mousedown = false;
@@ -32,7 +32,7 @@
     if (!show) {
       margin = { top: 50, bottom: 20, left: 50, right: 50 };
     } else {
-      margin = { top: 50, bottom: 20, left: 100, right: 100 };
+      margin = { top: 50, bottom: 20, left: 80, right: 80 };
     }
   }
 
@@ -369,12 +369,14 @@
           actPaths[srcIndex][d] = actPaths[srcIndex][d] + moveToReturn + " Z";
         }
       }
-    }
 
-    if ($graphs[$activeGraphTab].graph === "actigram") {
-      findOnOffsets(0);
-      findOnOffsets(1);
-      console.log($graphs[$activeGraphTab].chartData.onsets);
+      //do the onsets
+      for (let srcIndex = 0; srcIndex < srcLength; srcIndex++) {
+        if ($graphs[$activeGraphTab].sourceData[srcIndex].showOnsets) {
+          console.log("SHOW ONSETS FOR " + srcIndex);
+          findOnOffsets(srcIndex);
+        }
+      }
     }
     return actPaths;
   }
@@ -410,6 +412,8 @@
     const aboveBelow = values.map((value) =>
       value <= centileValue || isNaN(value) ? -1 : 1
     );
+    console.log(aboveBelow);
+    console.log(template);
 
     //get the best matching index for each day
     const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
@@ -419,6 +423,7 @@
     let bestMatchIndex = [];
     let bestMatchTime = [];
 
+    //TODO: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
     for (let d = 0; d < aboveBelow.length / periodStep; d++) {
       bestMatchIndex[d] =
         findBestMatchIndex(
@@ -626,99 +631,98 @@
 </script>
 
 {#if $graphs[$activeGraphTab].graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
-  <div class="actigramGraph">
-    <div
-      class="overlay"
-      style={mousedown
-        ? "display:block; left:" + mousePos.x + "px; top:" + mousePos.y + "px;"
-        : "display:none;"}
-    ></div>
+  <div
+    class="overlay"
+    style={mousedown
+      ? "display:block; left:" + mousePos.x + "px; top:" + mousePos.y + "px;"
+      : "display:none;"}
+  ></div>
 
-    <svg
-      id="svgContainer"
-      {width}
-      height={totalHeight}
-      on:mousedown={(e) => {
+  <svg
+    id="svgContainer"
+    style="transform-origin: top left; transform:scale(1);"
+    {width}
+    height={totalHeight}
+    on:mousedown={(e) => {
+      e.preventDefault();
+      mousedown = true;
+      showTime(e);
+    }}
+    on:mousemove={(e) => {
+      if (mousedown) {
         e.preventDefault();
-        mousedown = true;
-        showTime(e);
-      }}
-      on:mousemove={(e) => {
-        if (mousedown) {
-          e.preventDefault();
-          mouseToPoint(e);
-          showTime(e);
-        }
-      }}
-      on:mouseup={(e) => {
-        e.preventDefault();
-        mousedown = false;
         mouseToPoint(e);
-      }}
-      on:click={(e) => {
-        e.preventDefault();
-      }}
-      on:dblclick={(e) => {
-        e.preventDefault();
-        const ct = mouseToPoint(e);
-        reportTime(ct);
-      }}
-    >
-      <g transform={`translate(${margin.left},${margin.top})`}>
-        {#if actPaths.length > 0}
-          {#each actPaths as src, srcIndex}
-            {#each createSequenceArray(0, actPaths[srcIndex].length - 1) as d}
-              <path
-                d={actPaths[srcIndex][d]}
-                fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-                fill-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
-                  .alpha}
-              />
-              {#if $graphs[$activeGraphTab].params.showAxes}
-                <Axis
-                  {innerHeight}
-                  yoffset={d * (dayHeight + betweenHeight)}
-                  xoffset={15 * srcIndex}
-                  width={width - margin.left - margin.right - 15}
-                  scale={$graphs[$activeGraphTab].chartData.yScales[srcIndex][
-                    d
-                  ]}
-                  position={srcIndex === 0 ? "left" : "right"}
-                  nticks={dayHeight / 30 + 1}
-                  colour={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-                />
-              {/if}
-            {/each}
-          {/each}
-        {:else}
-          <text x="50%" y="50%" text-anchor="middle" fill="red"> </text>
-        {/if}
-
-        <!-- axis stuff-->
-        <Axis
-          {innerHeight}
-          yoffset="0"
-          scale={$graphs[$activeGraphTab].chartData.xScale}
-          position="top"
-          nticks={$graphs[$activeGraphTab].params.periodHrs}
-        />
-      </g>
-
-      <!-- OFFSETS -->
-      {#each $graphs[$activeGraphTab].chartData.onsets as onset, srcIndex}
-        {#if onset}
-          {#each $graphs[$activeGraphTab].chartData.onsets[srcIndex].onsetTimes as onsetT, d}
-            <circle
-              cx={$graphs[$activeGraphTab].chartData.xScale(
-                onsetT - d * $graphs[$activeGraphTab].params.periodHrs
-              ) + margin.left}
-              cy={d * (dayHeight + betweenHeight) + dayHeight + margin.top}
-              r="2"
+        showTime(e);
+      }
+    }}
+    on:mouseup={(e) => {
+      e.preventDefault();
+      mousedown = false;
+      mouseToPoint(e);
+    }}
+    on:click={(e) => {
+      e.preventDefault();
+    }}
+    on:dblclick={(e) => {
+      e.preventDefault();
+      const ct = mouseToPoint(e);
+      reportTime(ct);
+    }}
+  >
+    <g transform={`translate(${margin.left},${margin.top})`}>
+      {#if actPaths.length > 0}
+        {#each actPaths as src, srcIndex}
+          {#each createSequenceArray(0, actPaths[srcIndex].length - 1) as d}
+            <path
+              d={actPaths[srcIndex][d]}
               fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-              stroke-width="1"
-              stroke="black"
+              fill-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
+                .alpha}
             />
+            {#if $graphs[$activeGraphTab].params.showAxes}
+              <Axis
+                {innerHeight}
+                yoffset={d * (dayHeight + betweenHeight)}
+                xoffset={15 * srcIndex}
+                width={width - margin.left - margin.right - 15}
+                scale={$graphs[$activeGraphTab].chartData.yScales[srcIndex][d]}
+                position={srcIndex === 0 ? "left" : "right"}
+                nticks={dayHeight / 30 + 1}
+                colour={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+              />
+            {/if}
           {/each}
+        {/each}
+      {:else}
+        <text x="50%" y="50%" text-anchor="middle" fill="red"> </text>
+      {/if}
+
+      <!-- axis stuff-->
+      <Axis
+        {innerHeight}
+        yoffset="0"
+        scale={$graphs[$activeGraphTab].chartData.xScale}
+        position="top"
+        nticks={$graphs[$activeGraphTab].params.periodHrs}
+      />
+    </g>
+
+    <!-- OFFSETS -->
+    {#each $graphs[$activeGraphTab].chartData.onsets as onset, srcIndex}
+      {#if onset}
+        {#each $graphs[$activeGraphTab].chartData.onsets[srcIndex].onsetTimes as onsetT, d}
+          <circle
+            cx={$graphs[$activeGraphTab].chartData.xScale(
+              onsetT - d * $graphs[$activeGraphTab].params.periodHrs
+            ) + margin.left}
+            cy={d * (dayHeight + betweenHeight) + dayHeight + margin.top}
+            r="2"
+            fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+            stroke-width="1"
+            stroke="black"
+          />
+        {/each}
+        <!--
           <line
             x1={onset.median + onset.moveXDay * onset.estDay}
             y1={margin.top + $graphs[$activeGraphTab].params.dayHeight}
@@ -729,10 +733,10 @@
             y2={margin.top + innerHeight}
             style="stroke:rgb(255,0,0);stroke-width:2"
           ></line>
-        {/if}
-      {/each}
-    </svg>
-  </div>
+          -->
+      {/if}
+    {/each}
+  </svg>
 {/if}
 
 <style>

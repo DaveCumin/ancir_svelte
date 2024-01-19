@@ -130,6 +130,7 @@
 {#if $activeGraphTab < 0}
   <!-- Empty -->
 {:else}
+  <!-- The Data -->
   <div style="margin: 1em 1em 0 0;">
     <h1 style="display: inline;">{$graphTabs[$activeGraphTab].name} Data</h1>
     <span
@@ -140,7 +141,7 @@
       }}>+</span
     >
   </div>
-
+  <!-- -->
   <div class="graphDataTree">
     {#each $graphs[$activeGraphTab].sourceData as source, sourceIndex}
       <details open class="dataTable">
@@ -276,6 +277,20 @@
                   protoKey.slice(1) +
                   ":"}
                 bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex][
+                  protoKey
+                ]}
+              />
+            </div>
+          {/if}
+
+          <!-- CHECKBOX -->
+          {#if graphMap[$graphs[$activeGraphTab].graph].othertypes[keyIndex] === "checkbox"}
+            <div class="itemsliderContainer">
+              <a>{protoKey.charAt(0).toUpperCase() + protoKey.slice(1) + ":"}</a
+              >
+              <input
+                type="checkbox"
+                bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex][
                   protoKey
                 ]}
               />

@@ -3,10 +3,9 @@
 
   import { data, graphs, activeGraphTab } from "../../store";
   import { getDataFromSource } from "../../data/handleData";
-  import { tooltip } from "../../utils/Tooltip/Tooltip";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
-
+  import { tooltip } from "../../utils/Tooltip/tooltip";
   const margin = { top: 20, bottom: 60, left: 60, right: 20 };
 
   $: width = $graphs[$activeGraphTab].params.width;
@@ -65,14 +64,18 @@
 
 {#if $graphs[$activeGraphTab].graph === "raw" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="rawGraph">
-    <svg {width} {height}>
+    <svg
+      {width}
+      {height}
+      style="transform-origin: top left; transform:scale(1);"
+    >
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#each yValsToPlot as ys, sourceI}
           {#each ys as y, yi}
             {#if y !== null && !isNaN(y) && xValsToPlot[sourceI][yi] !== null && !isNaN(xValsToPlot[sourceI][yi])}
               <circle
-                tipcontent={xValsToPlot[sourceI][yi] + ", " + y}
                 use:tooltip
+                tipcontent={xValsToPlot[sourceI][yi] + ", " + y}
                 cx={xScale(xValsToPlot[sourceI][yi])}
                 cy={yScale(y)}
                 r={$graphs[$activeGraphTab].sourceData[sourceI].size}

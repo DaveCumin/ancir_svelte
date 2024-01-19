@@ -68,7 +68,7 @@
     margin: 0;
     background-color: var(--bg-color);
     z-index: 9;
-    width: calc(100% + 2.2em);
+    width: 100%;
   }
 
   ul {

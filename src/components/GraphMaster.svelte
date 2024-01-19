@@ -23,8 +23,8 @@
       graph: Actigram,
       controls: ActigramControls,
       prototypechartvalues: { time: "time", values: "values" },
-      prototypeother: { col: { hex: "#1B1D50", alpha: 0.5 } },
-      othertypes: ["colour"],
+      prototypeother: { col: { hex: "#1B1D50", alpha: 0.5 }, showOnsets: true },
+      othertypes: ["colour", "checkbox"],
       params: {
         startTime: DateTime.now()
           .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
@@ -182,7 +182,12 @@
   >
     <Pane>
       <GraphTabs />
-      <div id="thePlot" style="margin-top: 10px; margin-left: 5px;">
+      <div
+        id="thePlot"
+        style="    height: calc(100% - 4em);
+        overflow: auto;
+        width: auto;"
+      >
         {#if $activeGraphTab < 0}
           <h3>Need to add a graph</h3>
         {:else if $graphs[$activeGraphTab].graph in graphMap}
@@ -197,23 +202,28 @@
     <Pane size={25}>
       {#if $activeGraphTab < 0}{:else if $graphs[$activeGraphTab].graph in graphMap}
         <div
-          style="display: flex;
-        min-width: 200px;"
+          id="chartControlsTree"
+          style="height: 100%; width: auto; overflow: auto;"
         >
-          <h1
-            style="    padding: 6px 6px 0px 6px;
+          <div
+            style="display: flex;
+        min-width: 200px;"
+          >
+            <h1
+              style="    padding: 6px 6px 0px 6px;
           font-weight: bold;
           font-size: 1.2em;
           text-decoration: underline;"
-          >
-            Controls
-          </h1>
-        </div>
-        <svelte:component
-          this={graphMap[$graphs[$activeGraphTab].graph].controls}
-        />
+            >
+              Controls
+            </h1>
+          </div>
+          <svelte:component
+            this={graphMap[$graphs[$activeGraphTab].graph].controls}
+          />
 
-        <ChartMaster />
+          <ChartMaster />
+        </div>
       {:else}
         {JSON.stringify($graphs[$activeGraphTab].sourceData)}
       {/if}
