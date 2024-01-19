@@ -14,6 +14,7 @@ export var activeTableTab = writable(-1);
 
 //MENU MODAL
 export var menuModalActive = writable(false);
+export var menuModalType = writable("");
 export var contextMenu = writable({
   labels: [],
   funcs: [],

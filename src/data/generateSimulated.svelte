@@ -1,7 +1,7 @@
 <script>
   // @ts-nocheck
 
-  import { data, menuModalActive } from "../store";
+  import { data, menuModalActive, menuModalType } from "../store";
   import Slider from "../utils/Slider.svelte";
   import {
     forceFornat,
@@ -122,9 +122,10 @@
     periods.push(24);
     maxheights.push(100);
   }
+  console.log($menuModalType);
 </script>
 
-{#if $menuModalActive}
+{#if $menuModalActive && $menuModalType === "generateSim"}
   <div class="backdrop"></div>
   <dialog id="modal_simulated_data" class="dialog">
     <div class="modal-box">

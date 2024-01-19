@@ -12,6 +12,7 @@
   import ImportData from "./data/importData.svelte";
 
   import { version } from "../package.json";
+  import About from "./components/About.svelte";
   console.log(version);
 </script>
 
@@ -21,6 +22,7 @@
 
 <ContextMenu />
 <GenerateSimulated />
+<About />
 <ImportData />
 
 <div data-theme={$selectedTheme}>
