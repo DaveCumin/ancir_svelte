@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { menuModalActive, importFileOpen } from "../store";
+  import { menuModalActive, menuModalType, importFileOpen } from "../store";
   import { exportSVG } from "../charts/Charttools.svelte";
   import { makeNewChart, graphMap } from "../components/GraphMaster.svelte";
 
@@ -31,6 +31,7 @@
       items: [
         createMenuItem("Import Data", () => ($importFileOpen = true)),
         createMenuItem("Simulate Data", () => {
+          $menuModalType = "generateSim";
           $menuModalActive = true;
         }),
         { displayText: "--hr" },
@@ -49,7 +50,12 @@
     },
     {
       displayText: "Help",
-      items: [createMenuItem("About", () => console.log("AnCiR v"))],
+      items: [
+        createMenuItem("About", () => {
+          $menuModalType = "about";
+          $menuModalActive = true;
+        }),
+      ],
     },
   ];
 
