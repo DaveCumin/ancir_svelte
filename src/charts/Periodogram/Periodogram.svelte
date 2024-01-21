@@ -7,10 +7,11 @@
     getDataFromSource,
     averageBinnedValues,
   } from "../../data/handleData";
-  import { mean, pchisq } from "../../utils/MathsStats";
+  import { pchisq, qchisq } from "../../utils/CDFs";
+  import { mean } from "../../utils/MathsStats";
   import { tooltip } from "../../utils/Tooltip/tooltip";
 
-  let margin = { top: 20, bottom: 40, left: 60, right: 20 };
+  let margin = { top: 20, bottom: 40, left: 80, right: 20 };
 
   $: width = $graphs[$activeGraphTab].params.width;
   $: height = $graphs[$activeGraphTab].params.height;
@@ -18,6 +19,7 @@
   $: innerWidth = width - margin.left - margin.right;
 
   let thePaths = [];
+  let sigPaths = [];
 
   //----------------------------------------------------------------------------------------------------
   $: makePlotData(
@@ -36,10 +38,12 @@
     stepPeriod
   ) {
     if ($graphs[$activeGraphTab].graph === "periodogram") {
+      const alpha = 0.05;
+
       let xVals, yVals;
 
       let chartData = {
-        data: { periods: [], power: [], pvalue: [] },
+        data: { periods: [], power: [], sigThreshold: [], pvalue: [] },
         xScale: scaleLinear()
           .domain([minPeriod, maxPeriod])
           .range([0, innerWidth]),
@@ -67,9 +71,12 @@
         chartData.data.periods[sourceIndex] = [];
         chartData.data.power[sourceIndex] = [];
         chartData.data.pvalue[sourceIndex] = [];
+        chartData.data.sigThreshold[sourceIndex] = [];
 
         //calculate the chi-sq and put into the correct period
         let count = 0;
+        const lengthPeriod = 1 + (maxPeriod - minPeriod) / stepPeriod;
+        const correctedAlpha = Math.pow(1 - alpha, 1 / lengthPeriod);
         for (let prd = minPeriod; prd < maxPeriod; prd += stepPeriod) {
           chartData.data.periods[sourceIndex][count] = prd;
           chartData.data.power[sourceIndex][count] = calculatePower(
@@ -80,6 +87,11 @@
 
           chartData.data.pvalue[sourceIndex][count] = pchisq(
             chartData.data.power[sourceIndex][count],
+            Math.round(prd / binSizeHrs)
+          );
+
+          chartData.data.sigThreshold[sourceIndex][count] = qchisq(
+            correctedAlpha,
             Math.round(prd / binSizeHrs)
           );
 
@@ -97,7 +109,7 @@
 
       //now set the data
       $graphs[$activeGraphTab].chartData = chartData;
-      console.log(chartData);
+
       // set up the scales
       $graphs[$activeGraphTab].chartData.yScale = scaleLinear()
         .domain([yLims.ymin, yLims.ymax])
@@ -108,11 +120,18 @@
         for (let i = 0; i < chartData.data.power[sourceIndex].length; i++) {
           if (i === 0) {
             thePaths[sourceIndex] = `M `;
+            sigPaths[sourceIndex] = "M";
           }
           thePaths[sourceIndex] += `${$graphs[$activeGraphTab].chartData.xScale(
             chartData.data.periods[sourceIndex][i]
           )} ${$graphs[$activeGraphTab].chartData.yScale(
             chartData.data.power[sourceIndex][i]
+          )} `;
+
+          sigPaths[sourceIndex] += `${$graphs[$activeGraphTab].chartData.xScale(
+            chartData.data.periods[sourceIndex][i]
+          )} ${$graphs[$activeGraphTab].chartData.yScale(
+            chartData.data.sigThreshold[sourceIndex][i]
           )} `;
         }
       });
@@ -197,6 +216,15 @@
                 .alpha}
               stroke-width="2px"
             />
+
+            <path
+              d={sigPaths[srcIndex]}
+              fill="none"
+              stroke="red"
+              stroke-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
+                .alpha}
+              stroke-width="1px"
+            />
           {/each}
         {:else}
           <text x="50%" y="50%" text-anchor="middle" fill="red">No Data </text>
@@ -217,7 +245,7 @@
         />
         <text
           style="text-anchor: middle;"
-          transform={`translate(-40,${innerHeight / 2}) rotate(-90)     `}
+          transform={`translate(-50,${innerHeight / 2}) rotate(-90)     `}
           >Chi-sq</text
         >
         <text

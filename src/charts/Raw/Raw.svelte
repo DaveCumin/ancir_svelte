@@ -65,6 +65,7 @@
 {#if $graphs[$activeGraphTab].graph === "raw" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div class="rawGraph">
     <svg
+      id="svgContainer"
       {width}
       {height}
       style="transform-origin: top left; transform:scale(1);"
