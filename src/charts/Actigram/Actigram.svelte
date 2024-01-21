@@ -40,7 +40,8 @@
     margin,
     dayHeight,
     betweenHeight,
-    $graphs[$activeGraphTab].params.periodHrs
+    $graphs[$activeGraphTab].params.periodHrs,
+    $graphs[$activeGraphTab].chartData
   );
   $: binSize = $graphs[$activeGraphTab].params.binSizeHrs;
   $: width = $graphs[$activeGraphTab].params.width;
@@ -51,11 +52,10 @@
 
   function calcTotalHeight(margin, dayHeight, betweenHeight, periodHrs) {
     if ($graphs[$activeGraphTab].graph === "actigram") {
-      //TODO: something strange in here somewhere - make new actigram first thing after default start. Error re startoffsets
-      if (
-        $graphs[$activeGraphTab].chartData.startOffsets === undefined ||
-        $graphs[$activeGraphTab].chartData.startOffsets.length === 0
-      ) {
+      let days;
+      if ($graphs[$activeGraphTab].chartData.data.time.length > 0) {
+        days = $graphs[$activeGraphTab].chartData.data.time[0].length;
+      } else {
         makePlotData(
           $graphs[$activeGraphTab].sourceData,
           $graphs[$activeGraphTab].params.binSizeHrs,
@@ -63,9 +63,8 @@
           $graphs[$activeGraphTab].params.doublePlot,
           $graphs[$activeGraphTab].params.startTime
         );
+        days = $graphs[$activeGraphTab].chartData.data.time[0].length;
       }
-
-      const days = $graphs[$activeGraphTab].chartData.data.time[0].length;
 
       totalHeight =
         margin.top +
@@ -99,7 +98,8 @@
   ) {
     if ($graphs[$activeGraphTab].graph === "actigram") {
       let xVals, yVals;
-
+      console.log($graphs[$activeGraphTab]);
+      console.log($data);
       let chartData = {
         chartMins: [],
         chartMaxs: [],
