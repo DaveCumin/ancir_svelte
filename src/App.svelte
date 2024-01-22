@@ -1,4 +1,6 @@
 <script>
+  import { activeGraphTab } from "./store.js";
+
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import GenerateSimulated from "./data/GenerateSimulated.svelte";
   import DataTree from "./components/DataTree.svelte";

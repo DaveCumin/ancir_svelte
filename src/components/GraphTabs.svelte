@@ -7,10 +7,17 @@
     $activeGraphTab = ind;
   }
 
+  //TOFIX: There is an issue when the last tab is deleted: the components in GraphMaster try to update first and cannot find data.
   function deleteTab(ind) {
     $graphs.splice(ind, 1);
     $graphTabs.splice(ind, 1);
-    $activeGraphTab = $graphs.length > 0 ? 0 : -1;
+
+    if ($graphs.length > 0) {
+      $activeGraphTab = Math.min($activeGraphTab, $graphs.length - 1);
+    } else {
+      $activeGraphTab = -1;
+    }
+    console.log($activeGraphTab);
 
     $graphs = $graphs;
     $graphTabs = $graphTabs;

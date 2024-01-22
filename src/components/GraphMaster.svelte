@@ -200,7 +200,9 @@
       </div>
     </Pane>
     <Pane size={25}>
-      {#if $activeGraphTab < 0}{:else if $graphs[$activeGraphTab].graph in graphMap}
+      {#if $activeGraphTab < 0}
+        <h3>Need to add a graph</h3>
+      {:else if $graphs[$activeGraphTab].graph in graphMap}
         <div
           id="chartControlsTree"
           style="height: 100%; width: auto; overflow: auto;"
