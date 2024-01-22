@@ -17,6 +17,7 @@
     getDiffs,
     calculateMedian,
   } from "../../data/handleData";
+  import { onDestroy } from "svelte";
 
   let margin = { top: 50, bottom: 20, left: 80, right: 80 };
 
@@ -373,7 +374,6 @@
       //do the onsets
       for (let srcIndex = 0; srcIndex < srcLength; srcIndex++) {
         if ($graphs[$activeGraphTab].sourceData[srcIndex].showOnsets) {
-          console.log("SHOW ONSETS FOR " + srcIndex);
           findOnOffsets(srcIndex);
         }
       }
@@ -412,8 +412,6 @@
     const aboveBelow = values.map((value) =>
       value <= centileValue || isNaN(value) ? -1 : 1
     );
-    console.log(aboveBelow);
-    console.log(template);
 
     //get the best matching index for each day
     const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
