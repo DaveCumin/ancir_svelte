@@ -118,7 +118,7 @@
       style="margin-right:0 !important;"
       bind:value={$graphs[$activeGraphTab].params.scaleAxes}
     >
-      <option value="byPlot">byPlot</option>
+      <option value="byPlot">By row / plot</option>
       <option value="overall">Overall</option>
     </select>
   </div>
