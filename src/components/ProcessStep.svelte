@@ -8,6 +8,7 @@
   // ----- ADD NEW PROCESSING FUNCTIONS BELOW
   import Add, { add } from "../processes/Add.svelte";
   import Filter, { filter } from "../processes/Filter.svelte";
+  import Replace, { replace } from "../processes/Replace.svelte";
 
   // Import functions and components here as needed and add to the maps below
   export const componentMap = {
@@ -16,6 +17,11 @@
       component: Filter,
       startParams: { min: 0, max: 12 },
       func: filter,
+    },
+    replace: {
+      component: Replace,
+      startParams: { from: -999, to: NaN },
+      func: replace,
     },
     // Add more process functions here as needed
   };
