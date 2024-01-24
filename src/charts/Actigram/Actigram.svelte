@@ -29,7 +29,7 @@
   let yScales = [];
   let xScale = scaleLinear().domain([0, 100]).range([0, innerWidth]);
 
-  $: updateMargins($graphs[$activeGraphTab].params.showAxes);
+  $: updateMargins($graphs[$activeGraphTab]?.params.showAxes);
   function updateMargins(show) {
     if (!show) {
       margin = { top: 50, bottom: 20, left: 50, right: 50 };
@@ -42,18 +42,18 @@
     margin,
     dayHeight,
     betweenHeight,
-    $graphs[$activeGraphTab].params.periodHrs,
-    $graphs[$activeGraphTab].chartData
+    $graphs[$activeGraphTab]?.params.periodHrs,
+    $graphs[$activeGraphTab]?.chartData
   );
-  $: binSize = $graphs[$activeGraphTab].params.binSizeHrs;
-  $: width = $graphs[$activeGraphTab].params.width;
-  $: dayHeight = $graphs[$activeGraphTab].params.dayHeight;
-  $: betweenHeight = $graphs[$activeGraphTab].params.betweenHeight;
+  $: binSize = $graphs[$activeGraphTab]?.params.binSizeHrs;
+  $: width = $graphs[$activeGraphTab]?.params.width;
+  $: dayHeight = $graphs[$activeGraphTab]?.params.dayHeight;
+  $: betweenHeight = $graphs[$activeGraphTab]?.params.betweenHeight;
   $: innerHeight = totalHeight - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
   function calcTotalHeight(margin, dayHeight, betweenHeight, periodHrs) {
-    if ($graphs[$activeGraphTab].graph === "actigram") {
+    if ($graphs[$activeGraphTab]?.graph === "actigram") {
       let days;
       if ($graphs[$activeGraphTab].chartData.data.length > 0) {
         days = $graphs[$activeGraphTab].chartData.data[0].time.length;
@@ -83,14 +83,14 @@
 
   //----------------------------------------------------------------------------------------------------
   $: makePlotData(
-    $graphs[$activeGraphTab].sourceData,
-    $graphs[$activeGraphTab].params.binSizeHrs,
-    $graphs[$activeGraphTab].params.periodHrs,
-    $graphs[$activeGraphTab].params.startTime
+    $graphs[$activeGraphTab]?.sourceData,
+    $graphs[$activeGraphTab]?.params.binSizeHrs,
+    $graphs[$activeGraphTab]?.params.periodHrs,
+    $graphs[$activeGraphTab]?.params.startTime
   );
 
   function makePlotData(sourceData, binSizeHrs, periodHrs, startTime) {
-    if ($graphs[$activeGraphTab].graph === "actigram") {
+    if ($graphs[$activeGraphTab]?.graph === "actigram") {
       let xVals, yVals;
 
       let chartData = {
@@ -235,11 +235,11 @@
 
   //make the paths
   $: actPaths = createActipathArray(
-    $graphs[$activeGraphTab].chartData,
-    $graphs[$activeGraphTab].params.dayHeight,
-    $graphs[$activeGraphTab].params.doublePlot,
-    $graphs[$activeGraphTab].params.periodHrs,
-    $graphs[$activeGraphTab].params.binSizeHrs
+    $graphs[$activeGraphTab]?.chartData,
+    $graphs[$activeGraphTab]?.params.dayHeight,
+    $graphs[$activeGraphTab]?.params.doublePlot,
+    $graphs[$activeGraphTab]?.params.periodHrs,
+    $graphs[$activeGraphTab]?.params.binSizeHrs
   );
 
   function createActipathArray(
@@ -642,7 +642,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab].graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "actigram" && $graphs[$activeGraphTab]?.sourceData.length > 0}
   <div
     class="overlay"
     style={mousedown
