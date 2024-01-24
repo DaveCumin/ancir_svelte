@@ -4,7 +4,7 @@
     const dataMin = Math.min(...startVals);
     const dataMax = Math.max(...startVals);
 
-    var arr = startVals;
+    var arr = [...startVals];
     for (let i = 0; i < arr.length; i++) {
       if (arr[i] < params.min) {
         arr[i] = NaN;
@@ -28,12 +28,11 @@
     });
   }
 
-  export let dataIN;
   export let paramsStart;
   export let typeTime;
 
-  const dataMin = Math.min(...dataIN);
-  const dataMax = Math.max(...dataIN);
+  const dataMin = 0;
+  const dataMax = 10000;
 
   export let params = { min: dataMin, max: dataMax };
   if (Object.keys(paramsStart).length > 0) {

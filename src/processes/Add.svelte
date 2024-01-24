@@ -12,8 +12,8 @@
 </script>
 
 <script>
-  import { createEventDispatcher } from "svelte";
   import Slider from "../utils/Slider.svelte";
+  import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -34,7 +34,12 @@
 
 {#if typeTime.type === "value"}
   <Slider min={-20} max={20} bind:value={params.val} label="Add:" />
-{:else}
-  <!-- TODO: make this work for dates-->
-  <div>{JSON.stringify(typeTime.tocheck)}</div>
+{:else if typeTime.type === "time"}
+  <Slider
+    min={-20}
+    max={20}
+    step={0.5}
+    bind:value={params.val}
+    label="Add (hrs):"
+  />
 {/if}
