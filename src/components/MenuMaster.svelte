@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
   import { menuModalActive, menuModalType, importFileOpen } from "../store";
   import { exportSVG } from "../charts/Charttools.svelte";
-  import { makeNewChart, graphMap } from "../components/GraphMaster.svelte";
+  
+  import { graphMap, makeNewChart } from "../charts/allCharts";
 
   let keepOpen = false;
 

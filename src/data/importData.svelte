@@ -4,7 +4,7 @@
   import { data, importFileOpen } from "../store";
   import {
     guessDateofArray,
-    forceFornat,
+    forceFormat,
     getPeriod,
   } from "../utils/time/TimeUtils";
   import Papa from "papaparse";
@@ -41,6 +41,13 @@
 
   // do the heavy lifting for 'simple' csv files
   function doBasicFileImport(result, fname) {
+    // Filter out rows where all values are null or undefined
+    const allValuesNullOrUndefined = (obj) =>
+      Object.values(obj).every(
+        (value) => value === null || value === undefined
+      );
+    result.data = result.data.filter((row) => !allValuesNullOrUndefined(row));
+
     //set up the high-level structure
     makeSkeletonOUT(fname);
     dataOUT.datalength = result.data.length;
@@ -61,12 +68,13 @@
         };
       } else if (guessDateofArray([datum]) != -1) {
         const timefmt = guessDateofArray([datum]);
+        console.log("guessedformat = " + timefmt);
         dataOUT.data[f] = {
           name: f,
           type: "time",
           data: result.data.map((d) => d[f]),
           timeFormat: timefmt,
-          timeData: forceFornat(
+          timeData: forceFormat(
             result.data.map((d) => d[f]),
             timefmt
           ),

@@ -15,6 +15,7 @@
 
   import { version } from "../package.json";
   import About from "./components/About.svelte";
+
   console.log(version);
 </script>
 

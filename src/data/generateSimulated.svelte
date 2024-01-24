@@ -4,7 +4,7 @@
   import { data, menuModalActive, menuModalType } from "../store";
   import Slider from "../utils/Slider.svelte";
   import {
-    forceFornat,
+    forceFormat,
     guessDateofArray,
     getPeriod,
   } from "../utils/time/TimeUtils";
@@ -50,7 +50,7 @@
     }
 
     const timefmt = guessDateofArray(timeData);
-    const processedTimeData = forceFornat(timeData, timefmt);
+    const processedTimeData = forceFormat(timeData, timefmt);
     const timePeriod = getPeriod(timeData, timefmt);
 
     // Create time entry in newDataEntry.data
@@ -122,7 +122,6 @@
     periods.push(24);
     maxheights.push(100);
   }
-  console.log($menuModalType);
 </script>
 
 {#if $menuModalActive && $menuModalType === "generateSim"}

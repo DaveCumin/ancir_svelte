@@ -4,7 +4,7 @@
   import TableTabs from "./TableTabs.svelte";
   import {
     getGuessedFormat,
-    forceFornat,
+    forceFormat,
     getPeriod,
   } from "../utils/time/TimeUtils.js";
   import { updateDataProcess } from "../components/ProcessStep.svelte";
@@ -17,7 +17,7 @@
     //Update the timeData
     $data[
       $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
-    ].data[k].timeData = forceFornat(
+    ].data[k].timeData = forceFormat(
       currentTableData.data[k].data,
       currentTableData.data[k].timeFormat
     );

@@ -17,7 +17,7 @@
     updateGraphProcess,
   } from "../components/ProcessStep.svelte";
 
-  import { graphMap } from "../components/GraphMaster.svelte";
+  import { graphMap } from "../charts/allCharts";
   import { onMount } from "svelte";
 
   //force the refresh from the start

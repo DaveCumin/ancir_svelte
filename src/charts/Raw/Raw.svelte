@@ -95,8 +95,8 @@
         {/each}
 
         <!-- axis stuff-->
-        <Axis {innerHeight} {margin} scale={xScale} position="bottom" />
-        <Axis {innerHeight} {margin} scale={yScale} position="left" />
+        <Axis {innerHeight} scale={xScale} position="bottom" />
+        <Axis {innerHeight} scale={yScale} position="left" />
 
         <text
           style="text-anchor: middle;"

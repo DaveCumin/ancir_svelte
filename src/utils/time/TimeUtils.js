@@ -64,11 +64,17 @@ export function guessDateofArray(dates) {
 
 //TODO: add time difference data to the $data object - this is useful for barwidth calculations and will be for FFT etc also (need to note if all the differences are identical, and what the minimum differnce is)
 export function calculateTimeDifference(start, end, dateFormat) {
-  if (start === null || end === null) {
+  if (
+    start === null ||
+    end === null ||
+    start === undefined ||
+    end === undefined
+  ) {
     return null;
   }
   start = DateTime.fromFormat(start, dateFormat);
   end = DateTime.fromFormat(end, dateFormat);
+
   var diffTime = end.diff(start, "hours");
   return diffTime.hours;
 }
@@ -112,7 +118,7 @@ export function getGuessedFormat(dataIN) {
   return guessedFormat;
 }
 
-export function forceFornat(dataIN, formatIN) {
+export function forceFormat(dataIN, formatIN) {
   const dataout = dataIN.map((date) =>
     calculateTimeDifference(dataIN[0], date, convertFormat(formatIN))
   );
