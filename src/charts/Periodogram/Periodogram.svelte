@@ -13,8 +13,8 @@
 
   let margin = { top: 20, bottom: 40, left: 80, right: 20 };
 
-  $: width = $graphs[$activeGraphTab].params.width;
-  $: height = $graphs[$activeGraphTab].params.height;
+  $: width = $graphs[$activeGraphTab]?.params.width;
+  $: height = $graphs[$activeGraphTab]?.params.height;
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
@@ -23,11 +23,11 @@
 
   //----------------------------------------------------------------------------------------------------
   $: makePlotData(
-    $graphs[$activeGraphTab].sourceData,
-    $graphs[$activeGraphTab].params.binSizeHrs,
-    $graphs[$activeGraphTab].params.minPeriod,
-    $graphs[$activeGraphTab].params.maxPeriod,
-    $graphs[$activeGraphTab].params.stepPeriod
+    $graphs[$activeGraphTab]?.sourceData,
+    $graphs[$activeGraphTab]?.params.binSizeHrs,
+    $graphs[$activeGraphTab]?.params.minPeriod,
+    $graphs[$activeGraphTab]?.params.maxPeriod,
+    $graphs[$activeGraphTab]?.params.stepPeriod
   );
 
   function makePlotData(
@@ -37,7 +37,7 @@
     maxPeriod,
     stepPeriod
   ) {
-    if ($graphs[$activeGraphTab].graph === "periodogram") {
+    if ($graphs[$activeGraphTab]?.graph === "periodogram") {
       const alpha = 0.05;
 
       let xVals, yVals;
@@ -172,7 +172,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab].graph === "periodogram" && $graphs[$activeGraphTab].sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "periodogram" && $graphs[$activeGraphTab]?.sourceData.length > 0}
   <div class="periodogram">
     <svg
       id="svgContainer"
