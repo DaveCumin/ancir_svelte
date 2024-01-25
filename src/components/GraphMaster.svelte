@@ -24,7 +24,7 @@
         width: auto;"
       >
         {#if $activeGraphTab < 0}
-          <h3>Need to add a graph</h3>
+          <!-- NOTHING -->
         {:else if $graphs[$activeGraphTab].graph in graphMap}
           <svelte:component
             this={graphMap[$graphs[$activeGraphTab].graph].graph}
@@ -36,7 +36,7 @@
     </Pane>
     <Pane size={25}>
       {#if $activeGraphTab < 0}
-        <h3>Need to add a graph</h3>
+        <!-- NOTHING -->
       {:else if $graphs[$activeGraphTab].graph in graphMap}
         <div
           id="chartControlsTree"

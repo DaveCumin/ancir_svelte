@@ -23,7 +23,7 @@
 
 <div id="graphTabs" style="margin: 0 1em;">
   {#if $activeGraphTab < 0}
-    <h3>Need to add a graph</h3>
+    <h3>Need to add a chart</h3>
   {:else}
     <nav>
       <ul>

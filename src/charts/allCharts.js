@@ -38,12 +38,9 @@ export const graphMap = {
       showAxes: false,
     },
     chartData: {
-      chartMins: [],
-      chartMaxs: [],
-      data: { time: [], values: [], mins: [], maxs: [] },
-      yScales: [],
-      xScale: scaleLinear().domain([0, 48]).range([0, innerWidth]),
+      data: [{ time: [], values: [], day: [], scaleLimits: [] }],
       startOffsets: [],
+      onsets: [],
     },
   },
   periodogram: {
@@ -109,7 +106,7 @@ function putChartValues(keysIN, fieldsIN) {
   return chartValues;
 }
 
-//TODO: make this a popoup, like generate data: currently only works for actigram
+//TODO _med: make this a popoup, like generate data: currently only works for actigram
 export function makeNewChart(type) {
   let newchart = {
     graph: type,

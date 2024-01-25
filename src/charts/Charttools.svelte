@@ -7,6 +7,10 @@
 
   //EXPORT AS SVG
   export function exportSVG() {
+    if (get(activeGraphTab) < 0) {
+      console.log("Nothing to export");
+      return;
+    }
     const svgString = document
       .getElementById("thePlot")
       .querySelector("svg").outerHTML;
@@ -30,6 +34,7 @@
     const scale = parseFloat(
       svg.style.transform.slice(svg.style.transform.indexOf("scale") + 6)
     );
+
     var newScale = scale;
     if (type === "in") {
       newScale += 0.1;
@@ -38,7 +43,7 @@
     }
 
     svg.style.transform = "scale(" + newScale + ")";
-    svg.style.width = svg.getAttribute("width") * newScale;
+    svg.style.width = ""; //auto fill to contents - this takes care of the margin-left and margin-top offsets of the g element
   }
 </script>
 

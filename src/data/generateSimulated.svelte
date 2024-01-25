@@ -1,7 +1,7 @@
 <script>
   // @ts-nocheck
-
-  import { data, menuModalActive, menuModalType } from "../store";
+  import Dialog from "../components/Dialog.svelte";
+  import { data, menuModalType } from "../store";
   import Slider from "../utils/Slider.svelte";
   import {
     forceFormat,
@@ -94,7 +94,7 @@
     // Add the newDataEntry to the data array
     data.update((currentData) => [...currentData, newDataEntry]);
     //close the modal
-    $menuModalActive = false;
+    $menuModalType = null;
   }
 
   let Ndays = 28;
@@ -124,121 +124,82 @@
   }
 </script>
 
-{#if $menuModalActive && $menuModalType === "generateSim"}
-  <div class="backdrop"></div>
-  <dialog id="modal_simulated_data" class="dialog">
-    <div class="modal-box">
-      <h1>GENERATE SIMULATED DATA</h1>
-      <div>
-        <Slider
-          min={5}
-          max={30}
-          limits={[1, Infinity]}
-          bind:value={Ndays}
-          label="Days:"
-        />
-      </div>
-      <div>
-        <Slider
-          min={1}
-          max={240}
-          step={1}
-          limits={[1, 240]}
-          bind:value={fs_min}
-          label="Sampling period (minutes):"
-        />
-      </div>
-      <div>
-        <label for="val">Start time:</label>
-        <input
-          type="datetime-local"
-          name="start"
-          bind:value={start}
-          on:change={(value) => console.log(value)}
-        />
-      </div>
-      <hr />
-      <h2>Data:</h2>
-      <span class="addSimDataButton" on:click={() => addSimData()}>
-        ➕ <!-- Plus sign symbol -->
-      </span>
-      {#each Array.from({ length: N_simulated }) as _, i}
-        <div class="datum">
-          <div class="dataTitle">
-            <div>value{i}:</div>
-            <div
-              class="removeData hoverbutton"
-              on:click={() => removeSimData(i)}
-            >
-              🗑️ <!-- Trash bin symbol -->
-            </div>
+{#if $menuModalType === "generateSim"}
+  <Dialog title="GENERATE SIMULATED DATA">
+    <div>
+      <Slider
+        min={5}
+        max={30}
+        limits={[1, Infinity]}
+        bind:value={Ndays}
+        label="Days:"
+      />
+    </div>
+    <div>
+      <Slider
+        min={1}
+        max={240}
+        step={1}
+        limits={[1, 240]}
+        bind:value={fs_min}
+        label="Sampling period (minutes):"
+      />
+    </div>
+    <div>
+      <label for="val">Start time:</label>
+      <input
+        type="datetime-local"
+        name="start"
+        bind:value={start}
+        on:change={(value) => console.log(value)}
+      />
+    </div>
+    <hr />
+    <h2>Data:</h2>
+    <span class="addSimDataButton" on:click={() => addSimData()}>
+      ➕ <!-- Plus sign symbol -->
+    </span>
+    {#each Array.from({ length: N_simulated }) as _, i}
+      <div class="datum">
+        <div class="dataTitle">
+          <div>value{i}:</div>
+          <div class="removeData hoverbutton" on:click={() => removeSimData(i)}>
+            🗑️ <!-- Trash bin symbol -->
+          </div>
 
+          <div>
             <div>
-              <div>
-                <Slider
-                  min={21}
-                  max={26}
-                  limits={[6, 72]}
-                  step="0.1"
-                  bind:value={periods[i]}
-                  label="Rhythm period (hours):"
-                />
-              </div>
-              <div>
-                <Slider
-                  min={1}
-                  max={100}
-                  limits={[10, 10000]}
-                  bind:value={maxheights[i]}
-                  label="Max values:"
-                />
-              </div>
+              <Slider
+                min={21}
+                max={26}
+                limits={[6, 72]}
+                step="0.1"
+                bind:value={periods[i]}
+                label="Rhythm period (hours):"
+              />
+            </div>
+            <div>
+              <Slider
+                min={1}
+                max={100}
+                limits={[10, 10000]}
+                bind:value={maxheights[i]}
+                label="Max values:"
+              />
             </div>
           </div>
         </div>
-      {/each}
+      </div>
+    {/each}
 
-      <button
-        on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
-        >Generate</button
-      >
-      <button on:click={() => ($menuModalActive = false)}>Close</button>
-    </div>
-  </dialog>
+    <button
+      on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
+      >Generate</button
+    >
+  </Dialog>
 {/if}
 
 <style>
-  .backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(2px);
-    z-index: 9998;
-  }
-  dialog {
-    display: block;
-    position: absolute;
-    top: 10vh;
-    z-index: 1000;
-    max-height: 80vh;
-    overflow: auto;
-    background: var(--bg-color);
-    z-index: 9998;
-    box-shadow: 5px 5px 15px var(--secondary-color);
-    border: none;
-    border-radius: 5px;
-  }
-  .modal {
-    z-index: 1000;
-    opacity: 1;
-    max-height: 75%;
-  }
-  .modal-box {
-    z-index: 1000;
-  }
   .addSimDataButton {
     float: right;
     margin-top: -2.2em;

@@ -38,13 +38,7 @@
     }
   }
 
-  $: totalHeight = calcTotalHeight(
-    margin,
-    dayHeight,
-    betweenHeight,
-    $graphs[$activeGraphTab]?.params.periodHrs,
-    $graphs[$activeGraphTab]?.chartData
-  );
+  $: totalHeight = calcTotalHeight(margin, dayHeight, betweenHeight);
   $: binSize = $graphs[$activeGraphTab]?.params.binSizeHrs;
   $: width = $graphs[$activeGraphTab]?.params.width;
   $: dayHeight = $graphs[$activeGraphTab]?.params.dayHeight;
@@ -52,11 +46,11 @@
   $: innerHeight = totalHeight - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
-  function calcTotalHeight(margin, dayHeight, betweenHeight, periodHrs) {
+  function calcTotalHeight(margin, dayHeight, betweenHeight) {
     if ($graphs[$activeGraphTab]?.graph === "actigram") {
       let days;
-      if ($graphs[$activeGraphTab].chartData.data.length > 0) {
-        days = $graphs[$activeGraphTab].chartData.data[0].time.length;
+      if ($graphs[$activeGraphTab].chartData.onsets?.length > 0) {
+        days = $graphs[$activeGraphTab].chartData.onsets[0].onsetTimes.length;
       } else {
         makePlotData(
           $graphs[$activeGraphTab].sourceData,
@@ -64,7 +58,7 @@
           $graphs[$activeGraphTab].params.periodHrs,
           $graphs[$activeGraphTab].params.startTime
         );
-        days = $graphs[$activeGraphTab].chartData.data[0].time.length;
+        days = $graphs[$activeGraphTab].chartData.onsets[0].onsetTimes.length;
       }
 
       totalHeight =
@@ -168,12 +162,17 @@
 
       //now set the data
       $graphs[$activeGraphTab].chartData = chartData;
+
+      //do the onsets
+      for (let srcIndex = 0; srcIndex < sourceData.length; srcIndex++) {
+        findOnOffsets(srcIndex);
+      }
     }
   }
 
   function updateOffsets(startTime, activeGraphT) {
     let startOffsets = [];
-    //TODO: Change the start time when new data is added; to be the 00:00 of the first day of the data (here or in ChartMaster?)
+    //TODO _high: Change the start time when new data is added; to be the 00:00 of the first day of the data (here or in ChartMaster?)
     if (
       $graphs[activeGraphT].graph === "actigram" &&
       $graphs[activeGraphT].sourceData.length > 0
@@ -386,13 +385,6 @@
         }
       }
 
-      //do the onsets
-      for (let srcIndex = 0; srcIndex < srcLength; srcIndex++) {
-        if ($graphs[$activeGraphTab].sourceData[srcIndex].showOnsets) {
-          findOnOffsets(srcIndex);
-        }
-      }
-
       return actPaths;
     }
   }
@@ -428,7 +420,7 @@
     let bestMatchIndex = [];
     let bestMatchTime = [];
 
-    //TODO: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
+    //TODO _high: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
     for (let d = 0; d < aboveBelow.length / periodStep; d++) {
       bestMatchIndex[d] =
         findBestMatchIndex(
@@ -480,9 +472,9 @@
     //update for drawing
     $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = {
       onsetTimes: bestMatchTime,
-      //TODO: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
-      //TODO: need to truncate the line also - as it can go off the chart.
-      //TODO: Have a UI component for doing the estimation on a dataset.
+      //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
+      //TODO _med: need to truncate the line also - as it can go off the chart.
+      //TODO _high: Have a UI component for doing the estimation on a dataset.
       estimate: estimate,
       median: median,
       estDay: estDay,
@@ -642,7 +634,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab]?.graph === "actigram" && $graphs[$activeGraphTab]?.sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div
     class="overlay"
     style={mousedown
@@ -650,8 +642,11 @@
       : "display:none;"}
   ></div>
 
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <svg
     id="svgContainer"
+    margin-lr={margin.left + margin.right}
     style="transform-origin: top left; transform:scale(1);"
     {width}
     height={totalHeight}
@@ -717,23 +712,23 @@
         position="top"
         nticks={$graphs[$activeGraphTab].params.periodHrs}
       />
-    </g>
 
-    <!-- OFFSETS -->
-    {#each $graphs[$activeGraphTab].chartData.onsets as onset, srcIndex}
-      {#if onset}
-        {#each $graphs[$activeGraphTab].chartData.onsets[srcIndex].onsetTimes as onsetT, d}
-          <circle
-            cx={xScale(onsetT - d * $graphs[$activeGraphTab].params.periodHrs) +
-              margin.left}
-            cy={d * (dayHeight + betweenHeight) + dayHeight + margin.top}
-            r="2"
-            fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-            stroke-width="1"
-            stroke="black"
-          />
-        {/each}
-        <!--
+      <!-- ONSETS -->
+      {#each $graphs[$activeGraphTab].chartData.onsets as onset, srcIndex}
+        {#if $graphs[$activeGraphTab].sourceData[srcIndex].showOnsets}
+          {#each $graphs[$activeGraphTab].chartData.onsets[srcIndex].onsetTimes as onsetT, d}
+            <circle
+              cx={xScale(
+                onsetT - d * $graphs[$activeGraphTab].params.periodHrs
+              )}
+              cy={d * (dayHeight + betweenHeight) + dayHeight}
+              r="2"
+              fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+              stroke-width="1"
+              stroke="black"
+            />
+          {/each}
+          <!--
         <line
           x1={onset.median + onset.moveXDay * onset.estDay}
           y1={margin.top + $graphs[$activeGraphTab].params.dayHeight}
@@ -745,8 +740,9 @@
           style="stroke:rgb(255,0,0);stroke-width:2"
         ></line>
 -->
-      {/if}
-    {/each}
+        {/if}
+      {/each}
+    </g>
   </svg>
 {/if}
 

@@ -12,7 +12,6 @@
   function mouseMove(event) {
     x = event.clientX + 5;
     y = event.clientY + 5;
-    console.log(x + ", " + y);
   }
 
   function mouseLeave() {

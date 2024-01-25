@@ -35,11 +35,20 @@ export function getDataFromSource(sourceIndex, vals) {
   }
 }
 
+//get the type of a data field
+export function getFieldType(tableID, field) {
+  const tempData =
+    get(data)[get(data).findIndex((d) => d.id === tableID)].data[field];
+  return tempData.type;
+}
+
 //Bin the data into binSize bins
 // xs and ys are the time and values for an actigram
 // binSize is the size of each bin, usually in Hrs
 export function averageBinnedValues(xs, ys, binSize) {
-  const Nbins = Math.ceil((Math.max(...xs) + binSize) / binSize);
+  const Nbins = Math.ceil(
+    (Math.max(...xs.filter((x) => (x ? x : 0))) + binSize) / binSize
+  );
 
   const xout = new Array(Nbins);
   const yout = new Array(Nbins);
