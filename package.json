@@ -1,7 +1,7 @@
 {
   "name": "ancir",
   "private": true,
-  "version": "2.21",
+  "version": "2.22",
   "type": "module",
   "scripts": {
     "dev": "vite",

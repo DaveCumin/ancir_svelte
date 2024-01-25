@@ -15,6 +15,7 @@
 
   import { version } from "../package.json";
   import About from "./components/About.svelte";
+  import SaveLoadStore from "./utils/SaveLoadStore.svelte";
 
   console.log(version);
 </script>
