@@ -7,7 +7,7 @@
     activeGraphTab,
   } from "../store";
   import { exportSVG } from "../charts/Charttools.svelte";
-
+  import { saveStoreData, loadStoreData } from "../utils/SaveLoadStore.svelte";
   import { graphMap, makeNewChart } from "../charts/allCharts";
 
   let keepOpen = false;
@@ -48,7 +48,8 @@
             $menuModalType = "generateSim";
           }),
           { displayText: "--hr" },
-          createMenuItem("Exit", () => console.log("Exit")),
+          createMenuItem("Save session", saveStoreData),
+          createMenuItem("Load session", loadStoreData),
         ],
       },
       {
