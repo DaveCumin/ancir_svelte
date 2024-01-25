@@ -1,8 +1,13 @@
 <script>
   import { onMount } from "svelte";
-  import { menuModalActive, menuModalType, importFileOpen } from "../store";
+  import {
+    menuModalType,
+    importFileOpen,
+    graphTabs,
+    activeGraphTab,
+  } from "../store";
   import { exportSVG } from "../charts/Charttools.svelte";
-  
+
   import { graphMap, makeNewChart } from "../charts/allCharts";
 
   let keepOpen = false;
@@ -15,7 +20,10 @@
     }
   }
 
-  function createMenuItem(displayText, onClick) {
+  function createMenuItem(displayText, onClick, skip = false) {
+    if (skip) {
+      return null;
+    }
     return { displayText, onClick, visibleState: false };
   }
 
@@ -26,39 +34,47 @@
     return thecharts;
   }
 
-  let menuItems = [
-    {
-      displayText: "Data",
-      items: [
-        createMenuItem("Import Data", () => ($importFileOpen = true)),
-        createMenuItem("Simulate Data", () => {
-          $menuModalType = "generateSim";
-          $menuModalActive = true;
-        }),
-        { displayText: "--hr" },
-        createMenuItem("Exit", () => console.log("Exit")),
-      ],
-    },
-    {
-      displayText: "Chart",
-      items: [
-        {
-          displayText: "Insert Chart",
-          items: [generateChartItems()],
-        },
-        createMenuItem("Export current chart", () => exportSVG()),
-      ],
-    },
-    {
-      displayText: "Help",
-      items: [
-        createMenuItem("About", () => {
-          $menuModalType = "about";
-          $menuModalActive = true;
-        }),
-      ],
-    },
-  ];
+  $: menuItems = makeMenu($activeGraphTab);
+
+  function makeMenu(tab) {
+    console.log(menuItems);
+
+    return [
+      {
+        displayText: "Data",
+        items: [
+          createMenuItem("Import Data", () => ($importFileOpen = true)),
+          createMenuItem("Simulate Data", () => {
+            $menuModalType = "generateSim";
+          }),
+          { displayText: "--hr" },
+          createMenuItem("Exit", () => console.log("Exit")),
+        ],
+      },
+      {
+        displayText: "Chart",
+        items: [
+          {
+            displayText: "Insert Chart",
+            items: [generateChartItems()],
+          },
+          createMenuItem(
+            "Export <i>" + $graphTabs[tab]?.name + "</i>",
+            () => exportSVG(),
+            tab < 0
+          ),
+        ],
+      },
+      {
+        displayText: "Help",
+        items: [
+          createMenuItem("About", () => {
+            $menuModalType = "about";
+          }),
+        ],
+      },
+    ];
+  }
 
   function hideMenus(currentMenuItem) {
     menuItems.forEach((menuItem) => {
@@ -133,12 +149,14 @@
               }
             }}
           >
-            {menuItem.displayText}
+            {@html menuItem.displayText}
           </button>
           {#if menuItem.visibleState}
             <ul class="secondmenu dontclose">
               {#each menuItem.items as item}
-                {#if item.displayText === "--hr"}
+                {#if item === null}
+                  <!-- NOTHING -->
+                {:else if item.displayText === "--hr"}
                   <hr />
                 {:else if item.items}
                   <!-- Check if there are sub-items -->
@@ -149,7 +167,7 @@
                         setTimeout(() => {
                           item.visibleState = false;
                         }, 50)}
-                      >{item.displayText}
+                      >{@html item.displayText}
                       <span style="float:right">▶</span></button
                     >
                     {#if item.visibleState || keepOpen}
@@ -185,10 +203,11 @@
                         hideAllMenus();
                       }}
                     >
-                      {item.displayText}
+                      {@html item.displayText}
                     </button>
                   </li>
                 {/if}
+                <!-- null value-->
               {/each}
             </ul>
           {/if}

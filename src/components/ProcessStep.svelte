@@ -12,16 +12,23 @@
 
   // Import functions and components here as needed and add to the maps below
   export const componentMap = {
-    add: { component: Add, startParams: { val: 0 }, func: add },
+    add: {
+      component: Add,
+      startParams: { val: 0 },
+      func: add,
+      forTypes: ["value", "time"],
+    },
     filter: {
       component: Filter,
       startParams: { min: 0, max: 12 },
       func: filter,
+      forTypes: ["value", "time"],
     },
     replace: {
       component: Replace,
       startParams: { from: -999, to: NaN },
       func: replace,
+      forTypes: ["value"],
     },
     // Add more process functions here as needed
   };
@@ -82,7 +89,7 @@
         // Check if the function exists in the processMap
         dataIN = processFunction(dataIN, processObj.parameters); //CALL THE FUNCTION WITH PARAMS
       } else {
-        // TODO: MAKE THIS AN ERROR AND HANDLE IT BETTER
+        // TODO _low: MAKE THIS AN ERROR AND HANDLE IT BETTER (unlikely to enter here, realistically)
         console.error(`Function '${processName}' does not exist.`);
       }
     }

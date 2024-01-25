@@ -16,6 +16,7 @@
     componentMap,
     updateGraphProcess,
   } from "../components/ProcessStep.svelte";
+  import { getFieldType } from "../data/handleData";
 
   import { graphMap } from "../charts/allCharts";
   import { onMount } from "svelte";
@@ -109,15 +110,26 @@
     });
   }
 
-  function newData(where, id, fieldName) {
-    $contextMenu.labels = Object.keys(componentMap);
-    for (let i = 0; i < $contextMenu.labels.length; i++) {
-      $contextMenu.funcs[i] = () =>
-        addProcess($contextMenu.labels[i], where, id, fieldName);
+  //bring up the context menu to add a process to the field
+  function addProcessToGraphData(where, id, fieldName) {
+    $contextMenu = { labels: [], funcs: [] }; //reset the contextMenu
+    const type = getFieldType(
+      $graphs[$activeGraphTab].sourceData[id].tableID,
+      $graphs[$activeGraphTab].sourceData[id].chartvalues[fieldName].field
+    );
+    const tempLabels = Object.keys(componentMap);
+
+    for (let i = 0; i < tempLabels.length; i++) {
+      if (componentMap[tempLabels[i]].forTypes.includes(type)) {
+        //only add to the menu those processes appropriate for the type
+        $contextMenu.labels[i] = tempLabels[i];
+        $contextMenu.funcs[i] = () =>
+          addProcess(tempLabels[i], where, id, fieldName);
+      }
     }
   }
 
-  function createnewDataProcessContext() {
+  function createnewDataForGraph() {
     $contextMenu.labels = [];
     $contextMenu.funcs = [];
     for (let i = 0; i < $data.length; i++) {
@@ -137,7 +149,7 @@
       class="addbutton hoverbutton showContextMenu"
       on:click={(e) => {
         e.preventDefault();
-        createnewDataProcessContext();
+        createnewDataForGraph();
       }}>+</span
     >
   </div>
@@ -177,7 +189,7 @@
                 class="addbutton hoverbutton showContextMenu"
                 on:click={(e) => {
                   e.preventDefault();
-                  newData("graph", sourceIndex, key);
+                  addProcessToGraphData("graph", sourceIndex, key);
                 }}>+</span
               >
               <span

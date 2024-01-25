@@ -83,7 +83,7 @@
           rocessedData: [],
         };
       } else {
-        //TODO: deal with categorical data
+        //TODO _med: deal with categorical data
         type = "category";
       }
     });

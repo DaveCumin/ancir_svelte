@@ -13,6 +13,7 @@
     updateDataProcess,
     componentMap,
   } from "./ProcessStep.svelte";
+  import { getFieldType } from "../data/handleData";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
 
   //show the data in tables
@@ -80,10 +81,16 @@
   }
 
   function createContext(where, id, fieldName) {
-    $contextMenu.labels = Object.keys(componentMap);
-    for (let i = 0; i < $contextMenu.labels.length; i++) {
-      $contextMenu.funcs[i] = () =>
-        addProcess($contextMenu.labels[i], where, id, fieldName);
+    $contextMenu = { labels: [], funcs: [] }; //reset the contextMenu
+    const type = getFieldType(id, fieldName);
+    const tempLabels = Object.keys(componentMap);
+    for (let i = 0; i < tempLabels.length; i++) {
+      if (componentMap[tempLabels[i]].forTypes.includes(type)) {
+        //only add to the menu those processes appropriate for the type
+        $contextMenu.labels[i] = tempLabels[i];
+        $contextMenu.funcs[i] = () =>
+          addProcess(tempLabels[i], where, id, fieldName);
+      }
     }
   }
 </script>

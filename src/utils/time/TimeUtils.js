@@ -55,14 +55,13 @@ export function guessDateofArray(dates) {
       return guessedlistWorkAll[0];
     }
 
-    //TODO reduce to only those that have non-negative differences in time (assume times are in order!)
+    //TODO _low: reduce to only those that have non-negative differences in time (assume times are in order!)
     return guessedlist[0];
   } catch (error) {
     return -1;
   }
 }
 
-//TODO: add time difference data to the $data object - this is useful for barwidth calculations and will be for FFT etc also (need to note if all the differences are identical, and what the minimum differnce is)
 export function calculateTimeDifference(start, end, dateFormat) {
   if (
     start === null ||

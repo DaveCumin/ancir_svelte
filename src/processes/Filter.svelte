@@ -47,15 +47,30 @@
   }
 </script>
 
-<Slider
-  min={dataMin - 1}
-  max={dataMax + 1}
-  bind:value={params.min}
-  label="Min:"
-/>
-<Slider
-  min={dataMin - 1}
-  max={dataMax + 1}
-  bind:value={params.max}
-  label="Max:"
-/>
+{#if typeTime.type === "value"}
+  <Slider
+    min={dataMin - 1}
+    max={dataMax + 1}
+    bind:value={params.min}
+    label="Min:"
+  />
+  <Slider
+    min={dataMin - 1}
+    max={dataMax + 1}
+    bind:value={params.max}
+    label="Max:"
+  />
+{:else if typeTime.type === "time"}
+  <Slider
+    min={dataMin - 1}
+    max={dataMax + 1}
+    bind:value={params.min}
+    label="Min (hrs):"
+  />
+  <Slider
+    min={dataMin - 1}
+    max={dataMax + 1}
+    bind:value={params.max}
+    label="Max (hrs):"
+  />
+{/if}
