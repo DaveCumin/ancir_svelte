@@ -14,6 +14,7 @@
     $data[$data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])];
 
   function updateTimeFormat(k) {
+    console.log(currentTableData);
     //Update the timeData
     $data[
       $data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])
@@ -61,6 +62,11 @@
             <div>
               Imported: {currentTableData.importedFrom}
             </div>
+            <div>
+              Data length: {currentTableData.data[
+                Object.keys(currentTableData.data)[0]
+              ].data.length}
+            </div>
             {#each Object.keys(currentTableData.data) as k}
               {#if currentTableData.data[k].type === "time"}
                 <div style="display: flex; margin: 5px;">
@@ -68,7 +74,7 @@
                   <input
                     type="text"
                     bind:value={currentTableData.data[k].timeFormat}
-                    on:input={(e) => {
+                    on:change={(e) => {
                       updateTimeFormat(k);
                     }}
                   />

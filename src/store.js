@@ -14,6 +14,8 @@ export var activeTableTab = writable(-1);
 
 //MENU MODAL
 export var menuModalType = writable(null);
+
+//CONTEXT MENU
 export var contextMenu = writable({
   labels: [],
   funcs: [],
@@ -21,9 +23,6 @@ export var contextMenu = writable({
 
 //THEME
 export var selectedTheme = writable("light");
-
-//IMPORT FLAG
-export var importFileOpen = writable(false);
 
 //STATUS DATA
 export var statusData = writable([]);

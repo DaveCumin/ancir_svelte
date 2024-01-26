@@ -29,8 +29,10 @@
   }
 
   function submit() {
-    if (value != original) {
+    if (value != original && containsNonSpaceCharacter(value)) {
       dispatch("submit", value);
+    } else {
+      value = original;
     }
 
     editing = false;
@@ -42,6 +44,13 @@
       value = original;
       editing = false;
     }
+  }
+
+  // Regular expression to check if there is any non-space character
+  function containsNonSpaceCharacter(text) {
+    const nonSpaceRegex = /\S/;
+
+    return nonSpaceRegex.test(text);
   }
 </script>
 

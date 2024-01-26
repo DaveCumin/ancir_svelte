@@ -1,11 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import {
-    menuModalType,
-    importFileOpen,
-    graphTabs,
-    activeGraphTab,
-  } from "../store";
+  import { graphTabs, activeGraphTab, menuModalType } from "../store";
   import { exportSVG } from "../charts/Charttools.svelte";
   import { saveStoreData, loadStoreData } from "../utils/SaveLoadStore.svelte";
   import { graphMap, makeNewChart } from "../charts/allCharts";
@@ -37,13 +32,11 @@
   $: menuItems = makeMenu($activeGraphTab);
 
   function makeMenu(tab) {
-    console.log(menuItems);
-
     return [
       {
         displayText: "Data",
         items: [
-          createMenuItem("Import Data", () => ($importFileOpen = true)),
+          createMenuItem("Import Data", () => ($menuModalType = "import")),
           createMenuItem("Simulate Data", () => {
             $menuModalType = "generateSim";
           }),
@@ -138,6 +131,7 @@
     <ul class="topmenu">
       {#each menuItems as menuItem}
         <li>
+          <!-- svelte-ignore a11y-mouse-events-have-key-events -->
           <button
             class="dontclose"
             on:click={() => {
@@ -162,6 +156,7 @@
                 {:else if item.items}
                   <!-- Check if there are sub-items -->
                   <li>
+                    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
                     <button
                       on:mouseover={() => (item.visibleState = true)}
                       on:mouseleave={() =>
@@ -172,6 +167,7 @@
                       <span style="float:right">▶</span></button
                     >
                     {#if item.visibleState || keepOpen}
+                      <!-- svelte-ignore a11y-mouse-events-have-key-events -->
                       <ul
                         class="thirdmenu dontclose"
                         on:mouseover={() => {
@@ -269,14 +265,6 @@
     min-width: 150px;
     text-align: left;
   }
-  ul li ul.secondmenu li button span.shortcut {
-    padding-left: 100px;
-    padding-right: 8px;
-    float: right;
-  }
-  ul li button i {
-    padding: 0px 20px 0px 8px;
-  }
 
   ul li ul.thirdmenu {
     display: flex;
@@ -288,9 +276,6 @@
     margin-top: -30px;
   }
 
-  .hide {
-    display: none;
-  }
   hr {
     border: none;
     border-bottom: 1px solid var(--hover-color);
@@ -310,6 +295,7 @@
   }
   #switchtheme {
     -webkit-appearance: none;
+    appearance: none;
     outline: none;
     cursor: pointer;
     height: var(--theme-toggle-height);

@@ -5,7 +5,6 @@ import { get } from "svelte/store";
 export function getDataFromTable(tableID, key, getProcessed = true) {
   const tempData =
     get(data)[get(data).findIndex((d) => d.id === tableID)].data[key];
-  //console.log(tempData);
   if (tempData.processedData.length > 0 && getProcessed) {
     return tempData.processedData;
   }
@@ -46,9 +45,10 @@ export function getFieldType(tableID, field) {
 // xs and ys are the time and values for an actigram
 // binSize is the size of each bin, usually in Hrs
 export function averageBinnedValues(xs, ys, binSize) {
-  const Nbins = Math.ceil(
-    (Math.max(...xs.filter((x) => (x ? x : 0))) + binSize) / binSize
-  );
+  const Nbins =
+    Math.ceil(
+      (Math.max(...xs.filter((x) => (x ? x : 0))) + binSize) / binSize
+    ) || 1;
 
   const xout = new Array(Nbins);
   const yout = new Array(Nbins);

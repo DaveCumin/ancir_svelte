@@ -106,7 +106,7 @@ function putChartValues(keysIN, fieldsIN) {
   return chartValues;
 }
 
-//TODO _med: make this a popoup, like generate data: currently only works for actigram
+//TODO _med: make this a popoup, like generate data: currently relies on default data
 export function makeNewChart(type) {
   let newchart = {
     graph: type,

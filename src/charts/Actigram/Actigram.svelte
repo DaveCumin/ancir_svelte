@@ -1,5 +1,6 @@
 <script>
   // @ts-nocheck
+
   import { data, graphs, activeGraphTab, statusData } from "../../store";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
@@ -642,8 +643,8 @@
       : "display:none;"}
   ></div>
 
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <svg
     id="svgContainer"
     margin-lr={margin.left + margin.right}

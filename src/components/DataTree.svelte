@@ -103,6 +103,8 @@
         <summary
           ><InPlaceEdit bind:value={datum.displayName} />
 
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="deleteTable hoverbutton"
             on:click={(e) => {
@@ -112,6 +114,8 @@
           >
             🗑️
           </div>
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="viewTable hoverbutton"
             on:click={(e) => {
@@ -130,8 +134,12 @@
               ? ''
               : 'no-arrow'}"
           >
-            <summary
-              ><InPlaceEdit bind:value={datum.data[key].name} /><span
+            <summary>
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <InPlaceEdit bind:value={datum.data[key].name} />
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <span
                 class="addbutton hoverbutton showContextMenu"
                 on:click={(e) => {
                   e.preventDefault();
@@ -143,6 +151,8 @@
               <details open class="process">
                 <summary
                   >{ps.process}
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
                   <div
                     class="deleteProcess hoverbutton"
                     on:click={(e) => {
@@ -248,22 +258,7 @@
     border-radius: 20%;
   }
 
-  .label {
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
-
-  .label span {
-    margin-right: 10px;
-  }
-
-  .processItem {
-    padding: 10px 0px;
-  }
-
   .deleteTable {
-    display: inline-block;
     float: right;
     cursor: pointer;
     margin-right: 0em;
@@ -278,7 +273,6 @@
   }
 
   .viewTable {
-    display: inline-block;
     float: right;
     cursor: pointer;
     margin-right: 0.5em;
@@ -289,7 +283,6 @@
   }
 
   .deleteProcess {
-    display: inline-block;
     float: right;
     cursor: pointer;
     margin-right: 0em;
