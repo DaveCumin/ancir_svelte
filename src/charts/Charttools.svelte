@@ -75,7 +75,7 @@
   <Tooltip tipcontent="Zoom out">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="button" id="Zoom in" on:click={Zoom("out")}>
+    <div class="button" id="Zoom in" on:click={() => Zoom("out")}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -98,7 +98,7 @@
   <Tooltip tipcontent="Save plot">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="button" id="export" on:click={exportSVG()}>💾</div>
+    <div class="button" id="export" on:click={() => exportSVG()}>💾</div>
   </Tooltip>
 </div>
 
