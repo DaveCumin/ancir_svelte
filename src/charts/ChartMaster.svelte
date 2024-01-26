@@ -145,6 +145,10 @@
   <!-- The Data -->
   <div style="margin: 1em 1em 0 0;">
     <h1 style="display: inline;">{$graphTabs[$activeGraphTab].name} Data</h1>
+
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <span
       class="addbutton hoverbutton showContextMenu"
       on:click={(e) => {
@@ -160,6 +164,9 @@
         <summary
           ><InPlaceEdit bind:value={source.name} />
 
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="deleteTable hoverbutton"
             on:click={(e) => {
@@ -185,6 +192,8 @@
           >
             <summary
               >{key}:
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
               <span
                 class="addbutton hoverbutton showContextMenu"
                 on:click={(e) => {
@@ -213,6 +222,10 @@
               <details open class="process">
                 <summary
                   >{ps.process}
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
                   <div
                     class="deleteProcess hoverbutton"
                     on:click={(e) => {
@@ -297,6 +310,8 @@
 
           <!-- CHECKBOX -->
           {#if graphMap[$graphs[$activeGraphTab].graph].othertypes[keyIndex] === "checkbox"}
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <!-- svelte-ignore a11y-missing-attribute -->
             <div class="itemsliderContainer">
               <a>{protoKey.charAt(0).toUpperCase() + protoKey.slice(1) + ":"}</a
               >
@@ -391,22 +406,7 @@
     border-radius: 20%;
   }
 
-  .label {
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
-
-  .label span {
-    margin-right: 10px;
-  }
-
-  .processItem {
-    padding: 10px 0px;
-  }
-
   .deleteTable {
-    display: inline-block;
     float: right;
     cursor: pointer;
     margin-right: 0em;
@@ -420,19 +420,7 @@
     cursor: pointer;
   }
 
-  .viewTable {
-    display: inline-block;
-    float: right;
-    cursor: pointer;
-    margin-right: 0.5em;
-  }
-  .viewTable:hover {
-    margin-right: 0em;
-    cursor: pointer;
-  }
-
   .deleteProcess {
-    display: inline-block;
     float: right;
     cursor: pointer;
     margin-right: 0em;

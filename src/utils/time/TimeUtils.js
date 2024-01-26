@@ -2,6 +2,8 @@
 import { DateTime } from "luxon";
 import { guessFormat } from "./guessTimeFormat";
 
+const decimalPlaces = 4;
+
 function convertFormat(formatIN) {
   //moment format string to luxon format string (https://moment.github.io/luxon/#/parsing?id=table-of-tokens)
   const map = {
@@ -75,7 +77,7 @@ export function calculateTimeDifference(start, end, dateFormat) {
   end = DateTime.fromFormat(end, dateFormat);
 
   var diffTime = end.diff(start, "hours");
-  return diffTime.hours;
+  return diffTime.hours.toFixed(decimalPlaces);
 }
 
 //get the minimum period and if all the steps are the same
@@ -88,6 +90,8 @@ export function getPeriod(timeData, timefmt) {
       convertFormat(timefmt)
     );
   }
+  console.log(Math.min(...diffs) + ", " + Math.max(...diffs));
+  console.log(diffs);
   return {
     minDiff: Math.min(...diffs),
     constant: Math.min(...diffs) === Math.max(...diffs),
@@ -99,7 +103,7 @@ export function getPeriod(timeData, timefmt) {
 export function getstartTimeOffset(inputTime, firstTime, timeFormat) {
   let start = DateTime.fromISO(inputTime);
   let end = DateTime.fromFormat(firstTime, convertFormat(timeFormat));
-  return end.diff(start, "hours").hours;
+  return end.diff(start, "hours").hours.toFixed(decimalPlaces);
 }
 
 export function makeTimeProcessedData(rawData) {
