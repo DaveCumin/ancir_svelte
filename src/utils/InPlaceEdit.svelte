@@ -55,6 +55,8 @@
 </script>
 
 {#if editing}
+  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
   <form on:submit|preventDefault={submit} on:keydown={keydown}>
     <input
       bind:value
@@ -65,6 +67,8 @@
     />
   </form>
 {:else}
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <span
     on:dblclick={(e) => {
       edit();

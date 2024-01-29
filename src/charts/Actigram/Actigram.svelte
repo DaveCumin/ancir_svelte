@@ -644,6 +644,7 @@
   ></div>
 
   <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
   <svg
     id="svgContainer"
     margin-lr={margin.left + margin.right}
