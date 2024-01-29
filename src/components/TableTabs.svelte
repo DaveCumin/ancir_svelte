@@ -104,6 +104,8 @@
     <nav>
       <ul>
         {#each $dataIDsforTables as table, inx}
+          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <li
             class={$activeTableTab === inx ? "active" : ""}
             on:click={() => changeActiveNav(inx)}
