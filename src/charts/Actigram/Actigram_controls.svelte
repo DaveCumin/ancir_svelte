@@ -136,6 +136,7 @@
         type="checkbox"
         bind:checked={$graphs[$activeGraphTab].params.showAxes}
       />
+      <a>Scale </a>
       <select
         class="selectField"
         style="margin-right:0 !important;"
@@ -296,12 +297,51 @@
         <!-- svelte-ignore a11y-missing-attribute -->
         <!-- svelte-ignore a11y-missing-attribute -->
         <div class="itemsliderContainer">
-          <a>Onsets</a>
-          <input
-            type="checkbox"
-            bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex]
-              .showOnsets}
-          />
+          <details class="otherItemDetail">
+            <summary>
+              <a>Onsets</a>
+              <input
+                type="checkbox"
+                bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                  .showOnsets}
+              />
+              <span
+                >Est τ: {$graphs[$activeGraphTab].chartData.data[sourceIndex]
+                  .estimate}</span
+              >
+            </summary>
+            <div style="padding:5px">
+              <Slider
+                min="0"
+                max="100"
+                step="1"
+                limits={[0, 100]}
+                label="Centile threshold: "
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                  .centileThresh}
+              />
+            </div>
+            <div style="padding:5px">
+              <Slider
+                min="0"
+                max="10"
+                step="1"
+                limits={[0, 100]}
+                label="M: "
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].M}
+              />
+            </div>
+            <div style="padding:5px">
+              <Slider
+                min="0"
+                max="10"
+                step="1"
+                limits={[0, 100]}
+                label="N: "
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].N}
+              />
+            </div>
+          </details>
         </div>
 
         <!-- END OF THE EXTRAS-->

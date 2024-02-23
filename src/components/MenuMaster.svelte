@@ -1,9 +1,10 @@
 <script>
+  // @ts-nocheck
   import { onMount } from "svelte";
   import { graphTabs, activeGraphTab, menuModalType } from "../store";
-  import { exportSVG } from "../charts/Charttools.svelte";
   import { saveStoreData, loadStoreData } from "../utils/SaveLoadStore.svelte";
   import { graphMap, makeNewChart } from "../charts/allCharts";
+  import { exportSVG } from "../utils/exportSVG";
 
   let keepOpen = false;
 

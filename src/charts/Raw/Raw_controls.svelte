@@ -56,6 +56,7 @@
         bind:value={$graphs[$activeGraphTab].params.xAxisLabel}
       />
     </div>
+
     <div class="sliderContainer">
       <Slider
         min={-10}
@@ -81,6 +82,7 @@
         bind:value={$graphs[$activeGraphTab].params.yAxisLabel}
       />
     </div>
+
     <div class="sliderContainer">
       <Slider
         min={-10}

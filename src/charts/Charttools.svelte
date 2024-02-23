@@ -1,32 +1,10 @@
-<script context="module">
+<script>
   // @ts-nocheck
 
-  import { graphs, graphTabs, activeGraphTab } from "../store";
-  import { get } from "svelte/store";
+  import { data, graphs, activeGraphTab } from "../store";
+  import { getDataFromSource } from "../data/handleData";
   import Tooltip from "../utils/Tooltip/Tooltip.svelte";
-
-  //EXPORT AS SVG
-  export function exportSVG() {
-    if (get(activeGraphTab) < 0) {
-      console.log("Nothing to export");
-      return;
-    }
-    const svgString = document
-      .getElementById("thePlot")
-      .querySelector("svg").outerHTML;
-    const svgBlob = new Blob([svgString], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-    const svgUrl = URL.createObjectURL(svgBlob);
-
-    const link = document.createElement("a");
-    link.href = svgUrl;
-    link.download = get(graphTabs)[get(activeGraphTab)].name + ".svg";
-    document.body.appendChild(link);
-    link.click();
-
-    URL.revokeObjectURL(svgUrl);
-  }
+  import { exportSVG } from "../utils/exportSVG.js";
 
   //Zoom on the SVG
   function Zoom(type = "in") {
@@ -42,17 +20,101 @@
       newScale -= 0.1;
     }
 
-    graphs.update((current) => {
-      current[get(activeGraphTab)].zoom = newScale;
-      return current;
-    });
+    $graphs[$activeGraphTab].zoom = newScale;
 
     svg.style.transform = "scale(" + newScale + ")";
     svg.style.width = ""; //auto fill to contents - this takes care of the margin-left and margin-top offsets of the g element
   }
+
+  function scaleAxes() {
+    //find the max and min values
+    let tempxmin = Infinity;
+    let tempxmax = -Infinity;
+    let tempymin = Infinity;
+    let tempymax = -Infinity;
+
+    let xValsToPlot = [];
+    let yValsToPlot = [];
+
+    let xVals;
+    let yVals;
+
+    if ($graphs[$activeGraphTab]?.graph === "raw") {
+      $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
+        const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
+        //get the x data
+        if (plotData.chartvalues.x.field != "") {
+          xVals = getDataFromSource(sourceIndex, plotData.chartvalues.x);
+        }
+
+        //get the y data
+        if (plotData.chartvalues.y.field != "") {
+          yVals = getDataFromSource(sourceIndex, plotData.chartvalues.y);
+        }
+
+        //put the data into the chart
+        xValsToPlot.push(xVals);
+        yValsToPlot.push(yVals);
+      });
+
+      for (let i = 0; i < xValsToPlot.length; i++) {
+        if (Math.min(...xValsToPlot[i]) < tempxmin) {
+          tempxmin = Math.min(...xValsToPlot[i]);
+        }
+        if (Math.max(...xValsToPlot[i]) > tempxmax) {
+          tempxmax = Math.max(...xValsToPlot[i]);
+        }
+
+        if (Math.min(...yValsToPlot[i]) < tempymin) {
+          tempymin = Math.min(...yValsToPlot[i]);
+        }
+        if (Math.max(...yValsToPlot[i]) > tempymax) {
+          tempymax = Math.max(...yValsToPlot[i]);
+        }
+      }
+      $graphs[$activeGraphTab].params.xDomainMin = tempxmin;
+      $graphs[$activeGraphTab].params.xDomainMax = tempxmax;
+      $graphs[$activeGraphTab].params.yDomainMin = tempymin;
+      $graphs[$activeGraphTab].params.yDomainMax = tempymax;
+
+      console.log(tempxmin);
+      console.log(tempxmax);
+      console.log(tempymin);
+      console.log(tempymax);
+    }
+  }
 </script>
 
-<div id="chartTools">
+<div
+  id="chartTools"
+  style="margin-left: {$graphs[$activeGraphTab]?.graph === 'raw'
+    ? `calc(100% - 13em)`
+    : `calc(100% - 10em)`}"
+>
+  {#if $graphs[$activeGraphTab]?.graph === "raw"}
+    <Tooltip tipcontent="Auto scale axes">
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div class="button" id="scaleRaw" on:click={(e) => scaleAxes()}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 20 20"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            d="M2 2L2 18L18 18"
+            stroke="#292929"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+        </svg>
+      </div>
+    </Tooltip>
+  {/if}
   <Tooltip tipcontent="Zoom in">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -115,7 +177,6 @@
     backdrop-filter: blur(1px);
     opacity: 0.4;
     position: absolute;
-    margin-left: calc(100% - 10em);
     border-radius: 5px;
     display: flex;
   }

@@ -59,6 +59,7 @@
         ])
         .range([innerHeight, 0]);
     }
+    console.log("didplot");
   }
 </script>
 

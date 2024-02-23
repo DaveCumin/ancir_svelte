@@ -230,6 +230,17 @@ summary {
   padding: 5px 0px;
 }
 
+.otherItemDetail[open]{
+  margin-bottom: 15px;
+  margin-top: 5px;
+  margin-right: 0px;
+  box-shadow: 1px 1px 5px #888888;
+}
+.otherItemDetail {
+  margin-left: 0em;
+  padding: 5px 0px;
+}
+
 .processDetails {
   padding: 0.5em;
 }

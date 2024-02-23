@@ -6,12 +6,12 @@
 
   function mouseOver(event) {
     isHovered = true;
-    x = event.clientX + 5;
-    y = event.clientY + 5;
+    x = event.clientX + 5 - 750;
+    y = event.clientY + 5 - 60;
   }
   function mouseMove(event) {
-    x = event.clientX + 5;
-    y = event.clientY + 5;
+    x = event.clientX + 5 - 750;
+    y = event.clientY + 5 - 60;
   }
 
   function mouseLeave() {
@@ -35,6 +35,7 @@
 
 <style>
   .tooltip {
+    transform: none;
     border: 1px solid #ddd;
     box-shadow: 1px 1px 1px #ddd;
     background: white;
@@ -43,5 +44,6 @@
     position: absolute;
     margin: 0;
     z-index: 9999;
+    width: max-content;
   }
 </style>

@@ -47,7 +47,7 @@
     parseFile(skipLines + previewTableNrows + useHeaders); //preview the data - need 200 to account for actiware data
   }
 
-  //TODO consider recursive promise that checks until there is no more "__parsed_extra" key
+  //TODO_med consider recursive promise that checks until there is no more "__parsed_extra" key
   //EXAMPLE RECURSIVE STRUCTURE
   /*async function recursiveCall(index) {
     return new Promise((resolve) => {
@@ -198,13 +198,13 @@
     console.log("loading...");
     await parseFile(0); //load all the data
     console.log(tempData);
-    //TODO: perorm the required manipulations
+    //TODO_high: perorm the required manipulations
     doBasicFileImport(tempData, filesToImport[0].name); //LOAD THE DATA
     $menuModalType = ""; //close the dialog
   }
 
   // put the data into the tool store
-  //TODO: check the logic here, as the Sampling freq isn't updating properly for times.
+  //TODO_med: check the logic here, as the Sampling freq isn't updating properly for times.
   function doBasicFileImport(result, fname) {
     console.log(result);
     console.log(fname);
