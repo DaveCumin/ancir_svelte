@@ -648,7 +648,9 @@
   <svg
     id="svgContainer"
     margin-lr={margin.left + margin.right}
-    style="transform-origin: top left; transform:scale(1);"
+    style={"transform-origin: top left; transform:scale(" +
+      $graphs[$activeGraphTab].zoom +
+      ");"}
     {width}
     height={totalHeight}
     on:mousedown={(e) => {

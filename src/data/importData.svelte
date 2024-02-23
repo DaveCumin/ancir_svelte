@@ -47,6 +47,26 @@
     parseFile(skipLines + previewTableNrows + useHeaders); //preview the data - need 200 to account for actiware data
   }
 
+  //TODO consider recursive promise that checks until there is no more "__parsed_extra" key
+  //EXAMPLE RECURSIVE STRUCTURE
+  /*async function recursiveCall(index) {
+    return new Promise((resolve) => {
+        return resolve(index);
+    }).then(idx => {
+        if (idx < 3) {
+            return recursiveCall(++idx);
+        } else {
+            console.log('done'); // Move the statement here
+            return idx;
+        }
+    });
+  }
+
+  // Use await to handle the resolved value of the Promise.
+  const a = await recursiveCall(0);
+  console.log("a: " + a);
+  */
+
   //do the Papa parse stuff
   function parseFile(previewIN = 0) {
     errorInfile = false; //reset the errors

@@ -1,4 +1,4 @@
-import { data, graphs, activeGraphTab } from "../store";
+import { data, graphs, activeGraphTab, contextMenu } from "../store";
 import { get } from "svelte/store";
 
 //Get data from the data structure
@@ -22,6 +22,12 @@ export function getFieldName(tableID, field) {
   return tempData.name;
 }
 
+export function getFieldNames(source) {
+  return Object.keys(
+    get(data)[get(data).findIndex((d) => d.id === source.tableID)].data
+  );
+}
+
 //get the data from graph source
 export function getDataFromSource(sourceIndex, vals) {
   const sourceData = get(graphs)[get(activeGraphTab)].sourceData[sourceIndex];
@@ -39,6 +45,76 @@ export function getFieldType(tableID, field) {
   const tempData =
     get(data)[get(data).findIndex((d) => d.id === tableID)].data[field];
   return tempData.type;
+}
+
+//remove data from a graph
+export function removeGraphData(srcID) {
+  graphs.update((currentData) => {
+    const newData = [...currentData];
+    const currentGraphID = newData[get(activeGraphTab)].id;
+
+    // Find the current graph by ID
+    const currentGraph = newData.find((graph) => graph.id === currentGraphID);
+
+    // Check if the currentGraph exists and has sourceData
+    if (currentGraph && currentGraph.sourceData) {
+      // Remove the i-th sourceData element from the currentGraph
+      currentGraph.sourceData.splice(srcID, 1);
+    }
+
+    return newData;
+  });
+}
+
+export function createnewDataForGraph(protoValues, protoOther) {
+  contextMenu.update((menu) => {
+    menu.labels = [];
+    menu.funcs = [];
+    return menu;
+  });
+
+  for (let i = 0; i < get(data).length; i++) {
+    contextMenu.update((menu) => {
+      menu.labels.push(get(data)[i].displayName);
+      menu.funcs.push(() =>
+        addDataToGraph(get(data)[i].id, protoValues, protoOther)
+      );
+      return menu;
+    });
+  }
+}
+
+function addDataToGraph(tableID_IN, prototypechartvalues, prototypeother) {
+  let chartvalues = {};
+
+  // Iterate over the keys of the original object, make the fields
+  Object.keys(prototypechartvalues).forEach((key, cdindex) => {
+    // Create a new object structure for each key
+    chartvalues[key] = {
+      field: Object.keys(
+        get(data)[get(data).findIndex((d) => d.id === tableID_IN)].data
+      )[cdindex], //{insert fieldnames in order},
+      processSteps: [],
+      processedData: [],
+    };
+  });
+
+  // every graph has a tableID and a name; then add chartvalues
+  graphs.update((current) => {
+    current[get(activeGraphTab)].sourceData.push({
+      tableID: tableID_IN,
+      name: "Data " + (1 + get(graphs)[get(activeGraphTab)].sourceData.length),
+      chartvalues: chartvalues,
+      ...deepCopy(prototypeother),
+    });
+    return current;
+  });
+
+  console.log(get(graphs));
+}
+
+export function deepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 //Bin the data into binSize bins

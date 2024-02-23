@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { DateTime } from "luxon";
-import { scaleLinear } from "d3-scale";
 import { get } from "svelte/store";
 import { activeGraphTab, graphs, graphTabs } from "../store.js";
 
@@ -21,7 +20,10 @@ export const graphMap = {
     graph: Actigram,
     controls: ActigramControls,
     prototypechartvalues: { time: "time", values: "values" },
-    prototypeother: { col: { hex: "#1B1D50", alpha: 0.5 }, showOnsets: true },
+    prototypeother: {
+      col: { hex: "#1B1D50", alpha: 0.5 },
+      showOnsets: true,
+    },
     othertypes: ["colour", "checkbox"],
     params: {
       startTime: DateTime.now()
@@ -111,6 +113,7 @@ export function makeNewChart(type) {
   let newchart = {
     graph: type,
     id: getID(),
+    zoom: 1,
     sourceData: [
       {
         tableID: 0,
