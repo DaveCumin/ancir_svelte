@@ -395,9 +395,10 @@
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
   function findOnOffsets(sourceIndex) {
     //Set up the parameters
-    const centile = 60;
-    const Nhrs = 3;
-    const Mhrs = 3;
+    const centile =
+      $graphs[$activeGraphTab].sourceData[sourceIndex].centileThresh;
+    const Nhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].N;
+    const Mhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].M;
     const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
     const template = createTemplate(Nhrs, Mhrs, binSizeHrs);
 
@@ -435,8 +436,10 @@
         ];
     }
     const estimate = bestFitOnsets(getDiffs(bestMatchTime));
+    $graphs[$activeGraphTab].chartData.data[sourceIndex].estimate =
+      estimate.toFixed(3);
 
-    $statusData.push({
+    /*     $statusData.push({
       display:
         "Estimated period for " +
         $graphs[$activeGraphTab].sourceData[sourceIndex].name +
@@ -444,7 +447,7 @@
         estimate.toFixed(3),
     });
     $statusData = $statusData;
-
+ */
     //calculate the estimated period
     let xs = [];
     let ys = [];
@@ -475,7 +478,6 @@
       onsetTimes: bestMatchTime,
       //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
       //TODO _med: need to truncate the line also - as it can go off the chart.
-      //TODO _high: Have a UI component for doing the estimation on a dataset.
       estimate: estimate,
       median: median,
       estDay: estDay,

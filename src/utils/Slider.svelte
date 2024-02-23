@@ -10,6 +10,11 @@
   //the label
   export let label = "Label:";
 
+  $: {
+    update();
+    value = value;
+  }
+
   function keeptolimits() {
     //Make sure min and max reflect the limits
     if (min < limits[0]) {

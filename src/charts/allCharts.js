@@ -23,6 +23,9 @@ export const graphMap = {
     prototypeother: {
       col: { hex: "#1B1D50", alpha: 0.5 },
       showOnsets: true,
+      centileThresh: 80,
+      M: 3,
+      N: 3,
     },
     othertypes: ["colour", "checkbox"],
     params: {
