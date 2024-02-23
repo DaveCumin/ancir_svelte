@@ -20,4 +20,15 @@ Have fun.
 
 ## For developers
 
-Any advice or offers of support will be welcommed.
+Any advice or offers of support will be welcommed - email d.cumin@auckland.ac.nz.
+
+The following packages code was used in this project:
+
+- [Svelte](https://svelte.dev/) is used as the framework/library/compiler of the code.
+- [D3](https://d3js.org/) is used for plotting.
+- [Papaparse](https://www.papaparse.com/) is used for importing the data.
+- [In-place editing](https://svelte.dev/repl/79d35c3691cf4ed0924e7e98dc9af55e?version=4.2.8) is used for updating items.
+- [Moment-guess](https://www.npmjs.com/package/moment-guess) was adapted to guess the time format of data.
+- [Tooltip](https://svelte.dev/repl/dd6754a2ad0547c5b1c1ea37c0293fef?version=4.2.10) was adapted for this project.
+- [Spinner](https://github.com/EmilTholin/svelte-spinner/) was taken to use for the spinner.
+- [Luxon](https://www.npmjs.com/package/luxon) is used for date manipulation and caluclations.

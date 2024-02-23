@@ -1,7 +1,7 @@
 <script context="module">
   // @ts-nocheck
 
-  import { graphTabs, activeGraphTab } from "../store";
+  import { graphs, graphTabs, activeGraphTab } from "../store";
   import { get } from "svelte/store";
   import Tooltip from "../utils/Tooltip/Tooltip.svelte";
 
@@ -41,6 +41,11 @@
     } else {
       newScale -= 0.1;
     }
+
+    graphs.update((current) => {
+      current[get(activeGraphTab)].zoom = newScale;
+      return current;
+    });
 
     svg.style.transform = "scale(" + newScale + ")";
     svg.style.width = ""; //auto fill to contents - this takes care of the margin-left and margin-top offsets of the g element

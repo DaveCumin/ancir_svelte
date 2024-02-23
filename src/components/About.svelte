@@ -14,7 +14,8 @@
     </p>
 
     <p>
-      This is written in Svelte, with help from @korur and @khromov - thank you!
+      This is written in Svelte, using D3, with help from @korur and @khromov -
+      thank you!
     </p>
 
     <h4>For users</h4>
@@ -58,5 +59,44 @@
         >d.cumin@auckland.ac.nz</a
       >
     </p>
+
+    The following packages code was used in this project:
+    <ul>
+      <li>
+        <a href="https://svelte.dev/">Svelte</a> is used as the framework/library/compiler
+        of the code.
+      </li>
+      <li>
+        <a href="https://d3js.org/">D3</a> is used for plotting.
+      </li>
+      <li>
+        <a href="https://www.papaparse.com/">Papaparse</a> is used for importing
+        the data.
+      </li>
+      <li>
+        <a
+          href="https://svelte.dev/repl/79d35c3691cf4ed0924e7e98dc9af55e?version=4.2.8"
+          >In-place editing</a
+        > for updating items.
+      </li>
+      <li>
+        <a href="https://www.npmjs.com/package/moment-guess">Moment-guess</a>
+        was adapted to guess the time format of data.
+      </li>
+      <li>
+        <a
+          href="https://svelte.dev/repl/dd6754a2ad0547c5b1c1ea37c0293fef?version=4.2.10"
+          >Tooltip</a
+        > was adapted for this project.
+      </li>
+      <li>
+        <a href="https://github.com/EmilTholin/svelte-spinner/">Spinner</a> was taken
+        to use for the spinner.
+      </li>
+      <li>
+        <a href="https://www.npmjs.com/package/luxon">Luxon</a> is used for date
+        manipulation and caluclations.
+      </li>
+    </ul>
   </Dialog>
 {/if}

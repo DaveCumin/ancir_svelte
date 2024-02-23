@@ -68,7 +68,9 @@
       id="svgContainer"
       {width}
       {height}
-      style="transform-origin: top left; transform:scale(1);"
+      style={"transform-origin: top left; transform:scale(" +
+        $graphs[$activeGraphTab].zoom +
+        ");"}
     >
       <g transform={`translate(${margin.left},${margin.right})`}>
         {#each yValsToPlot as ys, sourceI}

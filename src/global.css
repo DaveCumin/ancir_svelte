@@ -181,6 +181,129 @@ g.axis > path {
  border: 1px solid var(--hover-color);
 }
 
+/* styles for the chart controls */
+.graphDataTree {
+  width: calc(100% - 12px);
+  border-radius: 0;
+  margin-left: 6px;
+  min-width: 200px;
+}
+
+details {
+  padding: 0px 10px;
+}
+
+summary {
+  padding: 0px 10px;
+  cursor: pointer;
+}
+.dataTable {
+  margin-left: 0.5em;
+  box-shadow: 1px 1px 5px #888888;
+  padding: 10px 0px;
+  margin: 8px 0px 10px 0px;
+}
+
+.dataTable > summary {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.tableLabel {
+  margin: 1em 1em 0.5em;
+}
+
+.field {
+  margin-left: 1.5em;
+  padding: 5px 0px;
+}
+
+.process[open] {
+  margin-bottom: 15px;
+  margin-top: 5px;
+  margin-right: 10px;
+  box-shadow: 1px 1px 5px #888888;
+}
+
+.process {
+  margin-left: 1.5em;
+  padding: 5px 0px;
+}
+
+.processDetails {
+  padding: 0.5em;
+}
+
+.no-arrow summary {
+  list-style: none;
+  cursor: default;
+}
+
+.no-arrow summary:before {
+  content: "\25AC\00a0";
+  margin-left: -2px;
+}
+
+.addbutton {
+  float: right;
+  cursor: pointer;
+  margin-right: 0em;
+}
+
+.addbutton:hover {
+  background: var(--hover-color);
+  padding: 0.2em 0.5em;
+  margin-right: -0.5em;
+  margin-top: -0.2em;
+  border-radius: 20%;
+}
+
+.deleteTable {
+  float: right;
+  cursor: pointer;
+  margin-right: 0em;
+  z-index: 2;
+}
+.hoverbutton:hover {
+  background: var(--hover-color);
+  padding: 0.2em 0.5em;
+  margin: -0.2em -0.5em;
+  border-radius: 20%;
+  cursor: pointer;
+}
+
+.deleteProcess {
+  float: right;
+  cursor: pointer;
+  margin-right: 0em;
+}
+
+.colour {
+  display: flex;
+  align-items: center;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+.colourPicker {
+  border-radius: 25px;
+  height: 2.5em;
+  padding: 0;
+  width: 2.5em;
+  margin-right: 1em;
+}
+.colourPicker::-webkit-color-swatch {
+  display: none;
+}
+.colourPicker::-moz-color-swatch {
+  display: none;
+}
+.sliderContainer {
+  width: calc(100% - 3.5em);
+}
+.itemsliderContainer {
+  width: calc(100% - 2em);
+  margin-left: 1em;
+}
 
 /* ------------------------------------------------- */
 

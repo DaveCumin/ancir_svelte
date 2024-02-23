@@ -1,8 +1,8 @@
 <script context="module">
   // @ts-nocheck
-  import { data, graphs, activeGraphTab } from "../store.js";
+  import { data, graphs, activeGraphTab, contextMenu } from "../store.js";
   import { get } from "svelte/store";
-  import { getDataFromTable } from "../data/handleData.js";
+  import { getDataFromTable, getFieldType } from "../data/handleData.js";
 
   //---------------------------------------------------------------------
   // ----- ADD NEW PROCESSING FUNCTIONS BELOW
@@ -158,6 +158,45 @@
           });
         }
       });
+    });
+  }
+
+  // THE FUNCTIONS BELOW ARE FOR GRAPH CONTROLS
+  //Update a process in the graph
+  export function updateProcess(xy, sourcei, processindex, processParams) {
+    get(graphs)[get(activeGraphTab)].sourceData[sourcei].chartvalues[
+      xy
+    ].processSteps[processindex].parameters = processParams;
+    updateGraphProcess(get(activeGraphTab), sourcei, xy);
+  }
+  //Remove a process
+  export function removeProcess(sourcei, xy, processindex) {
+    get(graphs)[get(activeGraphTab)].sourceData[sourcei].chartvalues[
+      xy
+    ].processSteps.splice(processindex, 1);
+    updateGraphProcess(get(activeGraphTab), sourcei, xy);
+  }
+
+  //bring up the context menu to add a process to the field
+  export function addProcessToGraphData(where, id, fieldName) {
+    contextMenu.set({ labels: [], funcs: [] }); //reset the contextMenu
+    const type = getFieldType(
+      get(graphs)[get(activeGraphTab)].sourceData[id].tableID,
+      get(graphs)[get(activeGraphTab)].sourceData[id].chartvalues[fieldName]
+        .field
+    );
+    const tempLabels = Object.keys(componentMap);
+
+    contextMenu.update((menu) => {
+      for (let i = 0; i < tempLabels.length; i++) {
+        if (componentMap[tempLabels[i]].forTypes.includes(type)) {
+          console.log(tempLabels[i]);
+          //only add to the menu those processes appropriate for the type
+          menu.labels[i] = tempLabels[i];
+          menu.funcs[i] = () => addProcess(tempLabels[i], where, id, fieldName);
+        }
+      }
+      return menu;
     });
   }
 </script>
