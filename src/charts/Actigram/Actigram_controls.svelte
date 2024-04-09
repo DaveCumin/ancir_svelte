@@ -18,10 +18,16 @@
   import { data, graphs, activeGraphTab, graphTabs } from "../../store";
   import { formatTimeFromISO } from "../../utils/time/TimeUtils";
 
+  import { getRandomHexColour } from "../../charts/allCharts";
+
   const prototypechartvalues = { time: "time", values: "values" };
   const prototypeother = {
-    col: { hex: "#1B1D50", alpha: 0.5 },
+    col: { hex: getRandomHexColour(), alpha: 0.5 },
     showOnsets: true,
+    centileThresh: 80,
+    M: 3,
+    N: 3,
+    estimate: 0,
   };
 
   let datePickVisible = true;
@@ -129,14 +135,13 @@
 
     <div class="sliderContainer">
       <!-- svelte-ignore a11y-missing-attribute -->
-      <a>y-Axes: </a>
-      <!-- svelte-ignore a11y-missing-attribute -->
-      <a>Show </a>
+      <a style="align-self: center;">Show y-axes: </a>
       <input
         type="checkbox"
         bind:checked={$graphs[$activeGraphTab].params.showAxes}
       />
-      <a>Scale </a>
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a style="align-self: center;">Scale: </a>
       <select
         class="selectField"
         style="margin-right:0 !important;"
@@ -306,7 +311,7 @@
                   .showOnsets}
               />
               <span
-                >Est τ: {$graphs[$activeGraphTab].chartData.data[sourceIndex]
+                >Est τ: {$graphs[$activeGraphTab].sourceData[sourceIndex]
                   .estimate}</span
               >
             </summary>
@@ -327,8 +332,8 @@
                 max="10"
                 step="1"
                 limits={[0, 100]}
-                label="M: "
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].M}
+                label="Template hours before: "
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].N}
               />
             </div>
             <div style="padding:5px">
@@ -337,8 +342,8 @@
                 max="10"
                 step="1"
                 limits={[0, 100]}
-                label="N: "
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].N}
+                label="Template hours after: "
+                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].M}
               />
             </div>
           </details>

@@ -6,6 +6,7 @@ export var data = writable([]);
 export var graphTabs = writable([]);
 export var activeGraphTab = writable(-1);
 export var graphs = writable([]);
+export var addedNewChartData = writable(false);
 
 //TABLES
 export var dataIDsforTables = writable([]);

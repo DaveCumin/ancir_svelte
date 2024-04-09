@@ -5,13 +5,14 @@
   let y;
 
   function mouseOver(event) {
+    console.log(event);
     isHovered = true;
-    x = event.clientX + 5 - 750;
-    y = event.clientY + 5 - 60;
+    x = 15;
+    y = 35;
   }
   function mouseMove(event) {
-    x = event.clientX + 5 - 750;
-    y = event.clientY + 5 - 60;
+    x = 15;
+    y = 35;
   }
 
   function mouseLeave() {
@@ -19,19 +20,21 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   on:mouseover={mouseOver}
   on:mouseleave={mouseLeave}
   on:mousemove={mouseMove}
+  style="position: relative;"
 >
   <slot />
+  {#if isHovered}
+    <div style="top: {y}px; left: {x}px;" class="tooltip">
+      {tipcontent}
+    </div>
+  {/if}
 </div>
-
-{#if isHovered}
-  <div style="top: {y}px; left: {x}px;" class="tooltip">
-    {tipcontent}
-  </div>
-{/if}
 
 <style>
   .tooltip {

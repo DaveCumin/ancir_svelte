@@ -59,7 +59,6 @@
         ])
         .range([innerHeight, 0]);
     }
-    console.log("didplot");
   }
 </script>
 
@@ -101,6 +100,7 @@
         <Axis {innerHeight} scale={xScale} position="bottom" />
         <Axis {innerHeight} scale={yScale} position="left" />
 
+        <!-- TODO_low: move the label and margins for when there are high numbers on the axis (so the label and ticks don't overlap) -->
         <text
           style="text-anchor: middle;"
           transform={`translate(-30,${innerHeight / 2}) rotate(-90)     `}

@@ -16,13 +16,14 @@
     addProcessToGraphData,
     componentMap,
   } from "../../components/ProcessStep.svelte";
+  import { getRandomHexColour } from "../../charts/allCharts";
 
   const prototypechartvalues = { x: "time", y: "values" };
   const prototypeother = {
-    col: { hex: "#78322e", alpha: 0.5 },
+    col: { hex: getRandomHexColour(), alpha: 0.5 },
     size: 2,
     strokeWidth: 1,
-    strokeCol: { hex: "#000000", alpha: 0.9 },
+    strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
   };
 </script>
 

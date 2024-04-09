@@ -1,10 +1,11 @@
 <script>
   // @ts-nocheck
 
-  import { data, graphs, activeGraphTab } from "../store";
-  import { getDataFromSource } from "../data/handleData";
+  import { graphs, activeGraphTab, addedNewChartData } from "../store";
   import Tooltip from "../utils/Tooltip/Tooltip.svelte";
   import { exportSVG } from "../utils/exportSVG.js";
+  import { tick } from "svelte";
+  import Raw_tools from "../charts/Raw/Raw_tools.svelte";
 
   //Zoom on the SVG
   function Zoom(type = "in") {
@@ -25,95 +26,11 @@
     svg.style.transform = "scale(" + newScale + ")";
     svg.style.width = ""; //auto fill to contents - this takes care of the margin-left and margin-top offsets of the g element
   }
-
-  function scaleAxes() {
-    //find the max and min values
-    let tempxmin = Infinity;
-    let tempxmax = -Infinity;
-    let tempymin = Infinity;
-    let tempymax = -Infinity;
-
-    let xValsToPlot = [];
-    let yValsToPlot = [];
-
-    let xVals;
-    let yVals;
-
-    if ($graphs[$activeGraphTab]?.graph === "raw") {
-      $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
-        const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
-        //get the x data
-        if (plotData.chartvalues.x.field != "") {
-          xVals = getDataFromSource(sourceIndex, plotData.chartvalues.x);
-        }
-
-        //get the y data
-        if (plotData.chartvalues.y.field != "") {
-          yVals = getDataFromSource(sourceIndex, plotData.chartvalues.y);
-        }
-
-        //put the data into the chart
-        xValsToPlot.push(xVals);
-        yValsToPlot.push(yVals);
-      });
-
-      for (let i = 0; i < xValsToPlot.length; i++) {
-        if (Math.min(...xValsToPlot[i]) < tempxmin) {
-          tempxmin = Math.min(...xValsToPlot[i]);
-        }
-        if (Math.max(...xValsToPlot[i]) > tempxmax) {
-          tempxmax = Math.max(...xValsToPlot[i]);
-        }
-
-        if (Math.min(...yValsToPlot[i]) < tempymin) {
-          tempymin = Math.min(...yValsToPlot[i]);
-        }
-        if (Math.max(...yValsToPlot[i]) > tempymax) {
-          tempymax = Math.max(...yValsToPlot[i]);
-        }
-      }
-      $graphs[$activeGraphTab].params.xDomainMin = tempxmin;
-      $graphs[$activeGraphTab].params.xDomainMax = tempxmax;
-      $graphs[$activeGraphTab].params.yDomainMin = tempymin;
-      $graphs[$activeGraphTab].params.yDomainMax = tempymax;
-
-      console.log(tempxmin);
-      console.log(tempxmax);
-      console.log(tempymin);
-      console.log(tempymax);
-    }
-  }
 </script>
 
-<div
-  id="chartTools"
-  style="margin-left: {$graphs[$activeGraphTab]?.graph === 'raw'
-    ? `calc(100% - 13em)`
-    : `calc(100% - 10em)`}"
->
+<div id="chartTools">
   {#if $graphs[$activeGraphTab]?.graph === "raw"}
-    <Tooltip tipcontent="Auto scale axes">
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="button" id="scaleRaw" on:click={(e) => scaleAxes()}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 20 20"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            d="M2 2L2 18L18 18"
-            stroke="#292929"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></path>
-        </svg>
-      </div>
-    </Tooltip>
+    <Raw_tools />
   {/if}
   <Tooltip tipcontent="Zoom in">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -179,12 +96,13 @@
     position: absolute;
     border-radius: 5px;
     display: flex;
+    right: 10px;
   }
   .button {
     margin: 5px;
     border: none;
     border-radius: 20%;
-    padding: 0.2em 0.5em;
+    padding: 2px 5px;
     opacity: 1;
     cursor: pointer;
     width: 20px;

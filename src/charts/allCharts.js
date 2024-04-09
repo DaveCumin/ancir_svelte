@@ -1,7 +1,13 @@
 // @ts-nocheck
 import { DateTime } from "luxon";
 import { get } from "svelte/store";
-import { activeGraphTab, graphs, graphTabs } from "../store.js";
+import {
+  activeGraphTab,
+  graphs,
+  graphTabs,
+  data,
+  statusData,
+} from "../store.js";
 
 //---------------------------------------------------------------------
 // ----- ADD NEW GRAPHS BELOW
@@ -26,8 +32,8 @@ export const graphMap = {
       centileThresh: 80,
       M: 3,
       N: 3,
+      estimate: 0,
     },
-    othertypes: ["colour", "checkbox"],
     params: {
       startTime: DateTime.now()
         .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
@@ -55,7 +61,6 @@ export const graphMap = {
     prototypeother: {
       col: { hex: "#78322e", alpha: 0.5 },
     },
-    othertypes: ["colour"],
     params: {
       width: 600,
       height: 200,
@@ -76,7 +81,6 @@ export const graphMap = {
       strokeWidth: 1,
       strokeCol: { hex: "#000000", alpha: 0.9 },
     },
-    othertypes: ["colour", "slider", "slider", "colour"],
     params: {
       width: 600,
       height: 200,
@@ -94,7 +98,7 @@ export const graphMap = {
 // ----- ADD NEW GRAPHS ABOVE
 //---------------------------------------------------------------------
 
-function getRandomHexColour() {
+export function getRandomHexColour() {
   // Generate a random hex color
   return "#" + Math.floor(Math.random() * 16777215).toString(16);
 }
@@ -111,54 +115,33 @@ function putChartValues(keysIN, fieldsIN) {
   return chartValues;
 }
 
-//TODO _med: make this a popoup, like generate data: currently relies on default data
 export function makeNewChart(type) {
-  let newchart = {
-    graph: type,
-    id: getID(),
-    zoom: 1,
-    sourceData: [
-      {
-        tableID: 0,
-        name: "Data 0",
-        chartvalues: putChartValues(
-          Object.keys(graphMap[type].prototypechartvalues),
-          ["time", "value0"]
-        ),
-        ...deepCopy(graphMap[type].prototypeother),
-      },
-      {
-        tableID: 0,
-        name: "Data 1",
-        chartvalues: putChartValues(
-          Object.keys(graphMap[type].prototypechartvalues),
-          ["time", "value1"]
-        ),
-        ...deepCopy(graphMap[type].prototypeother),
-      },
-    ],
-    params: { ...deepCopy(graphMap[type].params) },
-    chartData: { ...deepCopy(graphMap[type].chartData) },
-  };
+  if (get(data).length === 0) {
+    //if there is no data
+    statusData.update((current) => {
+      current.push({
+        display: `There is no data to make a ${type} with.`,
+      });
+      return current;
+    });
+  } else {
+    let newchart = {
+      graph: type,
+      id: getID(),
+      zoom: 1,
+      sourceData: [],
+      params: { ...deepCopy(graphMap[type].params) },
+      chartData: { ...deepCopy(graphMap[type].chartData) },
+    };
 
-  //change the colours if there are any
-  for (let p = 0; p < graphMap[type].othertypes.length; p++) {
-    if (graphMap[type].othertypes[p] === "colour") {
-      for (let s = 0; s < newchart.sourceData.length; s++) {
-        newchart.sourceData[s][
-          Object.keys(graphMap[type].prototypeother)[p]
-        ].hex = getRandomHexColour();
-      }
-    }
+    get(graphs).push(newchart);
+
+    get(graphTabs).push({ name: "Chart " + getID() });
+
+    //make the updates
+    graphTabs.update((currenttabs) => [...currenttabs]);
+    activeGraphTab.update(() => get(graphTabs).length - 1);
   }
-
-  get(graphs).push(newchart);
-
-  get(graphTabs).push({ name: "Chart " + getID() });
-
-  //make the updates
-  graphTabs.update((currenttabs) => [...currenttabs]);
-  activeGraphTab.update(() => get(graphTabs).length - 1);
 }
 
 //get the next highest id of graphs
