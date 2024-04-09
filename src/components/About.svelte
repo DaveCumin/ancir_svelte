@@ -4,18 +4,20 @@
 </script>
 
 {#if $menuModalType === "about"}
-  <Dialog title="ABOUT">
-    <h3>Analysis of Circadian Rhythms (AnCir)</h3>
+  <Dialog title="ABOUT AnCiR">
+    <h3>Analysis of Circadian Rhythms (AnCiR)</h3>
 
     <p>
-      This is our 'AnCir' to the need for a simple-to-use (GUI; no coding) tool
+      This is our 'AnCiR' to the need for a simple-to-use (GUI; no coding) tool
       for analysis of circadian rhythms. Currently, the tool only allows for
       import of csv data and plotting of actigrams.
     </p>
 
     <p>
-      This is written in Svelte, using D3, with help from @korur and @khromov -
-      thank you!
+      This is written in Svelte, using D3, with help from <a
+        href="https://github.com/korur">@korur</a
+      >
+      and <a href="https://github.com/khromov">@khromov</a> - thank you!
     </p>
 
     <h4>For users</h4>

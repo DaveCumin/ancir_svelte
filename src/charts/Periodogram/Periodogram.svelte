@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  import { data, graphs, activeGraphTab, statusData } from "../../store";
+  import { graphs, activeGraphTab } from "../../store";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
   import {
@@ -66,7 +66,7 @@
 
         //do the binning
         const binnedData = averageBinnedValues(xVals, yVals, binSizeHrs);
-        console.log(binnedData.values);
+
         //set up the plot data
         chartData.data.periods[sourceIndex] = [];
         chartData.data.power[sourceIndex] = [];

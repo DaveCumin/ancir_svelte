@@ -29,6 +29,8 @@
       <ul>
         {#each $graphTabs as tabItem, inx}
           <li class={$activeGraphTab === inx ? "active" : ""}>
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <span class="tabname" on:click={() => changeActiveNav(inx)}>
               <InPlaceEdit bind:value={tabItem.name} />
             </span>

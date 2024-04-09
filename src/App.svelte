@@ -1,4 +1,6 @@
 <script>
+  // @ts-nocheck
+
   import { activeGraphTab } from "./store.js";
 
   import { Pane, Splitpanes } from "svelte-splitpanes";
@@ -17,7 +19,7 @@
   import About from "./components/About.svelte";
   import SaveLoadStore from "./utils/SaveLoadStore.svelte";
 
-  console.log(version);
+  console.log("VERSION: " + version);
 </script>
 
 <svelte:head>

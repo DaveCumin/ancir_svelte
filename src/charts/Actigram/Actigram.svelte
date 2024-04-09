@@ -59,7 +59,7 @@
           $graphs[$activeGraphTab].params.periodHrs,
           $graphs[$activeGraphTab].params.startTime
         );
-        days = $graphs[$activeGraphTab].chartData.onsets[0].onsetTimes.length;
+        days = $graphs[$activeGraphTab].chartData.onsets[0]?.onsetTimes.length;
       }
 
       totalHeight =
@@ -173,7 +173,7 @@
 
   function updateOffsets(startTime, activeGraphT) {
     let startOffsets = [];
-    //TODO _high: Change the start time when new data is added; to be the 00:00 of the first day of the data (here or in ChartMaster?)
+    //TODO _high: Change the start time when new data is added; to be the 00:00 of the first day of the data
     if (
       $graphs[activeGraphT].graph === "actigram" &&
       $graphs[activeGraphT].sourceData.length > 0
@@ -436,7 +436,7 @@
         ];
     }
     const estimate = bestFitOnsets(getDiffs(bestMatchTime));
-    $graphs[$activeGraphTab].chartData.data[sourceIndex].estimate =
+    $graphs[$activeGraphTab].sourceData[sourceIndex].estimate =
       estimate.toFixed(3);
 
     /*     $statusData.push({

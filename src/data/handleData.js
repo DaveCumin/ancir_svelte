@@ -1,5 +1,12 @@
-import { data, graphs, activeGraphTab, contextMenu } from "../store";
+import {
+  data,
+  graphs,
+  activeGraphTab,
+  contextMenu,
+  addedNewChartData,
+} from "../store";
 import { get } from "svelte/store";
+import { getRandomHexColour } from "../charts/allCharts";
 
 //Get data from the data structure
 export function getDataFromTable(tableID, key, getProcessed = true) {
@@ -64,6 +71,7 @@ export function removeGraphData(srcID) {
 
     return newData;
   });
+  console.log(get(graphs));
 }
 
 export function createnewDataForGraph(protoValues, protoOther) {
@@ -84,7 +92,11 @@ export function createnewDataForGraph(protoValues, protoOther) {
   }
 }
 
-function addDataToGraph(tableID_IN, prototypechartvalues, prototypeother) {
+export function addDataToGraph(
+  tableID_IN,
+  prototypechartvalues,
+  prototypeother
+) {
   let chartvalues = {};
 
   // Iterate over the keys of the original object, make the fields
@@ -107,9 +119,27 @@ function addDataToGraph(tableID_IN, prototypechartvalues, prototypeother) {
       chartvalues: chartvalues,
       ...deepCopy(prototypeother),
     });
+
+    //change the colours if there are any
+    const L = get(graphs)[get(activeGraphTab)].sourceData.length - 1;
+    Object.keys(current[get(activeGraphTab)].sourceData[L]).forEach((k) => {
+      if (
+        Object.keys(current[get(activeGraphTab)].sourceData[L][k]).includes(
+          "hex"
+        )
+      ) {
+        current[get(activeGraphTab)].sourceData[L][k].hex =
+          getRandomHexColour();
+        console.log(current[get(activeGraphTab)].sourceData[L][k].hex);
+      }
+    });
+
     return current;
   });
-
+  if (get(graphs)[get(activeGraphTab)].graph === "raw") {
+    addedNewChartData.set(true);
+    console.log("set sem");
+  }
   console.log(get(graphs));
 }
 

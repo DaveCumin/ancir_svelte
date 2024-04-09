@@ -97,7 +97,7 @@
 
           //check for Actiware data - and remove appropriate lines, if so
           if (
-            firstLines[0].includes("Actiware Export File") &&
+            firstLines[0]?.includes("Actiware Export File") &&
             !specialRecognised
           ) {
             console.log("ACTIWARE");
@@ -308,7 +308,7 @@
 </script>
 
 {#if $menuModalType === "import"}
-  <Dialog title="IMPORT">
+  <Dialog title="IMPORT DATA">
     <input
       type="file"
       id="fileInput"
@@ -319,8 +319,12 @@
     <!-- show -->
     {#if Object.keys(tempData).length === 0}
       <button on:click={openFileChoose}>Choose file</button>
-      <input type="number" bind:value={skipLines} />
-      <input type="checkbox" label="headers" bind:checked={useHeaders} />
+      <lable>Skip lines:</lable><input type="number" bind:value={skipLines} />
+      <lable>Header:</lable><input
+        type="checkbox"
+        label="headers"
+        bind:checked={useHeaders}
+      />
     {/if}
 
     <!-- show errors if there are any-->
@@ -333,13 +337,13 @@
     {#if errorInfile}
       <p>{filesToImport[0].name}</p>
       <button on:click={openFileChoose}>Change file</button>
-      <input
+      <label>Header:</label><input
         type="checkbox"
         label="headers"
         bind:checked={useHeaders}
         on:change={() => parseFile(skipLines + previewTableNrows + useHeaders)}
       />
-      <input
+      <label>Skip lines:</label><input
         type="number"
         bind:value={skipLines}
         on:input={() => parseFile(skipLines + previewTableNrows + useHeaders)}
@@ -350,13 +354,13 @@
     {:else if Object.keys(tempData).length}
       <p>{filesToImport[0].name}</p>
       <button on:click={openFileChoose}>Change file</button>
-      <input
+      <label>Header:</label><input
         type="checkbox"
         label="headers"
         bind:checked={useHeaders}
         on:change={() => parseFile(skipLines + previewTableNrows + useHeaders)}
       />
-      <input
+      <label>Skip lines:</label><input
         type="number"
         bind:value={skipLines}
         on:input={() => parseFile(skipLines + previewTableNrows + useHeaders)}
@@ -371,3 +375,18 @@
     <!-- show error message if there are errors-->
   </Dialog>
 {/if}
+
+<style>
+  input[type="number"] {
+    width: 4em; /* Adjust the width as needed */
+    max-width: 6em;
+    height: 1.1rem;
+    border-radius: 0.5rem;
+    margin-left: auto;
+    align-self: center;
+    padding-left: 4px;
+    border-width: 1px;
+    text-align: end;
+    background: var(--bg-color);
+  }
+</style>

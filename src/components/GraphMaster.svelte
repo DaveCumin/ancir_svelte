@@ -4,7 +4,6 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { activeGraphTab, graphs, graphTabs } from "../store.js";
   import GraphTabs from "./GraphTabs.svelte";
-  import ChartMaster from "../charts/ChartMaster.svelte";
   import { graphMap } from "../charts/allCharts.js";
 </script>
 
@@ -58,8 +57,6 @@
           <svelte:component
             this={graphMap[$graphs[$activeGraphTab].graph].controls}
           />
-
-          <ChartMaster />
         </div>
       {:else}
         {JSON.stringify($graphs[$activeGraphTab].sourceData)}

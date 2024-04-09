@@ -3,9 +3,14 @@
   import { onMount } from "svelte";
   import { graphTabs, activeGraphTab, menuModalType } from "../store";
   import { saveStoreData, loadStoreData } from "../utils/SaveLoadStore.svelte";
-  import { graphMap, makeNewChart } from "../charts/allCharts";
+  import {
+    graphMap,
+    makeNewChart,
+    getRandomHexColour,
+  } from "../charts/allCharts";
   import { exportSVG } from "../utils/exportSVG";
 
+  // MenuMaster code
   let keepOpen = false;
 
   function switchTheme(e) {
@@ -98,9 +103,51 @@
     menuItems = menuItems;
   }
 
+  //----------------------------
+  //For the first graph
+  import { addDataToGraph } from "../data/handleData";
+  //----------------------------
+
   onMount(() => {
+    //----------------------------
     //create new graph
+    makeNewChart("raw");
+    addDataToGraph(
+      0,
+      { x: "any", y: "any" },
+      {
+        col: { hex: getRandomHexColour(), alpha: 0.5 },
+        size: 2,
+        strokeWidth: 1,
+        strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
+      }
+    );
+
     makeNewChart("actigram");
+    addDataToGraph(
+      0,
+      { time: "time", values: "values" },
+      {
+        col: { hex: getRandomHexColour(), alpha: 0.5 },
+        showOnsets: true,
+        centileThresh: 80,
+        M: 3,
+        N: 3,
+        estimate: 0,
+      }
+    );
+
+    makeNewChart("periodogram");
+    addDataToGraph(
+      0,
+      { time: "any", values: "any" },
+      {
+        col: { hex: getRandomHexColour(), alpha: 0.5 },
+      }
+    );
+
+    $activeGraphTab = 0;
+    //----------------------------
 
     //do click stuff
     const handleClickOutside = (event) => {
