@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { DateTime } from "luxon";
 import { guessFormat } from "./guessTimeFormat";
-
+import { min, max } from "../MathsStats";
 const decimalPlaces = 4;
 
 function convertFormat(formatIN) {
@@ -90,11 +90,11 @@ export function getPeriod(timeData, timefmt) {
       convertFormat(timefmt)
     );
   }
-  console.log(Math.min(...diffs) + ", " + Math.max(...diffs));
+  console.log(min(diffs) + ", " + max(diffs));
   console.log(diffs);
   return {
-    minDiff: Math.min(...diffs),
-    constant: Math.min(...diffs) === Math.max(...diffs),
+    minDiff: min(diffs),
+    constant: min(diffs) === max(diffs),
   };
 }
 

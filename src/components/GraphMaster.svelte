@@ -45,14 +45,7 @@
             style="display: flex;
         min-width: 200px;"
           >
-            <h1
-              style="    padding: 6px 6px 0px 6px;
-          font-weight: bold;
-          font-size: 1.2em;
-          text-decoration: underline;"
-            >
-              Controls
-            </h1>
+            <h1>Controls</h1>
           </div>
           <svelte:component
             this={graphMap[$graphs[$activeGraphTab].graph].controls}

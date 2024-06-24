@@ -15,6 +15,7 @@
   } from "./ProcessStep.svelte";
   import { getFieldType } from "../data/handleData";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
+  import { tooltip } from "../utils/Tooltip/tooltip";
 
   //show the data in tables
   function showDataTable(ID) {
@@ -111,6 +112,8 @@
               e.preventDefault();
               removeData(datum.id);
             }}
+            use:tooltip
+            tipcontent={"Delete " + datum.displayName}
           >
             🗑️
           </div>
@@ -122,6 +125,8 @@
               e.preventDefault();
               showDataTable(datum.id);
             }}
+            use:tooltip
+            tipcontent={"View " + datum.displayName + " as table"}
           >
             🔎
           </div></summary
@@ -144,7 +149,9 @@
                 on:click={(e) => {
                   e.preventDefault();
                   createContext("data", datum.id, key);
-                }}>+</span
+                }}
+                use:tooltip
+                tipcontent={"Add process to " + datum.data[key].name}>+</span
               ></summary
             >
             {#each datum.data[key].processSteps as ps, psID}
