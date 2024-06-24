@@ -2,7 +2,7 @@
   import Tooltip from "../../utils/Tooltip/Tooltip.svelte";
   import { data, graphs, activeGraphTab, addedNewChartData } from "../../store";
   import { getDataFromSource } from "../../data/handleData";
-
+  import { max, min } from "../../utils/MathsStats";
   function scaleAxes() {
     //find the max and min values
     let tempxmin = Infinity;
@@ -36,19 +36,19 @@
 
       for (let i = 0; i < xValsToPlot.length; i++) {
         const tempxVals = xValsToPlot[i].filter((d) => !isNaN(d));
-        if (Math.min(...tempxVals) < tempxmin) {
-          tempxmin = Math.min(...tempxVals);
+        if (min(tempxVals) < tempxmin) {
+          tempxmin = min(tempxVals);
         }
-        if (Math.max(...tempxVals) > tempxmax) {
-          tempxmax = Math.max(...tempxVals);
+        if (max(tempxVals) > tempxmax) {
+          tempxmax = max(tempxVals);
         }
 
         const tempyVals = yValsToPlot[i].filter((d) => !isNaN(d));
-        if (Math.min(...tempyVals) < tempymin) {
-          tempymin = Math.min(...tempyVals);
+        if (min(tempyVals) < tempymin) {
+          tempymin = min(tempyVals);
         }
-        if (Math.max(...tempyVals) > tempymax) {
-          tempymax = Math.max(...tempyVals);
+        if (max(tempyVals) > tempymax) {
+          tempymax = max(tempyVals);
         }
       }
       $graphs[$activeGraphTab].params.xDomainMin = tempxmin;

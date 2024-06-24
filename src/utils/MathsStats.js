@@ -26,7 +26,28 @@ export function createSequenceArray(start, end, step = 1) {
   return sequenceArray;
 }
 
-
 export function mean(data) {
   return data.reduce((sum, value) => sum + value, 0) / data.length;
+}
+
+export function max(data) {
+  let maxVal = Number.NEGATIVE_INFINITY;
+  for (let i = 0; i < data.length; i++) {
+    let val = parseFloat(data[i]) || 0; // Ensure to handle falsy values correctly
+    if (val > maxVal) {
+      maxVal = val;
+    }
+  }
+  return maxVal;
+}
+
+export function min(data) {
+  let minVal = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < data.length; i++) {
+    let val = parseFloat(data[i]) || 0; // Ensure to handle falsy values correctly
+    if (val < minVal) {
+      minVal = val;
+    }
+  }
+  return minVal;
 }

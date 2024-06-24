@@ -7,6 +7,7 @@ import {
 } from "../store";
 import { get } from "svelte/store";
 import { getRandomHexColour } from "../charts/allCharts";
+import { max } from "../utils/MathsStats";
 
 //Get data from the data structure
 export function getDataFromTable(tableID, key, getProcessed = true) {
@@ -152,9 +153,7 @@ export function deepCopy(obj) {
 // binSize is the size of each bin, usually in Hrs
 export function averageBinnedValues(xs, ys, binSize) {
   const Nbins =
-    Math.ceil(
-      (Math.max(...xs.filter((x) => (x ? x : 0))) + binSize) / binSize
-    ) || 1;
+    Math.ceil((max(xs.filter((x) => (x ? x : 0))) + binSize) / binSize) || 1;
 
   const xout = new Array(Nbins);
   const yout = new Array(Nbins);
