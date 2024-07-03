@@ -1,6 +1,9 @@
 <script context="module">
+  export { Add, forTypes, startParams };
+  const forTypes = ["value", "time"];
+  const startParams = { val: 0 };
   // Define the functions
-  export function add(startVals = [1, 2, 3], params = { val: 0 }) {
+  function Add(startVals = [1, 2, 3], params = { val: 0 }) {
     //ADDS A SET VALUE TO DATA
     var arr = [...startVals];
     for (let i = 0; i < arr.length; i++) {

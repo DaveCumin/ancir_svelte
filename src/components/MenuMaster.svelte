@@ -1,23 +1,26 @@
 <script>
   // @ts-nocheck
   import { onMount } from "svelte";
-  import { graphTabs, activeGraphTab, menuModalType } from "../store";
+  import { graphs, graphTabs, activeGraphTab, menuModalType } from "../store";
   import { saveStoreData, loadStoreData } from "../utils/SaveLoadStore.svelte";
   import {
     graphMap,
     makeNewChart,
     getRandomHexColour,
-  } from "../charts/allCharts";
+    graphFilesLoaded,
+  } from "../charts/AllCharts.js";
   import { exportSVG } from "../utils/exportSVG";
+  import { changeStyle } from "./Styling.svelte";
+  import ThemeChanger from "./ThemeChanger.svelte";
 
   // MenuMaster code
   let keepOpen = false;
 
   function switchTheme(e) {
     if (e.target.checked) {
-      document.documentElement.setAttribute("data-theme", "dark");
+      changeStyle("dark");
     } else {
-      document.documentElement.setAttribute("data-theme", "light");
+      changeStyle("light");
     }
   }
 
@@ -71,6 +74,9 @@
           createMenuItem("About", () => {
             $menuModalType = "about";
           }),
+          createMenuItem("Style", () => {
+            $menuModalType = "styling";
+          }),
         ],
       },
     ];
@@ -108,10 +114,37 @@
   import { addDataToGraph } from "../data/handleData";
   //----------------------------
 
-  onMount(() => {
+  onMount(async () => {
+    // Wait for graph files to be loaded
+    await graphFilesLoaded;
+
     //----------------------------
+    //make actigram
+    makeNewChart("Actigram");
+    addDataToGraph(
+      0,
+      { time: "time", values: "values" },
+      {
+        col: { hex: getRandomHexColour(), alpha: 0.5 },
+        onsets: [
+          {
+            type: "onset",
+            showOnsets: true,
+            filterStart: 1,
+            filterEnd: 28,
+            centileThresh: 80,
+            M: 3,
+            N: 3,
+            lmFit: { slope: 0, intercept: 0, rSquared: 0 },
+            col: { hex: getRandomHexColour(), alpha: 0.5 },
+            showLine: true,
+          },
+        ],
+      }
+    );
+
     //create new graph
-    makeNewChart("raw");
+    makeNewChart("Raw");
     addDataToGraph(
       0,
       { x: "any", y: "any" },
@@ -123,21 +156,7 @@
       }
     );
 
-    makeNewChart("actigram");
-    addDataToGraph(
-      0,
-      { time: "time", values: "values" },
-      {
-        col: { hex: getRandomHexColour(), alpha: 0.5 },
-        showOnsets: true,
-        centileThresh: 80,
-        M: 3,
-        N: 3,
-        estimate: 0,
-      }
-    );
-
-    makeNewChart("periodogram");
+    makeNewChart("Periodogram");
     addDataToGraph(
       0,
       { time: "any", values: "any" },
@@ -259,7 +278,7 @@
         </li>
       {/each}
     </ul>
-    <input type="checkbox" id="switchtheme" on:change={(e) => switchTheme(e)} />
+    <ThemeChanger />
   </div>
 </nav>
 
@@ -328,68 +347,5 @@
     border: none;
     border-bottom: 1px solid var(--hover-color);
     margin: 0px 0px;
-  }
-
-  #switchtheme {
-    float: right;
-    margin-right: 10px;
-    margin-top: -3em;
-  }
-  :root {
-    --theme-toggle-width: 3rem;
-    --theme-toggle-height: 1.5rem;
-    --theme-toggle-circle-width: 0;
-    --theme-toggle-circle-dimensions: calc(var(--theme-toggle-height) - 0.5rem);
-  }
-  #switchtheme {
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
-    cursor: pointer;
-    height: var(--theme-toggle-height);
-    width: var(--theme-toggle-width);
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    border: 1px solid var(--hover-color);
-    position: relative;
-    border-radius: var(--theme-toggle-circle-dimensions);
-    padding: 0.2rem;
-    background-color: var(--bg-color);
-    transition: background-color 0.5s;
-  }
-  #switchtheme:before {
-    content: "";
-    width: var(--theme-toggle-circle-dimensions);
-    height: var(--theme-toggle-circle-dimensions);
-    background-color: var(--primary-color);
-    position: absolute;
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%) translateX(0%);
-    transition: transform 0.5s;
-  }
-  #switchtheme:after {
-    content: "Light mode";
-    white-space: nowrap;
-    color: var(--bg-color);
-    position: absolute;
-    left: calc(100% + 1.5rem);
-    font-size: 1.3rem;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-
-  #switchtheme:checked {
-    background-color: var(--primary-color);
-    border: none;
-  }
-  #switchtheme:checked:before {
-    background-color: #fff;
-    transform: translateY(-50%)
-      translateX(calc(var(--theme-toggle-width) - var(--theme-toggle-height)));
-  }
-  #switchtheme:checked:after {
-    content: "Dark mode";
-    color: var(--bg-color);
   }
 </style>

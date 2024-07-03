@@ -59,15 +59,13 @@
       type: "time",
       data: timeData,
       timeData: processedTimeData,
-      processSteps: [],
-      processedData: [],
       timeFormat: timefmt,
       recordPeriod: timePeriod,
     };
 
     // Generate value data (value0 and value1)
     for (let i = 0; i < periods.length; i++) {
-      const valueKey = `value${i}`;
+      const valueKey = `generated_${i}`;
       const valueData = [];
       const max = maxheights[i];
       const period = periods[i];
@@ -83,11 +81,9 @@
 
       // Create value entry in newDataEntry.data
       newDataEntry.data[valueKey] = {
-        name: valueKey,
+        name: `value${i}`,
         type: "value",
         data: valueData,
-        processSteps: [],
-        processedData: [],
       };
     }
 

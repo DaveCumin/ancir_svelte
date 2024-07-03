@@ -9,14 +9,7 @@
     removeGraphData,
     createnewDataForGraph,
   } from "../../data/handleData";
-  import {
-    updateProcess,
-    removeProcess,
-    updateGraphProcess,
-    addProcessToGraphData,
-    componentMap,
-  } from "../../components/ProcessStep.svelte";
-  import { getRandomHexColour } from "../../charts/allCharts";
+  import { getRandomHexColour } from "../AllCharts.js";
 
   const prototypechartvalues = { time: "time", values: "values" };
   const prototypeother = {
@@ -24,7 +17,7 @@
   };
 </script>
 
-{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "periodogram"}
+{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Periodogram"}
   <div class="chartControls">
     <div class="sliderContainer">
       <Slider
@@ -133,30 +126,16 @@
         </div>
 
         {#each Object.keys(source.chartvalues) as key}
-          <details
-            open
-            class="field {source.chartvalues[key].processSteps.length > 0
-              ? ''
-              : 'no-arrow'}"
-          >
+          <details open class="field no-arrow">
             <summary
               >{key}:
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <span
-                class="addbutton hoverbutton showContextMenu"
-                on:click={(e) => {
-                  e.preventDefault();
-                  addProcessToGraphData("graph", sourceIndex, key);
-                }}>+</span
-              >
+
               <span
                 ><select
                   class="selectField"
                   bind:value={source.chartvalues[key].field}
-                  on:change={(e) => {
-                    updateGraphProcess($activeGraphTab, sourceIndex, key);
-                  }}
                 >
                   {#each getFieldNames(source) as fields}
                     <option value={fields}
@@ -167,46 +146,6 @@
                 </select></span
               >
             </summary>
-            {#each source.chartvalues[key].processSteps as ps, psIndex}
-              <details open class="process">
-                <summary
-                  >{ps.process}
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <div
-                    class="deleteProcess hoverbutton"
-                    on:click={(e) => {
-                      e.preventDefault();
-                      removeProcess(sourceIndex, key, psIndex);
-                    }}
-                  >
-                    🗑️
-                  </div></summary
-                >
-                <div class="processDetails">
-                  <svelte:component
-                    this={componentMap[ps.process].component}
-                    paramsStart={ps.parameters}
-                    typeTime={{
-                      type: $data[
-                        $data.findIndex((d) => d.id === source.tableID)
-                      ].data[source.chartvalues[key].field].type,
-                      tocheck: { tableID: source.tableID, key: key },
-                    }}
-                    on:update={(event) => {
-                      updateProcess(
-                        key,
-                        sourceIndex,
-                        psIndex,
-                        event.detail.params
-                      );
-                    }}
-                  />
-                </div>
-              </details>
-            {/each}
           </details>
         {/each}
         <!-- EXTRAS-->

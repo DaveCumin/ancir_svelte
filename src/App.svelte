@@ -17,7 +17,8 @@
 
   import { version } from "../package.json";
   import About from "./components/About.svelte";
-  import SaveLoadStore from "./utils/SaveLoadStore.svelte";
+  import CreateNewData from "./components/CreateNewData.svelte";
+  import Styling from "./components/Styling.svelte";
 
   console.log("VERSION: " + version);
 </script>
@@ -29,9 +30,11 @@
 <ContextMenu />
 <GenerateSimulated />
 <About />
+<Styling />
 <ImportData />
+<CreateNewData />
 
-<div data-theme={$selectedTheme}>
+<div>
   <div style="max-width: 100vw;">
     <MenuMaster />
   </div>

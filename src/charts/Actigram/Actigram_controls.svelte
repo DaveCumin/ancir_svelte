@@ -3,35 +3,43 @@
 
   import Slider from "../../utils/Slider.svelte";
   import InPlaceEdit from "../../utils/InPlaceEdit.svelte";
+  import Onset from "./Onset.svelte";
   import {
     getFieldNames,
     removeGraphData,
     createnewDataForGraph,
   } from "../../data/handleData";
-  import {
-    updateProcess,
-    removeProcess,
-    updateGraphProcess,
-    addProcessToGraphData,
-    componentMap,
-  } from "../../components/ProcessStep.svelte";
   import { data, graphs, activeGraphTab, graphTabs } from "../../store";
   import { formatTimeFromISO } from "../../utils/time/TimeUtils";
 
-  import { getRandomHexColour } from "../../charts/allCharts";
+  import { getRandomHexColour } from "../AllCharts.js";
 
   const prototypechartvalues = { time: "time", values: "values" };
   const prototypeother = {
     col: { hex: getRandomHexColour(), alpha: 0.5 },
-    showOnsets: true,
-    centileThresh: 80,
-    M: 3,
-    N: 3,
-    estimate: 0,
+    onsets: [],
   };
+
+  function addOnset(sourceIndex) {
+    $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
+      $graphs[$activeGraphTab].sourceData[sourceIndex].onsets.length
+    ] = {
+      type: "onset",
+      showOnsets: true,
+      filterStart: 1,
+      filterEnd: $graphs[$activeGraphTab].chartData.data[0].scaleLimits.length,
+      centileThresh: 80,
+      M: 3,
+      N: 3,
+      lmFit: { slope: 0, intercept: 0, rSquared: 0 },
+      col: { hex: getRandomHexColour(), alpha: 0.5, rSquared: 0 },
+      showLine: false,
+    };
+  }
 
   let datePickVisible = true;
 
+  //TODO_med: something not quite right with the datepicker. Also, it doesn't update the graph when changed.
   function toggleOpenDatePick() {
     datePickVisible = !datePickVisible;
 
@@ -40,15 +48,17 @@
 
     if (datePickVisible) {
       datePickLabel.style.display = "inline-block";
-      dateInput.style.width = "18px"; // Set the width back to auto or any other desired value
+      dateInput.style.width = "0px";
+      dateInput.style.height = "0px";
     } else {
       datePickLabel.style.display = "none";
       dateInput.style.width = "60%";
+      dateInput.style.height = "100%";
     }
   }
 </script>
 
-{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "actigram"}
+{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Actigram"}
   <div class="chartControls">
     <div class="sliderContainer">
       <span>Start time: </span>
@@ -59,7 +69,7 @@
       margin-right: 2px; 
       margin-left: auto;
       text-align: center;"
-        on:dblclick={(e) => {
+        on:click={(e) => {
           toggleOpenDatePick();
         }}
       >
@@ -67,10 +77,17 @@
       </div>
       <input
         class="dateInput"
+        style="
+      width: 0px;
+      height: 0px;"
         type="datetime-local"
         id="startTime"
         name="startTime"
         bind:value={$graphs[$activeGraphTab].params.startTime}
+        on:change={(e) => {
+          console.log("value = " + e.target.value);
+          console.log("pre st = " + $graphs[$activeGraphTab].params.startTime);
+        }}
         on:keydown={(e) => {
           if (e.key === "Enter") {
             toggleOpenDatePick();
@@ -117,7 +134,7 @@
         max={30}
         step="1"
         limits={[5, Infinity]}
-        label="Day Height:"
+        label="Row Height:"
         bind:value={$graphs[$activeGraphTab].params.dayHeight}
       />
     </div>
@@ -128,7 +145,7 @@
         max={20}
         step="1"
         limits={[-$graphs[$activeGraphTab]?.params.dayHeight, Infinity]}
-        label="Between Height:"
+        label="Between gap:"
         bind:value={$graphs[$activeGraphTab].params.betweenHeight}
       />
     </div>
@@ -140,6 +157,8 @@
         type="checkbox"
         bind:checked={$graphs[$activeGraphTab].params.showAxes}
       />
+    </div>
+    <div class="sliderContainer">
       <!-- svelte-ignore a11y-missing-attribute -->
       <a style="align-self: center;">Scale: </a>
       <select
@@ -147,7 +166,7 @@
         style="margin-right:0 !important;"
         bind:value={$graphs[$activeGraphTab].params.scaleAxes}
       >
-        <option value="byPlot">By row / plot</option>
+        <option value="byPlot">By row</option>
         <option value="overall">Overall</option>
       </select>
     </div>
@@ -184,6 +203,15 @@
             class="deleteTable hoverbutton"
             on:click={(e) => {
               e.preventDefault();
+              addOnset(sourceIndex);
+            }}
+          >
+            ++
+          </div>
+          <div
+            class="deleteTable hoverbutton"
+            on:click={(e) => {
+              e.preventDefault();
               removeGraphData(sourceIndex);
             }}
           >
@@ -197,30 +225,16 @@
         </div>
 
         {#each Object.keys(source.chartvalues) as key}
-          <details
-            open
-            class="field {source.chartvalues[key].processSteps.length > 0
-              ? ''
-              : 'no-arrow'}"
-          >
+          <details open class="field no-arrow">
             <summary
               >{key}:
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <span
-                class="addbutton hoverbutton showContextMenu"
-                on:click={(e) => {
-                  e.preventDefault();
-                  addProcessToGraphData("graph", sourceIndex, key);
-                }}>+</span
-              >
+
               <span
                 ><select
                   class="selectField"
                   bind:value={source.chartvalues[key].field}
-                  on:change={(e) => {
-                    updateGraphProcess($activeGraphTab, sourceIndex, key);
-                  }}
                 >
                   {#each getFieldNames(source) as fields}
                     <option value={fields}
@@ -231,46 +245,6 @@
                 </select></span
               >
             </summary>
-            {#each source.chartvalues[key].processSteps as ps, psIndex}
-              <details open class="process">
-                <summary
-                  >{ps.process}
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <div
-                    class="deleteProcess hoverbutton"
-                    on:click={(e) => {
-                      e.preventDefault();
-                      removeProcess(sourceIndex, key, psIndex);
-                    }}
-                  >
-                    🗑️
-                  </div></summary
-                >
-                <div class="processDetails">
-                  <svelte:component
-                    this={componentMap[ps.process].component}
-                    paramsStart={ps.parameters}
-                    typeTime={{
-                      type: $data[
-                        $data.findIndex((d) => d.id === source.tableID)
-                      ].data[source.chartvalues[key].field].type,
-                      tocheck: { tableID: source.tableID, key: key },
-                    }}
-                    on:update={(event) => {
-                      updateProcess(
-                        key,
-                        sourceIndex,
-                        psIndex,
-                        event.detail.params
-                      );
-                    }}
-                  />
-                </div>
-              </details>
-            {/each}
           </details>
         {/each}
         <!-- EXTRAS-->
@@ -299,55 +273,7 @@
         </div>
 
         <!-- ONSETS-->
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <div class="itemsliderContainer">
-          <details class="otherItemDetail">
-            <summary>
-              <a>Onsets</a>
-              <input
-                type="checkbox"
-                bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex]
-                  .showOnsets}
-              />
-              <span
-                >Est τ: {$graphs[$activeGraphTab].sourceData[sourceIndex]
-                  .estimate}</span
-              >
-            </summary>
-            <div style="padding:5px">
-              <Slider
-                min="0"
-                max="100"
-                step="1"
-                limits={[0, 100]}
-                label="Centile threshold: "
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
-                  .centileThresh}
-              />
-            </div>
-            <div style="padding:5px">
-              <Slider
-                min="0"
-                max="10"
-                step="1"
-                limits={[0, 100]}
-                label="Template hours before: "
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].N}
-              />
-            </div>
-            <div style="padding:5px">
-              <Slider
-                min="0"
-                max="10"
-                step="1"
-                limits={[0, 100]}
-                label="Template hours after: "
-                bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].M}
-              />
-            </div>
-          </details>
-        </div>
+        <Onset {sourceIndex} />
 
         <!-- END OF THE EXTRAS-->
       </details>
@@ -357,22 +283,12 @@
 {/if}
 
 <style>
-  .dateInput {
-    margin-right: 2px;
-    width: 18px;
-    padding-right: 4px;
-    margin-bottom: 5px;
-    margin-top: -3px;
-    padding-top: 2px;
-    background: var(--primary-color);
-    cursor: pointer;
-  }
-
   .datepicklabelshow {
     display: inline-block;
   }
   .datepicklabel {
     display: none;
+    cursor: pointer;
   }
 
   .dateInput:hover {

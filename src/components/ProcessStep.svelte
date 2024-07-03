@@ -1,83 +1,59 @@
 <script context="module">
   // @ts-nocheck
-  import { data, graphs, activeGraphTab, contextMenu } from "../store.js";
+  import { data } from "../store.js";
   import { get } from "svelte/store";
-  import { getDataFromTable, getFieldType } from "../data/handleData.js";
 
   //---------------------------------------------------------------------
-  // ----- ADD NEW PROCESSING FUNCTIONS BELOW
-  import Add, { add } from "../processes/Add.svelte";
-  import Filter, { filter } from "../processes/Filter.svelte";
-  import Replace, { replace } from "../processes/Replace.svelte";
+  // Dynamically import all process files
+  const modules = import.meta.glob("../processes/*.svelte");
 
-  // Import functions and components here as needed and add to the maps below
-  export const componentMap = {
-    add: {
-      component: Add,
-      startParams: { val: 0 },
-      func: add,
-      forTypes: ["value", "time"],
-    },
-    filter: {
-      component: Filter,
-      startParams: { min: 0, max: 12 },
-      func: filter,
-      forTypes: ["value", "time"],
-    },
-    replace: {
-      component: Replace,
-      startParams: { from: -999, to: NaN },
-      func: replace,
-      forTypes: ["value"],
-    },
-    // Add more process functions here as needed
-  };
+  // Initialize an empty componentMap
+  export let componentMap = {};
 
-  // ----- ADD NEW PROCESSING FUNCTIONS ABOVE HERE: import the file and add to the maps.
+  // Function to dynamically load the process files
+  async function loadProcessFiles() {
+    for (const path in modules) {
+      const module = await modules[path]();
+      const fileName = path.split("/").pop().split(".").shift();
+
+      componentMap[fileName] = {
+        component: module.default,
+        startParams: module.startParams,
+        func: module[fileName],
+        forTypes: module.forTypes,
+      };
+    }
+  }
+
+  // Load the process files when the module script is executed
+  loadProcessFiles().then(() => {
+    console.log("Process files loaded:", componentMap);
+  });
   //---------------------------------------------------------------------
 
   let selectedSettings = null;
 
   //add a process when context menu is clicked clicked
-  export function addProcess(PROCESS, WHEREP, ID, FIELDNAME) {
+  export function addProcess(PROCESS, ID, FIELDNAME) {
     // Update your data array with the result
     selectedSettings = {
       process: PROCESS,
       parameters: componentMap[PROCESS].startParams,
     };
 
-    if (WHEREP === "data") {
-      data.update((currentData) => {
-        // Find the data entry with the specified ID
-        const newData = [...currentData];
-        const datum = newData.find((entry) => entry.id === ID);
+    data.update((currentData) => {
+      // Find the data entry with the specified ID
+      const newData = [...currentData];
+      const datum = newData.find((entry) => entry.id === ID);
 
-        // Check if the data entry and key exist
-        if (datum && datum.data[FIELDNAME]) {
-          datum.data[FIELDNAME].processSteps.push(selectedSettings);
-        }
-        return newData;
-      });
-      //now update the data with the new process
-      updateDataProcess(ID, FIELDNAME);
-    }
-
-    //FOR GRAPH
-    if (WHEREP === "graph") {
-      graphs.update((currentData) => {
-        // Find the data entry with the specified ID
-        const newData = [...currentData];
-        const datum = newData.find((entry) => entry.id === ID);
-
-        newData[get(activeGraphTab)].sourceData[ID].chartvalues[
-          FIELDNAME
-        ].processSteps.push(selectedSettings);
-
-        return newData;
-      });
-      //now update the data with the new process
-      updateGraphProcess(get(activeGraphTab), ID, FIELDNAME);
-    }
+      // Check if the data entry and key exist
+      if (datum && datum.data[FIELDNAME]) {
+        datum.data[FIELDNAME].processSteps.push(selectedSettings);
+      }
+      return newData;
+    });
+    //now update the data with the new process
+    updateDataProcess(ID, FIELDNAME);
   }
 
   function processData(processes, dataIN) {
@@ -96,35 +72,12 @@
     return dataIN;
   }
 
-  //Update the data with processes for graphs
-  export function updateGraphProcess(graph, sourcei, xy) {
-    // Initial values, from store
-    let tableID = get(graphs)[graph].sourceData[sourcei].tableID;
-    let field = get(graphs)[graph].sourceData[sourcei].chartvalues[xy].field;
-
-    let result = getDataFromTable(tableID, field);
-
-    //check for data processes and add them
-    //If there are graph processes, execute the processes
-    let processes =
-      get(graphs)[graph].sourceData[sourcei].chartvalues[xy].processSteps;
-    if (processes.length > 0) {
-      result = processData(processes, result);
-    }
-
-    //UPDATE THE STORE
-    graphs.update((currentData) => {
-      // Find the data entry with the specified ID
-      const newData = [...currentData];
-      newData[graph].sourceData[sourcei].chartvalues[xy].processedData = result;
-      return newData;
-    });
-  }
-
   // FUNCTION THAT UPDATES THE PROCESSED DATA, AND ANY GRAPHED DATA IF THERE ARE
   export function updateDataProcess(tableID, field) {
     // Initial values, from store
-    let result = getDataFromTable(tableID, field, false);
+    let result =
+      get(data)[get(data).findIndex((d) => d.id === tableID)].data[field]
+        .originalData;
 
     // Iterate through the JSON array and execute the processes
     let processes = get(data).find((entry) => entry.id === tableID).data[field]
@@ -142,61 +95,9 @@
       // Check if the data entry and key exist
       if (datum && datum.data[field]) {
         // Add a new process step to the selected key
-        datum.data[field].processedData = result;
+        datum.data[field].data = result;
       }
       return newData;
-    });
-
-    //Update any graphs that use the data
-    get(graphs).forEach((graph, graphIndex) => {
-      graph.sourceData.forEach((source, sourceIndex) => {
-        if (source.tableID === tableID) {
-          Object.keys(source.chartvalues).forEach((key) => {
-            if (source.chartvalues[key].field === field) {
-              updateGraphProcess(graphIndex, sourceIndex, key);
-            }
-          });
-        }
-      });
-    });
-  }
-
-  // THE FUNCTIONS BELOW ARE FOR GRAPH CONTROLS
-  //Update a process in the graph
-  export function updateProcess(xy, sourcei, processindex, processParams) {
-    get(graphs)[get(activeGraphTab)].sourceData[sourcei].chartvalues[
-      xy
-    ].processSteps[processindex].parameters = processParams;
-    updateGraphProcess(get(activeGraphTab), sourcei, xy);
-  }
-  //Remove a process
-  export function removeProcess(sourcei, xy, processindex) {
-    get(graphs)[get(activeGraphTab)].sourceData[sourcei].chartvalues[
-      xy
-    ].processSteps.splice(processindex, 1);
-    updateGraphProcess(get(activeGraphTab), sourcei, xy);
-  }
-
-  //bring up the context menu to add a process to the field
-  export function addProcessToGraphData(where, id, fieldName) {
-    contextMenu.set({ labels: [], funcs: [] }); //reset the contextMenu
-    const type = getFieldType(
-      get(graphs)[get(activeGraphTab)].sourceData[id].tableID,
-      get(graphs)[get(activeGraphTab)].sourceData[id].chartvalues[fieldName]
-        .field
-    );
-    const tempLabels = Object.keys(componentMap);
-
-    contextMenu.update((menu) => {
-      for (let i = 0; i < tempLabels.length; i++) {
-        if (componentMap[tempLabels[i]].forTypes.includes(type)) {
-          console.log(tempLabels[i]);
-          //only add to the menu those processes appropriate for the type
-          menu.labels[i] = tempLabels[i];
-          menu.funcs[i] = () => addProcess(tempLabels[i], where, id, fieldName);
-        }
-      }
-      return menu;
     });
   }
 </script>

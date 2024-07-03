@@ -35,22 +35,6 @@
     }
   }
 
-  function updateProcess(dataID, datakey, processindex, processParams) {
-    let dataIndex = $data.findIndex((d) => d.id === dataID);
-    $data[dataIndex].data[datakey].processSteps[processindex].parameters =
-      processParams;
-    updateDataProcess(dataID, datakey);
-  }
-
-  function removeProcess(dataID, datakey, processindex) {
-    let dataIndex = $data.findIndex((d) => d.id === dataID);
-    $data[dataIndex].data[datakey].processSteps.splice(processindex, 1);
-    updateDataProcess(dataID, datakey);
-    if ($data[dataIndex].data[datakey].processSteps.length === 0) {
-      $data[dataIndex].data[datakey].processedData = [];
-    }
-  }
-
   function removeData(dataID) {
     //remove any tables associated
     $dataIDsforTables = $dataIDsforTables.filter((dt) => dt !== dataID);
@@ -81,7 +65,23 @@
     });
   }
 
-  function createContext(where, id, fieldName) {
+  function updateProcess(dataID, datakey, processindex, processParams) {
+    let dataIndex = $data.findIndex((d) => d.id === dataID);
+    $data[dataIndex].data[datakey].processSteps[processindex].parameters =
+      processParams;
+    updateDataProcess(dataID, datakey);
+  }
+
+  function removeProcess(dataID, datakey, processindex) {
+    let dataIndex = $data.findIndex((d) => d.id === dataID);
+    $data[dataIndex].data[datakey].processSteps.splice(processindex, 1);
+    updateDataProcess(dataID, datakey);
+    if ($data[dataIndex].data[datakey].processSteps.length === 0) {
+      $data[dataIndex].data[datakey].processedData = [];
+    }
+  }
+
+  function createContext(id, fieldName) {
     $contextMenu = { labels: [], funcs: [] }; //reset the contextMenu
     const type = getFieldType(id, fieldName);
     const tempLabels = Object.keys(componentMap);
@@ -89,8 +89,7 @@
       if (componentMap[tempLabels[i]].forTypes.includes(type)) {
         //only add to the menu those processes appropriate for the type
         $contextMenu.labels[i] = tempLabels[i];
-        $contextMenu.funcs[i] = () =>
-          addProcess(tempLabels[i], where, id, fieldName);
+        $contextMenu.funcs[i] = () => addProcess(tempLabels[i], id, fieldName);
       }
     }
   }
@@ -126,65 +125,75 @@
               showDataTable(datum.id);
             }}
             use:tooltip
-            tipcontent={"View " + datum.displayName + " as table"}
+            tipcontent={"View/edit " + datum.displayName + " as table"}
           >
-            🔎
-          </div></summary
-        >
+            📝
+          </div>
+        </summary>
 
         {#each Object.entries(datum.data) as [key, value] (key)}
-          <details
-            open
-            class="field {datum.data[key].processSteps.length > 0
-              ? ''
-              : 'no-arrow'}"
-          >
+          <details closed class="field">
             <summary>
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <InPlaceEdit bind:value={datum.data[key].name} />
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <span
-                class="addbutton hoverbutton showContextMenu"
-                on:click={(e) => {
-                  e.preventDefault();
-                  createContext("data", datum.id, key);
-                }}
-                use:tooltip
-                tipcontent={"Add process to " + datum.data[key].name}>+</span
-              ></summary
-            >
-            {#each datum.data[key].processSteps as ps, psID}
-              <details open class="process">
-                <summary
-                  >{ps.process}
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <div
-                    class="deleteProcess hoverbutton"
-                    on:click={(e) => {
-                      e.preventDefault();
-                      removeProcess(datum.id, key, psID);
-                    }}
-                  >
-                    🗑️
-                  </div></summary
+              {#if key.includes("processed")}
+                <span
+                  class="addbutton hoverbutton showContextMenu"
+                  on:click={(e) => {
+                    e.preventDefault();
+                    createContext(datum.id, key);
+                  }}
+                  use:tooltip
+                  tipcontent={"Add process to " + datum.data[key].name}>+</span
                 >
+              {/if}
+            </summary>
+            {#if datum.data[key].type == "time"}
+              Format: {datum.data[key].timeFormat}
+              <br />
+              Data: {datum.data[key].data[0]},{datum.data[key].data[1]}...
+              <br />
+              Time: {datum.data[key].timeData[0]},{datum.data[key]
+                .timeData[1]}...
+            {:else if key.includes("processed")}
+              Data: {datum.data[key].data[0]},{datum.data[key].data[1]}...
+              <br />
+              {#each datum.data[key].processSteps as ps, psID}
+                <details open class="process">
+                  <summary
+                    >{ps.process}
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <div
+                      class="deleteProcess hoverbutton"
+                      on:click={(e) => {
+                        e.preventDefault();
+                        removeProcess(datum.id, key, psID);
+                      }}
+                    >
+                      🗑️
+                    </div>
+                  </summary>
 
-                <div class="processDetails">
-                  <svelte:component
-                    this={componentMap[ps.process].component}
-                    paramsStart={ps.parameters}
-                    typeTime={{
-                      type: $data[datumID].data[key].type,
-                      tocheck: { tableID: datum.id, key: key },
-                    }}
-                    on:update={(event) =>
-                      updateProcess(datum.id, key, psID, event.detail.params)}
-                  />
-                </div>
-              </details>
-            {/each}
+                  <div class="processDetails">
+                    <svelte:component
+                      this={componentMap[ps.process].component}
+                      paramsStart={ps.parameters}
+                      typeTime={{
+                        type: $data[datumID].data[key].type,
+                        tocheck: { tableID: datum.id, key: key },
+                      }}
+                      on:update={(event) =>
+                        updateProcess(datum.id, key, psID, event.detail.params)}
+                    />
+                  </div>
+                </details>
+              {/each}
+            {:else}
+              Data: {datum.data[key].data[0]},{datum.data[key].data[1]}...
+            {/if}
           </details>
         {/each}
       </details>
@@ -235,20 +244,12 @@
   .process {
     margin-left: 1.5em;
     padding: 5px 0px;
+    margin-right: 10px;
+    box-shadow: 1px 1px 5px #888888;
   }
 
   .processDetails {
     padding: 0.5em;
-  }
-
-  .no-arrow summary {
-    list-style: none;
-    cursor: default;
-  }
-
-  .no-arrow summary:before {
-    content: "\25AC\00a0";
-    margin-left: -2px;
   }
 
   .addbutton {

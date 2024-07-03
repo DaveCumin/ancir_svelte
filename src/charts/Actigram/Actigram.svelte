@@ -17,7 +17,9 @@
     bestFitOnsets,
     getDiffs,
     calculateMedian,
+    linearRegression,
   } from "../../data/handleData";
+  import About from "../../components/About.svelte";
 
   let margin = { top: 50, bottom: 20, left: 80, right: 80 };
 
@@ -48,7 +50,7 @@
   $: innerWidth = width - margin.left - margin.right;
 
   function calcTotalHeight(margin, dayHeight, betweenHeight) {
-    if ($graphs[$activeGraphTab]?.graph === "actigram") {
+    if ($graphs[$activeGraphTab]?.graph === "Actigram") {
       let days;
       if ($graphs[$activeGraphTab].chartData.onsets?.length > 0) {
         days = $graphs[$activeGraphTab].chartData.onsets[0].onsetTimes.length;
@@ -85,7 +87,7 @@
   );
 
   function makePlotData(sourceData, binSizeHrs, periodHrs, startTime) {
-    if ($graphs[$activeGraphTab]?.graph === "actigram") {
+    if ($graphs[$activeGraphTab]?.graph === "Actigram") {
       let xVals, yVals;
 
       let chartData = {
@@ -175,7 +177,7 @@
     let startOffsets = [];
     //TODO _high: Change the start time when new data is added; to be the 00:00 of the first day of the data
     if (
-      $graphs[activeGraphT].graph === "actigram" &&
+      $graphs[activeGraphT].graph === "Actigram" &&
       $graphs[activeGraphT].sourceData.length > 0
     ) {
       //set the up to start with
@@ -249,7 +251,7 @@
     periodHrs,
     binSizeHrs
   ) {
-    if (chartData && $graphs[$activeGraphTab].graph === "actigram") {
+    if (chartData && $graphs[$activeGraphTab].graph === "Actigram") {
       const dayLength = periodHrs / binSizeHrs;
       const srcLength = $graphs[$activeGraphTab].chartData.data.length;
 
@@ -393,110 +395,154 @@
   //----------------------------------------------------------------------------------------------------
   //Code to find the onsets and offsets
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
+  //TODO_high: move this to the Onset.svelte file? or make for each onset
   function findOnOffsets(sourceIndex) {
-    //Set up the parameters
-    const centile =
-      $graphs[$activeGraphTab].sourceData[sourceIndex].centileThresh;
-    const Nhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].N;
-    const Mhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].M;
-    const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
-    const template = createTemplate(Nhrs, Mhrs, binSizeHrs);
-
     //get the data
     const times = $graphs[$activeGraphTab].chartData.data[sourceIndex].time;
     const values = $graphs[$activeGraphTab].chartData.data[sourceIndex].values;
-
-    //find the centile
-    const centileValue = findCentileValue(values, centile);
-
-    //conver the data to -1s and 1s
-    const aboveBelow = values.map((value) =>
-      value <= centileValue || isNaN(value) ? -1 : 1
-    );
-
-    //get the best matching index for each day
+    const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
     const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
     const periodStep = periodHrs / binSizeHrs;
 
     const dbl = $graphs[$activeGraphTab].params.doublePlot;
-    let bestMatchIndex = [];
-    let bestMatchTime = [];
 
-    //TODO _high: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
-    for (let d = 0; d < aboveBelow.length / periodStep; d++) {
-      bestMatchIndex[d] =
-        findBestMatchIndex(
-          aboveBelow.slice(d * periodStep, (d + 1) * periodStep),
-          template
-        ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
+    //loop over the onsets and calculate
+    for (
+      let o = 0;
+      o < $graphs[$activeGraphTab].sourceData[sourceIndex].onsets.length;
+      o++
+    ) {
+      //Set up the parameters
+      const centile =
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+          .centileThresh;
+      const Nhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].N;
+      const Mhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].M;
 
-      bestMatchTime[d] =
-        $graphs[$activeGraphTab].chartData.data[sourceIndex].time[
-          bestMatchIndex[d] + d * periodStep
-        ];
+      const template = createTemplate(
+        Nhrs,
+        Mhrs,
+        binSizeHrs,
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type
+      );
+
+      //find the centile
+      const centileValue = findCentileValue(values, centile);
+
+      //conver the data to -1s and 1s
+      const aboveBelow = values.map((value) =>
+        value <= centileValue || isNaN(value) ? -1 : 1
+      );
+
+      //get the best matching index for each day
+      let bestMatchIndex = [];
+      let bestMatchTime = [];
+
+      //TODO _high: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
+      //ALSO need to add in acrophase
+
+      for (let d = 0; d < aboveBelow.length / periodStep; d++) {
+        bestMatchIndex[d] =
+          findBestMatchIndex(
+            aboveBelow.slice(d * periodStep, (d + 1) * periodStep),
+            template
+          ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
+
+        bestMatchTime[d] =
+          $graphs[$activeGraphTab].chartData.data[sourceIndex].time[
+            bestMatchIndex[d] + d * periodStep
+          ];
+      }
+
+      //calculate the estimated period
+      let xs = [];
+      let ys = [];
+
+      for (let d = 0; d < bestMatchTime.length; d++) {
+        xs[d] =
+          xScale(
+            bestMatchTime[d] - d * $graphs[$activeGraphTab].params.periodHrs
+          ) + margin.left;
+        ys[d] = d * (dayHeight + betweenHeight) + dayHeight + margin.top;
+      }
+
+      const median = calculateMedian(xs);
+
+      //which day is the median point?
+      const estDay = xs.reduce(
+        (prevIndex, curr, currIndex) =>
+          Math.abs(curr - median) < Math.abs(xs[prevIndex] - median)
+            ? currIndex
+            : prevIndex,
+        0
+      );
+
+      let y = [];
+      let x = [];
+      for (
+        let i =
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+            .filterStart - 1;
+        i <
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].filterEnd;
+        i++
+      ) {
+        y.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
+        x.push(
+          bestMatchTime.slice(i, i + 1) -
+            i * $graphs[$activeGraphTab]?.params.periodHrs
+        );
+      }
+
+      const linearFit = linearRegression(y, x);
+      $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].lmFit =
+        linearFit;
+
+      //update for drawing
+      $graphs[$activeGraphTab].chartData.onsets = [
+        ...$graphs[$activeGraphTab].chartData.onsets,
+        {
+          onsetTimes: bestMatchTime,
+          //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
+          //TODO _med: need to truncate the line also - as it can go off the chart.
+          show: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+            .showOnsets,
+          col: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].col,
+          alpha:
+            $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].alpha,
+          filterStart:
+            $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+              .filterStart,
+          filterEnd:
+            $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+              .filterEnd,
+          median: median,
+          estDay: estDay,
+          lmFit: linearFit,
+          showLine:
+            $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].showLine,
+        },
+      ];
     }
-    const estimate = bestFitOnsets(getDiffs(bestMatchTime));
-    $graphs[$activeGraphTab].sourceData[sourceIndex].estimate =
-      estimate.toFixed(3);
-
-    /*     $statusData.push({
-      display:
-        "Estimated period for " +
-        $graphs[$activeGraphTab].sourceData[sourceIndex].name +
-        " = " +
-        estimate.toFixed(3),
-    });
-    $statusData = $statusData;
- */
-    //calculate the estimated period
-    let xs = [];
-    let ys = [];
-
-    for (let d = 0; d < bestMatchTime.length; d++) {
-      xs[d] =
-        xScale(
-          bestMatchTime[d] - d * $graphs[$activeGraphTab].params.periodHrs
-        ) + margin.left;
-      ys[d] = d * (dayHeight + betweenHeight) + dayHeight + margin.top;
-    }
-    //difference between the estimate and the period: this is to caluclate the slope of the line to draw (this value for each step in day)
-    const D = $graphs[$activeGraphTab].params.periodHrs - estimate;
-
-    const median = calculateMedian(xs);
-
-    //which day is the median point?
-    const estDay = xs.reduce(
-      (prevIndex, curr, currIndex) =>
-        Math.abs(curr - median) < Math.abs(xs[prevIndex] - median)
-          ? currIndex
-          : prevIndex,
-      0
-    );
-
-    //update for drawing
-    $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = {
-      onsetTimes: bestMatchTime,
-      //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
-      //TODO _med: need to truncate the line also - as it can go off the chart.
-      estimate: estimate,
-      median: median,
-      estDay: estDay,
-      moveXDay: xScale(D),
-      slope:
-        xScale(D) /
-        ($graphs[$activeGraphTab].params.dayHeight +
-          $graphs[$activeGraphTab].params.betweenHeight),
-    };
   }
 
   //create the template
-  function createTemplate(Nhrs, Mhrs, binSize) {
+  function createTemplate(Nhrs, Mhrs, binSize, onoff) {
     const N = Math.round(Nhrs / binSize);
     const M = Math.round(Mhrs / binSize);
-    // Create an array with N -1s followed by M 1s
-    const resultArray = Array.from({ length: N }, () => -1).concat(
-      Array.from({ length: M }, () => 1)
-    );
+    let resultArray;
+
+    //TODO_high: Something wrong with the offset... onset seems to work fine, but offset is strange. SEEMS TO BE WHEN THE OFFSET/ONSET is at 24h.
+    if (onoff === "onset") {
+      // Create an array with N -1s followed by M 1s
+      resultArray = Array.from({ length: N }, () => -1).concat(
+        Array.from({ length: M }, () => 1)
+      );
+    } else {
+      resultArray = Array.from({ length: N }, () => 1).concat(
+        Array.from({ length: M }, () => -1)
+      );
+    }
 
     return resultArray;
   }
@@ -637,7 +683,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab]?.graph === "actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "Actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div
     class="overlay"
     style={mousedown
@@ -720,31 +766,39 @@
 
       <!-- ONSETS -->
       {#each $graphs[$activeGraphTab].chartData.onsets as onset, srcIndex}
-        {#if $graphs[$activeGraphTab].sourceData[srcIndex].showOnsets}
-          {#each $graphs[$activeGraphTab].chartData.onsets[srcIndex].onsetTimes as onsetT, d}
-            <circle
-              cx={xScale(
-                onsetT - d * $graphs[$activeGraphTab].params.periodHrs
-              )}
-              cy={d * (dayHeight + betweenHeight) + dayHeight}
-              r="2"
-              fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-              stroke-width="1"
-              stroke="black"
-            />
+        {#if onset.show}
+          {#each onset.onsetTimes as onsetT, d}
+            {#if d >= onset.filterStart - 1 && d <= onset.filterEnd - 1}
+              <!-- only show those in the filter range-->
+              <circle
+                cx={xScale(
+                  onsetT - d * $graphs[$activeGraphTab].params.periodHrs
+                )}
+                cy={d * (dayHeight + betweenHeight) + dayHeight}
+                r="4"
+                fill={onset.col.hex}
+                fill-opacity={onset.col.alpha}
+                stroke-width="0.5"
+                stroke="black"
+              />
+            {/if}
+            {#if onset.showLine}
+              <line
+                x1={xScale(onset.lmFit.intercept)}
+                y1={0 * (dayHeight + betweenHeight) + dayHeight}
+                x2={xScale(
+                  onset.lmFit.intercept +
+                    (onset.onsetTimes.length - 1) *
+                      onset.lmFit.slope *
+                      $graphs[$activeGraphTab].params.periodHrs
+                )}
+                y2={(onset.onsetTimes.length - 1) *
+                  (dayHeight + betweenHeight) +
+                  dayHeight}
+                stroke={onset.col.hex}
+              />
+            {/if}
           {/each}
-          <!--
-        <line
-          x1={onset.median + onset.moveXDay * onset.estDay}
-          y1={margin.top + $graphs[$activeGraphTab].params.dayHeight}
-          x2={onset.median -
-            onset.moveXDay *
-              ($graphs[$activeGraphTab].chartData.data[srcIndex]].time.length -
-                onset.estDay)}
-          y2={margin.top + innerHeight}
-          style="stroke:rgb(255,0,0);stroke-width:2"
-        ></line>
--->
         {/if}
       {/each}
     </g>

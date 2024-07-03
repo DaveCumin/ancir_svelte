@@ -1,10 +1,11 @@
 <script>
   import { menuModalType } from "../store";
   import { fade } from "svelte/transition";
+
   export let title = "";
 
   function closeDialog() {
-    $menuModalType = null;
+    $menuModalType = "";
   }
   function handleKeydown(event) {
     const key = event.key;

@@ -221,7 +221,8 @@
     dataOUT.datalength = result[Object.keys(result)[0]].length;
 
     //insert a data element for each header
-    Object.keys(result).forEach((f) => {
+    Object.keys(result).forEach((f, i) => {
+      const valueKey = `imported_${i}`;
       //find the data type based on the first non-NaN element
       const datum = getFirstValid(result[f]);
       let type = "";
@@ -229,31 +230,25 @@
       if (guessDateofArray([datum]) != -1) {
         const timefmt = guessDateofArray([datum]);
         console.log("guessedformat = " + timefmt);
-        dataOUT.data[f] = {
+        dataOUT.data[valueKey] = {
           name: f,
           type: "time",
           data: result[f],
           timeFormat: timefmt,
           timeData: forceFormat(result[f], timefmt),
           recordPeriod: getPeriod(datum, timefmt),
-          processSteps: [],
-          processedData: [],
         };
       } else if (!isNaN(datum)) {
-        dataOUT.data[f] = {
+        dataOUT.data[valueKey] = {
           name: f,
           type: "value",
           data: result[f],
-          processSteps: [],
-          processedData: [],
         };
       } else {
-        dataOUT.data[f] = {
+        dataOUT.data[valueKey] = {
           name: f,
           type: "category",
           data: result[f],
-          processSteps: [],
-          processedData: [],
         };
       }
     });
@@ -375,18 +370,3 @@
     <!-- show error message if there are errors-->
   </Dialog>
 {/if}
-
-<style>
-  input[type="number"] {
-    width: 4em; /* Adjust the width as needed */
-    max-width: 6em;
-    height: 1.1rem;
-    border-radius: 0.5rem;
-    margin-left: auto;
-    align-self: center;
-    padding-left: 4px;
-    border-width: 1px;
-    text-align: end;
-    background: var(--bg-color);
-  }
-</style>

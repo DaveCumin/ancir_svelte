@@ -1,23 +1,5 @@
-:root {
-  --bg-color: #fff;
-  --font-color: #424242;
-  --hover-color: #eee;
-
-  --primary-color: lightblue;
-  --secondary-color: #888888;
-}
-
-[data-theme="dark"] {
-  --bg-color: #161625;
-  --font-color: #e1e1ff;
-
-  --hover-color: #888888;
-
-  --primary-color: #9a97f3;
-  --secondary-color: #888888;
-}
-
-* {
+*,
+html {
   font-size: 10pt;
   color: var(--font-color);
 }
@@ -130,6 +112,19 @@ button {
   padding: 15px 0;
 }
 
+input[type="number"] {
+  width: 4em; /* Adjust the width as needed */
+  max-width: 6em;
+  height: 1.1rem;
+  border-radius: 0.5rem;
+  margin-left: auto;
+  align-self: center;
+  padding-left: 4px;
+  border-width: 1px;
+  text-align: end;
+  background: var(--bg-color);
+}
+
 input[type="text"],
 input[type="datetime-local"] {
   height: 1.4em;
@@ -216,17 +211,19 @@ summary {
 .process {
   margin-left: 1.5em;
   padding: 5px 0px;
+  margin-right: 10px;
+  box-shadow: 1px 1px 5px #888888;
 }
 
 .otherItemDetail[open] {
   margin-bottom: 15px;
-  margin-top: 5px;
-  margin-right: 0px;
+  margin: 10px;
   box-shadow: 1px 1px 5px #888888;
 }
 .otherItemDetail {
-  margin-left: 0em;
+  margin: 10px;
   padding: 5px 0px;
+  box-shadow: 1px 1px 5px #888888;
 }
 
 .processDetails {
@@ -239,7 +236,7 @@ summary {
 }
 
 .no-arrow summary:before {
-  content: "\25AC\00a0";
+  content: "";
   margin-left: -2px;
 }
 
@@ -285,9 +282,9 @@ summary {
 }
 .colourPicker {
   border-radius: 25px;
-  height: 2.5em;
+  height: 2em;
   padding: 0;
-  width: 2.5em;
+  width: 2em;
   margin-right: 1em;
 }
 .colourPicker::-webkit-color-swatch {

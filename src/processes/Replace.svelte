@@ -1,9 +1,9 @@
 <script context="module">
+  export { Replace, forTypes, startParams };
+  const forTypes = ["value", "time"];
+  const startParams = { from: -999, to: NaN };
   // Define the functions
-  export function replace(
-    startVals = [1, 2, 3],
-    params = { from: 0, to: 100 }
-  ) {
+  function Replace(startVals = [1, 2, 3], params = { from: 0, to: 100 }) {
     //ADDS A SET VALUE TO DATA
     var arr = [...startVals];
 
