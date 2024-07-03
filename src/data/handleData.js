@@ -5,17 +5,15 @@ import {
   contextMenu,
   addedNewChartData,
 } from "../store";
+// @ts-ignore
+import { getRandomHexColour } from "../charts/AllCharts.js";
 import { get } from "svelte/store";
-import { getRandomHexColour } from "../charts/allCharts";
 import { max } from "../utils/MathsStats";
 
 //Get data from the data structure
-export function getDataFromTable(tableID, key, getProcessed = true) {
+export function getDataFromTable(tableID, key) {
   const tempData =
     get(data)[get(data).findIndex((d) => d.id === tableID)].data[key];
-  if (tempData.processedData.length > 0 && getProcessed) {
-    return tempData.processedData;
-  }
 
   if (tempData.type === "time") {
     return tempData.timeData;
@@ -39,13 +37,10 @@ export function getFieldNames(source) {
 //get the data from graph source
 export function getDataFromSource(sourceIndex, vals) {
   const sourceData = get(graphs)[get(activeGraphTab)].sourceData[sourceIndex];
-  if (vals.processedData.length > 0) {
-    return vals.processedData;
-  } else {
-    const tableID = sourceData.tableID;
 
-    return getDataFromTable(tableID, vals.field);
-  }
+  const tableID = sourceData.tableID;
+
+  return getDataFromTable(tableID, vals.field);
 }
 
 //get the type of a data field
@@ -107,8 +102,6 @@ export function addDataToGraph(
       field: Object.keys(
         get(data)[get(data).findIndex((d) => d.id === tableID_IN)].data
       )[cdindex], //{insert fieldnames in order},
-      processSteps: [],
-      processedData: [],
     };
   });
 
@@ -137,7 +130,7 @@ export function addDataToGraph(
 
     return current;
   });
-  if (get(graphs)[get(activeGraphTab)].graph === "raw") {
+  if (get(graphs)[get(activeGraphTab)].graph === "Raw") {
     addedNewChartData.set(true);
     console.log("set sem");
   }
@@ -206,6 +199,7 @@ export function getMeanSD(data) {
 // it uses Median Absolute Deviation (MAD) to 'ignore' the possible 'disconnects'
 //-----
 export function bestFitOnsets(data) {
+  /*
   // Calculate the median and MAD
   const median = calculateMedian(data);
   const mad = calculateMAD(data, median);
@@ -217,8 +211,8 @@ export function bestFitOnsets(data) {
 
   // Calculate the mean of the filtered data
   const mean = calculateMean(filteredData);
-
-  return mean;
+*/
+  return calculateMean(data);
 }
 
 export function calculateMedian(data) {
@@ -266,5 +260,20 @@ export function linearRegression(x, y) {
   const slope = (n * sumXY - sumX * sumY) / (n * sumXSquare - sumX * sumX);
   const intercept = (sumY - slope * sumX) / n;
 
-  return { slope, intercept };
+  // Calculate R-squared
+  let ssTotal = 0;
+  let ssResidual = 0;
+  const meanY = sumY / n;
+
+  for (let i = 0; i < n; i++) {
+    const predictedY = slope * x[i] + intercept;
+    ssTotal += (y[i] - meanY) ** 2;
+    ssResidual += (y[i] - predictedY) ** 2;
+  }
+  console.log(intercept);
+  console.log(slope);
+  console.log("------");
+  const rSquared = 1 - ssResidual / ssTotal;
+
+  return { slope, intercept, rSquared };
 }

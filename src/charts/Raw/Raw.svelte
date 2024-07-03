@@ -1,11 +1,13 @@
 <script>
   // @ts-nocheck
-
+  // imports
   import { data, graphs, activeGraphTab } from "../../store";
   import { getDataFromSource } from "../../data/handleData";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
   import { tooltip } from "../../utils/Tooltip/tooltip";
+
+  //Do the plot
   const margin = { top: 20, bottom: 60, left: 60, right: 20 };
 
   $: width = $graphs[$activeGraphTab]?.params.width;
@@ -27,7 +29,7 @@
     let xVals;
     let yVals;
 
-    if ($graphs[$activeGraphTab]?.graph === "raw") {
+    if ($graphs[$activeGraphTab]?.graph === "Raw") {
       $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
         const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
         //get the x data
@@ -62,7 +64,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab]?.graph === "raw" && $graphs[$activeGraphTab]?.sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "Raw" && $graphs[$activeGraphTab]?.sourceData.length > 0}
   <div class="rawGraph">
     <svg
       id="svgContainer"

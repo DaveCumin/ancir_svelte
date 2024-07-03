@@ -16,7 +16,7 @@
     let xVals;
     let yVals;
 
-    if ($graphs[$activeGraphTab]?.graph === "raw") {
+    if ($graphs[$activeGraphTab]?.graph === "Raw") {
       $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
         const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
         //get the x data
@@ -59,7 +59,6 @@
   }
   $: updateAxes($addedNewChartData);
   function updateAxes(sem) {
-    console.log("sem = " + sem);
     if (sem) {
       scaleAxes();
       $addedNewChartData = false;

@@ -111,7 +111,7 @@
 
 <style>
   .numberInput {
-    width: 40%; /* Adjust the width as needed */
+    width: 40%;
     max-width: 6em;
     float: right;
     height: 1.1rem;
@@ -129,8 +129,6 @@
     accent-color: var(--primary-color);
     cursor: pointer;
     box-sizing: border-box;
-    border-width: 0;
-    border-style: solid;
   }
 
   .sliderLabel {

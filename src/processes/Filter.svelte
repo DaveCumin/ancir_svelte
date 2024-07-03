@@ -1,6 +1,9 @@
 <script context="module">
+  export { Filter, forTypes, startParams };
+  const forTypes = ["value", "time"];
+  const startParams = { min: 0, max: 100 };
   // Define the function
-  export function filter(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
+  function Filter(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
     const dataMin = Math.min(...startVals);
     const dataMax = Math.max(...startVals);
 

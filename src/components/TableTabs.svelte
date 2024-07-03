@@ -6,13 +6,90 @@
     data,
   } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
-  import { tooltip } from "../utils/Tooltip/tooltip";
+  import { forceFormat } from "../utils/time/TimeUtils";
 
-  let minrowstoshow = 100;
+  // make a sequence of integers
+  function range(from, to) {
+    const result = [];
+    let i = from;
 
-  function doshowalldata() {
-    $showalldata[$activeTableTab] = true;
+    while (i <= to) {
+      result.push(i);
+      i += 1;
+    }
+
+    return result;
   }
+
+  //TODO_med: Make this a popup process, to select the starting data and processes, etc. Maybe an option to paste in data also?
+  function newColumn() {
+    const newdatadata = range(0, Nrows);
+    const newdata = {
+      name: "test",
+      type: "value",
+      originalData: newdatadata,
+      processSteps: [],
+      data: newdatadata,
+    };
+    const keyname =
+      "processed_" +
+      (Object.keys(
+        $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
+          .data
+      ).length +
+        1);
+
+    $data.find((item) => item.id === $dataIDsforTables[$activeTableTab]).data[
+      keyname
+    ] = newdata;
+    $data = $data;
+    console.log($data);
+  }
+
+  //when there is an edit of data
+  function editEvent(event, row, k) {
+    console.log(
+      $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
+    );
+    //If it's a heading, update the name
+    if (row == "heading") {
+      $data.find((item) => item.id === $dataIDsforTables[$activeTableTab]).data[
+        k
+      ].name = event.detail;
+      $data = $data;
+    } else {
+      //update the data
+      let key = Object.keys(
+        $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
+          .data
+      )[k];
+      $data.find((item) => item.id === $dataIDsforTables[$activeTableTab]).data[
+        key
+      ].data[row] = event.detail;
+
+      $data = $data;
+
+      //update time if needed
+      if (
+        $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
+          .data[key].type == "time"
+      ) {
+        console.log("updating the time data also");
+        $data.find(
+          (item) => item.id === $dataIDsforTables[$activeTableTab]
+        ).data[key].timeData = forceFormat(
+          $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
+            .data[key].data,
+          $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
+            .data[key].timeFormat
+        );
+      }
+      $data = $data;
+    }
+  }
+
+  let startRow = 1;
+  let endRow = 10;
 
   function changeActiveNav(ind) {
     $activeTableTab = ind;
@@ -28,73 +105,12 @@
     $activeTableTab = $dataIDsforTables.length > 0 ? 0 : -1;
   }
 
-  //Get the active data
-  function getActiveData($activeTableTab) {
-    return $dataIDsforTables.length > 0
-      ? $data.find((item) => item.id === $dataIDsforTables[$activeTableTab])
-      : { data: -1, displayName: -1 };
-  }
-
-  //Function nto make a table from the active data
-  function makeTableData(dataIN, d) {
-    let out = [];
-    for (const key in dataIN) {
-      out.push(dataIN[key].data);
-      //Add the computed time
-      if (dataIN[key].type === "time") {
-        out.push(dataIN[key].timeData);
-      }
-      //Add processed data
-      if (dataIN[key].processSteps.length > 0) {
-        out.push(dataIN[key].processedData);
-      }
-    }
-
-    return out;
-  }
-
-  //Get headinngs for the table
-  function makeTableHeadings(dataIN, d) {
-    if ($dataIDsforTables.length > 0) {
-      var outheadings = [];
-      var outprocessed = [];
-
-      for (const key in dataIN) {
-        outheadings.push(dataIN[key].name);
-        outprocessed.push(false);
-
-        //If there is a process, add in the raw data headers first
-        if (dataIN[key].processSteps.length > 0) {
-          outheadings.push(dataIN[key].name);
-          outprocessed.push(true);
-        }
-        if (dataIN[key].type === "time") {
-          outheadings.push(dataIN[key].name + " (hrs)");
-          outprocessed.push(true);
-        }
-      }
-      return { headings: outheadings, processed: outprocessed };
-    } else {
-      return { headings: [""], processed: [false] };
-    }
-  }
-
-  let tableData;
-  $: {
-    tableData = makeTableData(getActiveData($activeTableTab).data, $data);
-    if (tableData.length > 0) {
-      if (tableData[0].length <= minrowstoshow) {
-        console.log(tableData[0].length);
-        console.log(tableData[0].length <= minrowstoshow);
-        $showalldata[$activeTableTab] = true;
-      }
-    }
-  }
-
-  $: tableHeadings = makeTableHeadings(
-    getActiveData($activeTableTab).data,
-    $data
-  );
+  $: theDataToEdit = $data.find(
+    (item) => item.id === $dataIDsforTables[$activeTableTab]
+  ) || {
+    data: {}, //This is to not throw an error when the Dialog is closed
+  };
+  $: Nrows = theDataToEdit.datalength;
 </script>
 
 <div id="tableTabs" style="margin: 0 1em;">
@@ -112,8 +128,11 @@
           >
             <span class="tabname">
               <InPlaceEdit
-                bind:value={$data[$data.findIndex((d) => d.id === table)]
-                  .displayName}
+                bind:value={$data[
+                  $data.findIndex(
+                    (d) => d.id === $dataIDsforTables[$activeTableTab]
+                  )
+                ].displayName}
               />
             </span>
             <button class="closeButton" on:click={() => deleteTab(inx)}>
@@ -139,61 +158,65 @@
   {/if}
 </div>
 
-{#if $activeTableTab >= 0 && tableData.length > 0}
+{#if $activeTableTab >= 0}
   <main>
+    <div id="editTablePagination">
+      Show rows <input
+        type="number"
+        id="min"
+        bind:value={startRow}
+        min="0"
+        max={endRow - 1}
+      />
+      to
+      <input
+        type="number"
+        id="min"
+        bind:value={endRow}
+        min={startRow + 1}
+        max={Nrows}
+      />
+      of {Nrows}
+    </div>
+
     <table>
-      <thead
-        ><tr>
-          {#each tableHeadings.headings as heading, i}
-            {#if tableHeadings.processed[i]}
-              <th><i>{heading}*</i></th>
-            {:else}
-              <th>{heading}</th>
+      <thead>
+        <tr>
+          <td></td>
+          {#each Object.keys(theDataToEdit.data) as heading}
+            <td
+              ><InPlaceEdit
+                bind:value={theDataToEdit.data[heading].name}
+                on:submit={(event) => editEvent(event, "heading", heading)}
+              /></td
+            >
+            {#if theDataToEdit.data[heading].type == "time"}
+              <td><i>{theDataToEdit.data[heading].name}*</i> </td>
             {/if}
           {/each}
-        </tr></thead
-      >
+          <td><button on:click={newColumn}>+</button> </td>
+        </tr>
+      </thead>
       <tbody>
-        <!-- only show the whole table if showalldata is true-->
-        {#if $showalldata[$activeTableTab]}
-          {#each tableData[0] as _, row}
-            <tr>
-              {#each tableData as _, col}
-                {#if tableHeadings.processed[col]}
-                  <td><i>{tableData[col][row]}</i></td>
-                {:else}
-                  <td>{tableData[col][row]}</td>
-                {/if}
-              {/each}
-            </tr>
-          {/each}
-          <!-- otherwise only show minrowstoshow rows-->
-        {:else}
-          {#each { length: minrowstoshow } as _, row}
-            <tr>
-              {#each tableData as tdc, col}
-                {#if tableHeadings.processed[col]}
-                  <td><i>{tableData[col][row]}</i></td>
-                {:else}
-                  <td>{tableData[col][row]}</td>
-                {/if}
-              {/each}
-            </tr>
-          {/each}
-        {/if}
+        {#each range(Math.max(0, startRow - 1), Math.min(endRow - 1, Nrows)) as i}
+          <tr>
+            <td><i>{i + 1}</i></td>
+            {#each Object.keys(theDataToEdit.data) as heading, c}
+              <td
+                ><InPlaceEdit
+                  bind:value={theDataToEdit.data[heading].data[i]}
+                  on:submit={(event) => editEvent(event, i, c)}
+                /></td
+              >
+              {#if theDataToEdit.data[heading].type == "time"}
+                <td><i>{theDataToEdit.data[heading].timeData[i]}</i> </td>
+              {/if}
+            {/each}
+          </tr>
+        {/each}
       </tbody>
     </table>
   </main>
-  <!-- have a button to show all rows-->
-  {#if !$showalldata[$activeTableTab]}
-    <button
-      use:tooltip
-      tipcontent="Show more"
-      class="showmorebutton"
-      style="display: {$showalldata[$activeTableTab] ? 'none' : 'block'};"
-      on:click={(e) => doshowalldata()}>...</button
-    >
-  {/if}
 {/if}
 
 <style>

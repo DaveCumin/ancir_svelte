@@ -2,7 +2,7 @@
   // @ts-nocheck
 
   import Spinner from "../utils/Spinner.svelte";
-  import { statusData } from "../store";
+  import { statusData, data, graphs } from "../store";
   import { afterUpdate } from "svelte";
 
   let statusList;
@@ -23,4 +23,7 @@
   {#each $statusData as status}
     <p>{@html status.display}</p>
   {/each}
+  <p>debugging</p>
+  <button on:click={() => console.log($data)}>data</button>
+  <button on:click={() => console.log($graphs)}>graphs</button>
 </div>

@@ -1,7 +1,7 @@
 <script>
   // @ts-nocheck
 
-  import { graphs, activeGraphTab, addedNewChartData } from "../store";
+  import { graphs, activeGraphTab } from "../store";
   import Tooltip from "../utils/Tooltip/Tooltip.svelte";
   import { exportSVG } from "../utils/exportSVG.js";
   import { tick } from "svelte";
@@ -29,7 +29,7 @@
 </script>
 
 <div id="chartTools">
-  {#if $graphs[$activeGraphTab]?.graph === "raw"}
+  {#if $graphs[$activeGraphTab]?.graph === "Raw"}
     <Raw_tools />
   {/if}
   <Tooltip tipcontent="Zoom in">
@@ -79,7 +79,7 @@
     </div>
   </Tooltip>
 
-  <Tooltip tipcontent="Save plot">
+  <Tooltip tipcontent="Save">
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="button" id="export" on:click={() => exportSVG()}>💾</div>

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { DateTime } from "luxon";
 import { get } from "svelte/store";
 import {
   activeGraphTab,
@@ -9,107 +8,66 @@ import {
   statusData,
 } from "../store.js";
 
-//---------------------------------------------------------------------
-// ----- ADD NEW GRAPHS BELOW
-//---------------------------------------------------------------------
-import Actigram from "../charts/Actigram/Actigram.svelte";
-import ActigramControls from "../charts/Actigram/Actigram_controls.svelte";
-
-import Periodogram from "../charts/Periodogram/Periodogram.svelte";
-import PeriodogramControls from "../charts/Periodogram/Periodogram_controls.svelte";
-
-import Raw from "../charts/Raw/Raw.svelte";
-import RawControls from "../charts/Raw/Raw_controls.svelte";
-
-export const graphMap = {
-  actigram: {
-    graph: Actigram,
-    controls: ActigramControls,
-    prototypechartvalues: { time: "time", values: "values" },
-    prototypeother: {
-      col: { hex: "#1B1D50", alpha: 0.5 },
-      showOnsets: true,
-      centileThresh: 80,
-      M: 3,
-      N: 3,
-      estimate: 0,
-    },
-    params: {
-      startTime: DateTime.now()
-        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-        .toISO()
-        .slice(0, 16),
-      periodHrs: 24,
-      binSizeHrs: 0.25,
-      width: 800,
-      dayHeight: 10,
-      betweenHeight: 2,
-      doublePlot: 2,
-      scaleAxes: "byPlot",
-      showAxes: false,
-    },
-    chartData: {
-      data: [{ time: [], values: [], day: [], scaleLimits: [] }],
-      startOffsets: [],
-      onsets: [],
-    },
-  },
-  periodogram: {
-    graph: Periodogram,
-    controls: PeriodogramControls,
-    prototypechartvalues: { time: "any", values: "any" },
-    prototypeother: {
-      col: { hex: "#78322e", alpha: 0.5 },
-    },
-    params: {
-      width: 600,
-      height: 200,
-      minPeriod: 4,
-      maxPeriod: 30,
-      stepPeriod: 0.25,
-      binSizeHrs: 0.25,
-    },
-    chartData: {},
-  },
-  raw: {
-    graph: Raw,
-    controls: RawControls,
-    prototypechartvalues: { x: "any", y: "any" },
-    prototypeother: {
-      col: { hex: "#78322e", alpha: 0.5 },
-      size: 2,
-      strokeWidth: 1,
-      strokeCol: { hex: "#000000", alpha: 0.9 },
-    },
-    params: {
-      width: 600,
-      height: 200,
-      yDomainMin: 0,
-      yDomainMax: 200,
-      xDomainMin: 0,
-      xDomainMax: 680,
-      yAxisLabel: "y-axis",
-      xAxisLabel: "x-axis title here",
-    },
-    chartData: {},
-  },
-};
-//---------------------------------------------------------------------
-// ----- ADD NEW GRAPHS ABOVE
-//---------------------------------------------------------------------
-
 export function getRandomHexColour() {
-  // Generate a random hex color
-  return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  // Generate a random number between 0 and 16777215 (0xFFFFFF in hex)
+  const randomColor = Math.floor(Math.random() * 16777215);
+  // Convert the random number to a hex string and pad with leading zeros if necessary
+  const hexColor = "#" + randomColor.toString(16).padStart(6, "0");
+  return hexColor;
 }
+
+//--Auto add the graphs
+const modules = import.meta.glob("../charts/**/*.svelte");
+
+// Initialize an empty componentMap
+export let graphMap = {};
+
+// Function to dynamically lo ad
+async function loadGraphFiles() {
+  for (const path in modules) {
+    const module = await modules[path]();
+
+    const fileName = path.split("/").pop().split(".").shift();
+    const folderName = path.split("/").slice(-2)[0];
+
+    if (folderName == fileName) {
+      console.log(fileName);
+      console.log(module);
+      console.log(module.defaultParams);
+
+      const controlsPath =
+        path.substring(0, path.lastIndexOf(".")) + "_controls.svelte";
+      const controlsModule = await modules[controlsPath]();
+      const defaultsPath =
+        path.substring(0, path.lastIndexOf(".")) + "_defaults.svelte";
+      const defaults = await modules[defaultsPath]();
+
+      graphMap[fileName] = {
+        graph: module.default,
+        controls: controlsModule.default || {}, //TODO_high: this isn't working
+        params: defaults.defaultParams || {},
+        prototypechartvalues: defaults.defaultchartvalues || {},
+        prototypeother: defaults.defaultother || {},
+        chartData: defaults.defaultChartData || {},
+        extras: {},
+      };
+    }
+  }
+}
+
+// Load the graph files when the module script is executed
+export const graphFilesLoaded = loadGraphFiles().then(() => {
+  console.log("Graph files loaded:", graphMap);
+  console.log(graphMap);
+});
+//----------------------
+
 // MAKE A NEW CHART
 function putChartValues(keysIN, fieldsIN) {
   const chartValues = {};
   for (let i = 0; i < keysIN.length; i++) {
     chartValues[keysIN[i]] = {
       field: fieldsIN[i],
-      processSteps: [],
-      processedData: [],
     };
   }
   return chartValues;
@@ -132,6 +90,7 @@ export function makeNewChart(type) {
       sourceData: [],
       params: { ...deepCopy(graphMap[type].params) },
       chartData: { ...deepCopy(graphMap[type].chartData) },
+      extras: { ...deepCopy(graphMap[type].extras) },
     };
 
     get(graphs).push(newchart);

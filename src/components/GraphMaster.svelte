@@ -2,9 +2,9 @@
   // @ts-nocheck
 
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { activeGraphTab, graphs, graphTabs } from "../store.js";
+  import { activeGraphTab, graphs } from "../store.js";
   import GraphTabs from "./GraphTabs.svelte";
-  import { graphMap } from "../charts/allCharts.js";
+  import { graphMap } from "../charts/AllCharts.js";
 </script>
 
 <Pane size={80}>

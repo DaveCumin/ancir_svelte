@@ -24,6 +24,13 @@ export var contextMenu = writable({
 
 //THEME
 export var selectedTheme = writable("light");
+export var userStyle = writable({
+  "--bg-color": "#fff",
+  "--font-color": "#424242",
+  "--hover-color": "#eee",
+  "--primary-color": "lightblue",
+  "--secondary-color": "#888888",
+});
 
 //STATUS DATA
 export var statusData = writable([]);

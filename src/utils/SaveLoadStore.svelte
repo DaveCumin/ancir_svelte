@@ -8,6 +8,7 @@
     showalldata,
     activeTableTab,
     selectedTheme,
+    userStyle,
     statusData,
   } from "../store";
   import { get } from "svelte/store";
@@ -21,6 +22,7 @@
     const _showalldata = get(showalldata);
     const _activeTableTab = get(activeTableTab);
     const _selectedTheme = get(selectedTheme);
+    const _userStyle = get(userStyle);
     const _statusData = get(statusData);
 
     const store = {
@@ -32,6 +34,7 @@
       _showalldata,
       _activeTableTab,
       _selectedTheme,
+      _userStyle,
       _statusData,
     };
 

@@ -37,7 +37,7 @@
     maxPeriod,
     stepPeriod
   ) {
-    if ($graphs[$activeGraphTab]?.graph === "periodogram") {
+    if ($graphs[$activeGraphTab]?.graph === "Periodogram") {
       const alpha = 0.05;
 
       let xVals, yVals;
@@ -172,7 +172,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab]?.graph === "periodogram" && $graphs[$activeGraphTab]?.sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "Periodogram" && $graphs[$activeGraphTab]?.sourceData.length > 0}
   <div class="periodogram">
     <svg
       id="svgContainer"

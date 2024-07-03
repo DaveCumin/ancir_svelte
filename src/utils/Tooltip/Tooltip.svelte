@@ -5,7 +5,6 @@
   let y;
 
   function mouseOver(event) {
-    console.log(event);
     isHovered = true;
     x = 15;
     y = 35;
