@@ -263,17 +263,18 @@ export function linearRegression(x, y) {
   // Calculate R-squared
   let ssTotal = 0;
   let ssResidual = 0;
+  let sumSquaredErrors = 0;
   const meanY = sumY / n;
 
   for (let i = 0; i < n; i++) {
     const predictedY = slope * x[i] + intercept;
     ssTotal += (y[i] - meanY) ** 2;
     ssResidual += (y[i] - predictedY) ** 2;
+    sumSquaredErrors += (y[i] - predictedY) ** 2;
   }
-  console.log(intercept);
-  console.log(slope);
-  console.log("------");
-  const rSquared = 1 - ssResidual / ssTotal;
 
-  return { slope, intercept, rSquared };
+  const rSquared = 1 - ssResidual / ssTotal;
+  const rmse = Math.sqrt(sumSquaredErrors / n);
+
+  return { slope, intercept, rSquared, rmse };
 }

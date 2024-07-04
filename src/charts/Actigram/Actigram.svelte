@@ -444,7 +444,9 @@
       for (let d = 0; d < aboveBelow.length / periodStep; d++) {
         bestMatchIndex[d] =
           findBestMatchIndex(
-            aboveBelow.slice(d * periodStep, (d + 1) * periodStep),
+            aboveBelow
+              .slice(d * periodStep, (d + 1) * periodStep)
+              .concat(Array.from({ length: 5 * Mhrs }, () => -1)),
             template
           ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
 

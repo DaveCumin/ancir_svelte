@@ -11,7 +11,6 @@
   } from "../../data/handleData";
   import { data, graphs, activeGraphTab, graphTabs } from "../../store";
   import { formatTimeFromISO } from "../../utils/time/TimeUtils";
-
   import { getRandomHexColour } from "../AllCharts.js";
 
   const prototypechartvalues = { time: "time", values: "values" };
@@ -199,15 +198,18 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
+
           <div
             class="deleteTable hoverbutton"
+            style="padding: 0.2em 0.5em; margin: -0.2em 0.2em;"
             on:click={(e) => {
               e.preventDefault();
               addOnset(sourceIndex);
             }}
           >
-            ++
+            📍
           </div>
+
           <div
             class="deleteTable hoverbutton"
             on:click={(e) => {

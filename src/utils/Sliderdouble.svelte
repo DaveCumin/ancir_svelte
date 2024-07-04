@@ -12,7 +12,7 @@
       max = min;
       min = temp;
     }
-    rangeSelected.style.left = (min / maxValue) * 100 + "%";
+    rangeSelected.style.left = (min / maxValue) * 100 - 2 + "%";
     rangeSelected.style.right = 100 - (max / maxValue) * 100 + "%";
   }
 </script>
@@ -110,6 +110,11 @@
     -webkit-appearance: none;
     cursor: pointer;
   }
+
+  .range-input input::-webkit-slider-thumb:hover {
+    filter: brightness(1.2);
+  }
+
   .range-input input::-moz-range-thumb {
     height: 1.1rem;
     width: 1.1rem;
@@ -118,6 +123,7 @@
     pointer-events: auto;
     -moz-appearance: none;
   }
+
   .range-num {
     display: flex;
     justify-content: center;
