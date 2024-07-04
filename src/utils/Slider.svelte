@@ -130,6 +130,13 @@
     cursor: pointer;
     box-sizing: border-box;
   }
+  .sliderInputfutureupgradeNotWorkingNow {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: var(--text-color);
+    border-radius: 50%;
+  }
 
   .sliderLabel {
     line-height: 1rem;

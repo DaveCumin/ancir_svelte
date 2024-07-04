@@ -6,6 +6,11 @@
   import Sliderdouble from "../../utils/Sliderdouble.svelte";
 
   export let sourceIndex = 0;
+
+  function removeOnsetData(sourceIndex, o) {
+    $graphs[$activeGraphTab].sourceData[sourceIndex].onsets.splice(o, 1);
+    $graphs = $graphs;
+  }
 </script>
 
 <!-- svelte-ignore a11y-missing-attribute -->
@@ -23,6 +28,15 @@
         <option value="offset">Offset</option>
         <!-- <option value="acrophase">Acrophase</option>-->
       </select>
+      <div
+        class="deleteTable hoverbutton"
+        on:click={(e) => {
+          e.preventDefault();
+          removeOnsetData(sourceIndex, o);
+        }}
+      >
+        🗑️
+      </div>
       <br />
       <label>show:</label><input
         type="checkbox"
@@ -84,6 +98,25 @@
             o
           ].showLine}
         />
+        <br />
+        <span
+          style="cursor:text"
+          on:click={(e) => {
+            e.preventDefault();
+          }}
+          >R-squared: {$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
+            o
+          ].lmFit.rSquared.toFixed(2)}
+        </span>
+        <span
+          style="cursor:text"
+          on:click={(e) => {
+            e.preventDefault();
+          }}
+          >Error: {$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
+            o
+          ].lmFit.rmse.toFixed(2)}
+        </span>
       </div>
       <details>
         <summary>
