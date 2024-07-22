@@ -12,7 +12,6 @@
 
   $: {
     update();
-    value = value;
   }
 
   function keeptolimits() {

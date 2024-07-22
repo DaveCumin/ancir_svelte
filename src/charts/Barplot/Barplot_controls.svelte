@@ -2,7 +2,7 @@
   // @ts-nocheck
 
   import Slider from "../../utils/Slider.svelte";
-  import { data, graphs, activeGraphTab, graphTabs } from "../../store";
+  import { data, graphs, graphTabs, activeGraphTab } from "../../store";
   import InPlaceEdit from "../../utils/InPlaceEdit.svelte";
   import {
     getFieldNames,
@@ -10,62 +10,17 @@
     createnewDataForGraph,
   } from "../../data/handleData";
   import { getRandomHexColour } from "../AllCharts.js";
-
-  import {
-    defaultchartvalues,
-    defaultother,
-  } from "./Periodogram_defaults.svelte";
+  import { defaultchartvalues, defaultother } from "./Barplot_defaults.svelte";
 </script>
 
-{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Periodogram"}
+{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Barplot"}
   <div class="chartControls">
-    <div class="sliderContainer">
-      <Slider
-        min={10}
-        max={$graphs[$activeGraphTab].params.maxPeriod}
-        limits={[1, Infinity]}
-        label="Min period:"
-        bind:value={$graphs[$activeGraphTab].params.minPeriod}
-      />
-    </div>
-    <div class="sliderContainer">
-      <Slider
-        min={$graphs[$activeGraphTab].params.minPeriod}
-        max={30}
-        limits={[1, Infinity]}
-        label="Max period:"
-        bind:value={$graphs[$activeGraphTab].params.maxPeriod}
-      />
-    </div>
-    <div class="sliderContainer">
-      <Slider
-        min={0.1}
-        max={1}
-        step={0.01}
-        limits={[0.1, 1]}
-        label="Period step:"
-        bind:value={$graphs[$activeGraphTab].params.stepPeriod}
-      />
-    </div>
-
-    <div class="sliderContainer">
-      <Slider
-        min={0.05}
-        max={1}
-        step="0.05"
-        limits={[0.05, $graphs[$activeGraphTab].params.maxPeriod]}
-        label="Bin size (hrs):"
-        bind:value={$graphs[$activeGraphTab].params.binSizeHrs}
-      />
-    </div>
-
     <div class="sliderContainer">
       <Slider
         min={100}
         max={1000}
-        step="1"
         limits={[5, Infinity]}
-        label="Width: "
+        label="Width:"
         bind:value={$graphs[$activeGraphTab].params.width}
       />
     </div>
@@ -73,11 +28,21 @@
     <div class="sliderContainer">
       <Slider
         min={10}
-        max={30}
-        step="1"
+        max={3000}
         limits={[5, Infinity]}
-        label="Height:"
+        label="Height: "
         bind:value={$graphs[$activeGraphTab].params.height}
+      />
+    </div>
+
+    <div class="sliderContainer">
+      <Slider
+        min={0}
+        max={1}
+        limits={[0, 1]}
+        step="0.01"
+        label="Spacing: "
+        bind:value={$graphs[$activeGraphTab].params.barspace}
       />
     </div>
   </div>
@@ -148,31 +113,6 @@
             </summary>
           </details>
         {/each}
-        <!-- EXTRAS-->
-        <!-- COLOUR-->
-        <div class="colour">
-          <input
-            class="colourPicker"
-            id={sourceIndex}
-            type="color"
-            style="background: {$graphs[$activeGraphTab].sourceData[sourceIndex]
-              .col.hex}"
-            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-              .hex}
-          />
-          <div class="sliderContainer">
-            <Slider
-              min="0"
-              max="1"
-              step="0.01"
-              limits={[0, 1]}
-              label="Alpha: "
-              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].col
-                .alpha}
-            />
-          </div>
-        </div>
-        <!-- END OF THE EXTRAS-->
       </details>
       <!-- The end of the data-->
     {/each}

@@ -158,6 +158,18 @@
             ].M}
           />
         </div>
+        <div style="padding:5px">
+          <Slider
+            min="0"
+            max="10"
+            step="0.25"
+            limits={[0, 10]}
+            label="MAD threshold to exclude: "
+            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
+              o
+            ].MAD}
+          />
+        </div>
       </details>
     </div>
   </div>

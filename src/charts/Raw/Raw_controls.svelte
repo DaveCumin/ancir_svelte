@@ -11,13 +11,7 @@
   } from "../../data/handleData";
   import { getRandomHexColour } from "../AllCharts.js";
 
-  const prototypechartvalues = { x: "time", y: "values" };
-  const prototypeother = {
-    col: { hex: getRandomHexColour(), alpha: 0.5 },
-    size: 2,
-    strokeWidth: 1,
-    strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
-  };
+  import { defaultchartvalues, defaultother } from "./Raw_defaults.svelte";
 </script>
 
 {#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Raw"}
@@ -108,7 +102,7 @@
       class="addbutton hoverbutton showContextMenu"
       on:click={(e) => {
         e.preventDefault();
-        createnewDataForGraph(prototypechartvalues, prototypeother);
+        createnewDataForGraph(defaultchartvalues, defaultother);
       }}>+</span
     >
   </div>

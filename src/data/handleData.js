@@ -194,27 +194,6 @@ export function getMeanSD(data) {
   return { mean, sd };
 }
 
-//-------
-// the following code is to estimate the period from the onset/offset times
-// it uses Median Absolute Deviation (MAD) to 'ignore' the possible 'disconnects'
-//-----
-export function bestFitOnsets(data) {
-  /*
-  // Calculate the median and MAD
-  const median = calculateMedian(data);
-  const mad = calculateMAD(data, median);
-
-  // Filter out values that are considered outliers
-  const filteredData = data.filter(
-    (value) => Math.abs(value - median) <= 2 * mad
-  );
-
-  // Calculate the mean of the filtered data
-  const mean = calculateMean(filteredData);
-*/
-  return calculateMean(data);
-}
-
 export function calculateMedian(data) {
   const sortedData = data.slice().sort((a, b) => a - b);
   const middle = Math.floor(sortedData.length / 2);
@@ -226,12 +205,12 @@ export function calculateMedian(data) {
   }
 }
 
-function calculateMAD(data, median) {
+export function calculateMAD(data, median) {
   const absoluteDeviations = data.map((value) => Math.abs(value - median));
   return calculateMedian(absoluteDeviations);
 }
 
-function calculateMean(data) {
+export function calculateMean(data) {
   const sum = data.reduce((acc, value) => acc + value, 0);
   return sum / data.length;
 }

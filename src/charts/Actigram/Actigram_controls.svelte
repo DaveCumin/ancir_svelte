@@ -13,11 +13,7 @@
   import { formatTimeFromISO } from "../../utils/time/TimeUtils";
   import { getRandomHexColour } from "../AllCharts.js";
 
-  const prototypechartvalues = { time: "time", values: "values" };
-  const prototypeother = {
-    col: { hex: getRandomHexColour(), alpha: 0.5 },
-    onsets: [],
-  };
+  import { defaultchartvalues, defaultother } from "./Actigram_defaults.svelte";
 
   function addOnset(sourceIndex) {
     $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
@@ -25,6 +21,8 @@
     ] = {
       type: "onset",
       showOnsets: true,
+      excludeOnsets: [],
+      MAD: 2,
       filterStart: 1,
       filterEnd: $graphs[$activeGraphTab].chartData.data[0].scaleLimits.length,
       centileThresh: 80,
@@ -184,7 +182,7 @@
       class="addbutton hoverbutton showContextMenu"
       on:click={(e) => {
         e.preventDefault();
-        createnewDataForGraph(prototypechartvalues, prototypeother);
+        createnewDataForGraph(defaultchartvalues, defaultother);
       }}>+</span
     >
   </div>

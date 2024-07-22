@@ -130,6 +130,8 @@
           {
             type: "onset",
             showOnsets: true,
+            excludeOnsets: [],
+            MAD: 2,
             filterStart: 1,
             filterEnd: 28,
             centileThresh: 80,
