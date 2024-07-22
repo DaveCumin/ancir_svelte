@@ -9,14 +9,14 @@
     getISODate,
     addTime,
   } from "../../utils/time/TimeUtils";
-  import { createSequenceArray } from "../../utils/MathsStats";
+  import { createSequenceArray, min, max } from "../../utils/MathsStats";
   import {
     getDataFromSource,
     getFieldName,
     averageBinnedValues,
-    bestFitOnsets,
     getDiffs,
     calculateMedian,
+    calculateMAD,
     linearRegression,
   } from "../../data/handleData";
   import About from "../../components/About.svelte";
@@ -41,7 +41,11 @@
     }
   }
 
-  $: totalHeight = calcTotalHeight(margin, dayHeight, betweenHeight);
+  $: totalHeight = calcTotalHeight(
+    margin,
+    $graphs[$activeGraphTab]?.params.dayHeight,
+    $graphs[$activeGraphTab]?.params.betweenHeight
+  );
   $: binSize = $graphs[$activeGraphTab]?.params.binSizeHrs;
   $: width = $graphs[$activeGraphTab]?.params.width;
   $: dayHeight = $graphs[$activeGraphTab]?.params.dayHeight;
@@ -51,18 +55,18 @@
 
   function calcTotalHeight(margin, dayHeight, betweenHeight) {
     if ($graphs[$activeGraphTab]?.graph === "Actigram") {
-      let days;
-      if ($graphs[$activeGraphTab].chartData.onsets?.length > 0) {
-        days = $graphs[$activeGraphTab].chartData.onsets[0].onsetTimes.length;
-      } else {
-        makePlotData(
-          $graphs[$activeGraphTab].sourceData,
-          $graphs[$activeGraphTab].params.binSizeHrs,
-          $graphs[$activeGraphTab].params.periodHrs,
-          $graphs[$activeGraphTab].params.startTime
-        );
-        days = $graphs[$activeGraphTab].chartData.onsets[0]?.onsetTimes.length;
-      }
+      let days =
+        $graphs[$activeGraphTab].chartData.data[0]?.day[
+          $graphs[$activeGraphTab].chartData.data[0]?.day.length - 1
+        ];
+      console.log(days);
+
+      makePlotData(
+        $graphs[$activeGraphTab].sourceData,
+        $graphs[$activeGraphTab].params.binSizeHrs,
+        $graphs[$activeGraphTab].params.periodHrs,
+        $graphs[$activeGraphTab].params.startTime
+      );
 
       totalHeight =
         margin.top +
@@ -73,7 +77,7 @@
       if (totalHeight < margin.top + margin.bottom) {
         totalHeight = margin.top + margin.bottom;
       }
-
+      console.log(totalHeight);
       return totalHeight;
     }
   }
@@ -252,7 +256,8 @@
     binSizeHrs
   ) {
     if (chartData && $graphs[$activeGraphTab].graph === "Actigram") {
-      const dayLength = periodHrs / binSizeHrs;
+      const dayLength = Math.ceil(periodHrs / binSizeHrs);
+
       const srcLength = $graphs[$activeGraphTab].chartData.data.length;
 
       xScale = scaleLinear()
@@ -279,12 +284,8 @@
         //default scale is the whole data
         var yScale = scaleLinear()
           .domain([
-            Math.min(
-              ...$graphs[$activeGraphTab].chartData.data[srcIndex].values
-            ),
-            Math.max(
-              ...$graphs[$activeGraphTab].chartData.data[srcIndex].values
-            ),
+            min($graphs[$activeGraphTab].chartData.data[srcIndex].values),
+            max($graphs[$activeGraphTab].chartData.data[srcIndex].values),
           ])
           .range([dayHeight, 0]);
 
@@ -402,7 +403,7 @@
     const values = $graphs[$activeGraphTab].chartData.data[sourceIndex].values;
     const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
     const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
-    const periodStep = periodHrs / binSizeHrs;
+    const periodStep = Math.ceil(periodHrs / binSizeHrs);
 
     const dbl = $graphs[$activeGraphTab].params.doublePlot;
 
@@ -456,7 +457,33 @@
           ];
       }
 
-      //calculate the estimated period
+      //remove points beyond Median Absolute Deviations
+      let excludedOnsets;
+      if ($graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD > 0) {
+        const N = bestMatchTime.length;
+        const bestMatchHrs = bestMatchTime.map(
+          (value, index) =>
+            value - $graphs[$activeGraphTab]?.params.periodHrs * index
+        );
+        const medianBMT = calculateMedian(bestMatchHrs);
+        const madBMT = calculateMAD(
+          bestMatchHrs,
+          calculateMedian(bestMatchHrs)
+        );
+        excludedOnsets = bestMatchHrs
+          .map((value, index) => ({ value, index }))
+          .filter(
+            ({ value }) =>
+              Math.abs(value - medianBMT) >
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD *
+                madBMT
+          )
+          .map(({ index }) => index);
+      } else {
+        excludedOnsets = [];
+      }
+
+      //calculate the points to plot
       let xs = [];
       let ys = [];
 
@@ -470,15 +497,7 @@
 
       const median = calculateMedian(xs);
 
-      //which day is the median point?
-      const estDay = xs.reduce(
-        (prevIndex, curr, currIndex) =>
-          Math.abs(curr - median) < Math.abs(xs[prevIndex] - median)
-            ? currIndex
-            : prevIndex,
-        0
-      );
-
+      //set up for the linear regression
       let y = [];
       let x = [];
       for (
@@ -489,13 +508,16 @@
         $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].filterEnd;
         i++
       ) {
-        y.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
-        x.push(
-          bestMatchTime.slice(i, i + 1) -
-            i * $graphs[$activeGraphTab]?.params.periodHrs
-        );
+        console.log(i);
+        if (!excludedOnsets.includes(i)) {
+          y.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
+          x.push(
+            bestMatchTime.slice(i, i + 1) -
+              i * $graphs[$activeGraphTab]?.params.periodHrs
+          );
+        }
       }
-
+      console.log(x);
       const linearFit = linearRegression(y, x);
       $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].lmFit =
         linearFit;
@@ -505,8 +527,10 @@
         ...$graphs[$activeGraphTab].chartData.onsets,
         {
           onsetTimes: bestMatchTime,
+          excludeOnsets: excludedOnsets,
           //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
           //TODO _med: need to truncate the line also - as it can go off the chart.
+          MAD: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD,
           show: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
             .showOnsets,
           col: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].col,
@@ -519,7 +543,6 @@
             $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
               .filterEnd,
           median: median,
-          estDay: estDay,
           lmFit: linearFit,
           showLine:
             $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].showLine,
@@ -767,22 +790,38 @@
       />
 
       <!-- ONSETS -->
-      {#each $graphs[$activeGraphTab].chartData.onsets as onset, srcIndex}
+      {#each $graphs[$activeGraphTab].chartData.onsets as onset, osIndex}
         {#if onset.show}
           {#each onset.onsetTimes as onsetT, d}
             {#if d >= onset.filterStart - 1 && d <= onset.filterEnd - 1}
               <!-- only show those in the filter range-->
-              <circle
-                cx={xScale(
-                  onsetT - d * $graphs[$activeGraphTab].params.periodHrs
-                )}
-                cy={d * (dayHeight + betweenHeight) + dayHeight}
-                r="4"
-                fill={onset.col.hex}
-                fill-opacity={onset.col.alpha}
-                stroke-width="0.5"
-                stroke="black"
-              />
+              {#if onset.excludeOnsets.includes(d)}
+                <!-- show excluded without fill-->
+                <circle
+                  cx={xScale(
+                    onsetT - d * $graphs[$activeGraphTab].params.periodHrs
+                  )}
+                  cy={d * (dayHeight + betweenHeight) + dayHeight}
+                  r="4"
+                  fill={onset.col.hex}
+                  fill-opacity="0"
+                  stroke-width="0.5"
+                  stroke="black"
+                />
+              {:else}
+                <!-- show included with fill -->
+                <circle
+                  cx={xScale(
+                    onsetT - d * $graphs[$activeGraphTab].params.periodHrs
+                  )}
+                  cy={d * (dayHeight + betweenHeight) + dayHeight}
+                  r="4"
+                  fill={onset.col.hex}
+                  fill-opacity={onset.col.alpha}
+                  stroke-width="0.5"
+                  stroke="black"
+                />
+              {/if}
             {/if}
             {#if onset.showLine}
               <line
