@@ -13,6 +13,8 @@
 
   $: width = $graphs[$activeGraphTab]?.params.width;
   $: height = $graphs[$activeGraphTab]?.params.height;
+  $: innerHeight = height - margin.top - margin.bottom;
+  $: innerWidth = width - margin.left - margin.right;
 
   let categories;
   let categoryValues;
@@ -78,13 +80,13 @@
       // Create the x (horizontal position) scale.
       xScale = scaleBand()
         .domain(categories)
-        .range([margin.left, width - margin.right])
+        .range([0, innerWidth])
         .paddingInner($graphs[$activeGraphTab].params.barspace);
 
       // Create the y (vertical position) scale.
       yScale = scaleLinear()
         .domain([0, max(categoryValues)])
-        .range([height - margin.bottom, margin.top]);
+        .range([innerHeight, 0]);
     }
   }
 </script>
@@ -99,7 +101,7 @@
         $graphs[$activeGraphTab].zoom +
         ");"}
     >
-      <g class="bar">
+      <g class="bar" transform={`translate(${margin.left},${margin.right})`}>
         {#each categories as cat, i}
           <rect
             x={xScale(cat)}
@@ -109,70 +111,22 @@
             fill="red"
           />
         {/each}
-      </g>
 
-      <!-- X-Axis -->
-      <g transform="translate(0,{height - margin.bottom})">
-        <line stroke="black" x1={margin.left - 6} x2={width} />
+        <!-- axis stuff-->
+        <Axis {innerHeight} scale={xScale} position="bottom" />
+        <Axis {innerHeight} scale={yScale} position="left" />
 
-        {#each categories as cat}
-          <!-- X-Axis Ticks -->
-          <line
-            stroke="black"
-            x1={xScale(cat) + xScale.bandwidth() / 2}
-            x2={xScale(cat) + xScale.bandwidth() / 2}
-            y1={0}
-            y2={6}
-          />
-
-          <!-- X-Axis Tick Labels -->
-          <text
-            fill="black"
-            text-anchor="middle"
-            x={xScale(cat) + xScale.bandwidth() / 2}
-            y={22}
-          >
-            {cat}
-          </text>
-        {/each}
-
-        <!-- X-Axis Label -->
-        <text fill="black" x={width / 2} y={50}>Categories</text>
-      </g>
-
-      <!-- Y-Axis -->
-      <g transform="translate({margin.left},0)">
-        {#each yScale.ticks() as tick}
-          <!-- 
-        Y-Axis Ticks. 
-        Note: First tick is skipped since the x-axis already acts as a tick. 
-      -->
-          {#if tick !== 0}
-            <line
-              stroke="black"
-              x1={0}
-              x2={-6}
-              y1={yScale(tick)}
-              y2={yScale(tick)}
-            />
-          {/if}
-
-          <!-- Y-Axis Tick Labels -->
-          <text
-            fill="black"
-            text-anchor="end"
-            dominant-baseline="middle"
-            x={-9}
-            y={yScale(tick)}
-          >
-            {Math.trunc(tick)}
-          </text>
-        {/each}
-
-        <!-- Y-Axis Label -->
-        <text fill="black" text-anchor="start" x={-margin.eft} y={15}>
-          Value
-        </text>
+        <!-- TODO_low: move the label and margins for when there are high numbers on the axis (so the label and ticks don't overlap) -->
+        <text
+          style="text-anchor: middle;"
+          transform={`translate(-30,${innerHeight / 2}) rotate(-90)     `}
+          >Values</text
+        >
+        <text
+          style="text-anchor: middle;"
+          x={innerWidth / 2}
+          y={innerHeight + 32}>Categories</text
+        >
       </g>
     </svg>
   </div>
