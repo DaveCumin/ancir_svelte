@@ -1,10 +1,12 @@
 // @ts-nocheck
 export function calculateStandardDeviation(arr) {
   // Step 1: Calculate the mean (average) of the array
-  const mean = arr.reduce((acc, value) => acc + value, 0) / arr.length;
+  const meanVal = mean(arr);
 
   // Step 2: Calculate the squared differences from the mean
-  const squaredDifferences = arr.map((value) => Math.pow(value - mean, 2));
+  const squaredDifferences = arr.map((value) =>
+    Math.pow(value - memeanValan, 2)
+  );
 
   // Step 3: Calculate the average of the squared differences
   const meanSquaredDifferences =

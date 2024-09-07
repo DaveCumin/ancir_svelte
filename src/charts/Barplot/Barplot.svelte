@@ -6,7 +6,6 @@
   import { max } from "../../utils/MathsStats";
   import { scaleLinear, scaleBand } from "d3-scale";
   import Axis from "../Axis.svelte";
-  import { tooltip } from "../../utils/Tooltip/tooltip";
 
   //Do the plot
   const margin = { top: 20, bottom: 60, left: 60, right: 20 };
@@ -16,9 +15,9 @@
   $: innerHeight = height - margin.top - margin.bottom;
   $: innerWidth = width - margin.left - margin.right;
 
-  let categories;
-  let categoryValues;
-  let categoryErrors;
+  let categories = [];
+  let categoryValues = [];
+  let categoryErrors = [];
   let xScale;
   let yScale;
 
@@ -30,6 +29,8 @@
 
     if ($graphs[$activeGraphTab]?.graph === "Barplot") {
       $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
+        console.log(sourceIndex);
+
         const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
 
         //get the x data
@@ -56,38 +57,57 @@
           categoryStats[cat].count += 1;
           categoryStats[cat].values.push(value);
         });
+
+        // Calculate mean and standard deviation for each category
+        categories = Object.keys(categoryStats);
+        categoryValues = [];
+        categoryErrors = [];
+        let i = 0;
+        for (const cat in categoryStats) {
+          const stats = categoryStats[cat];
+          const mean = stats.sum / stats.count;
+
+          // Calculate standard deviation
+          const variance =
+            stats.values.reduce(
+              (acc, val) => acc + Math.pow(val - mean, 2),
+              0
+            ) / stats.count;
+          const stdDev = Math.sqrt(variance);
+
+          categoryValues[i] = mean;
+          categoryErrors[i] = stdDev;
+          i = i + 1;
+        }
+
+        // Create the x (horizontal position) scale.
+        xScale = scaleBand()
+          .domain(categories)
+          .range([0, innerWidth])
+          .paddingInner($graphs[$activeGraphTab].params.barspace);
+
+        // Create the y (vertical position) scale.
+        yScale = scaleLinear()
+          .domain([0, max(categoryValues)])
+          .range([innerHeight, 0]);
+
+        updateChartData(sourceIndex);
       });
-      // Calculate mean and standard deviation for each category
-      categories = Object.keys(categoryStats);
-      categoryValues = [];
-      categoryErrors = [];
-      let i = 0;
-      for (const cat in categoryStats) {
-        const stats = categoryStats[cat];
-        const mean = stats.sum / stats.count;
-
-        // Calculate standard deviation
-        const variance =
-          stats.values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
-          stats.count;
-        const stdDev = Math.sqrt(variance);
-
-        categoryValues[i] = mean;
-        categoryErrors[i] = stdDev;
-        i = i + 1;
-      }
-
-      // Create the x (horizontal position) scale.
-      xScale = scaleBand()
-        .domain(categories)
-        .range([0, innerWidth])
-        .paddingInner($graphs[$activeGraphTab].params.barspace);
-
-      // Create the y (vertical position) scale.
-      yScale = scaleLinear()
-        .domain([0, max(categoryValues)])
-        .range([innerHeight, 0]);
     }
+  }
+
+  function updateChartData(sourceIndex) {
+    console.log(categories);
+    console.log(sourceIndex);
+    console.log(
+      $graphs[$activeGraphTab].chartData.data[sourceIndex].categories
+    );
+    $graphs[$activeGraphTab].chartData.data[sourceIndex].categories =
+      categories;
+    $graphs[$activeGraphTab].chartData.data[sourceIndex].categoryValues =
+      categoryValues;
+    $graphs[$activeGraphTab].chartData.data[sourceIndex].categoryErrors =
+      categoryErrors;
   }
 </script>
 

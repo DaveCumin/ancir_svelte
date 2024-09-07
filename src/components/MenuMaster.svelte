@@ -119,8 +119,8 @@
     await graphFilesLoaded;
 
     //----------------------------
-    //make actigram
-    makeNewChart("Actigram");
+    //make actogram
+    makeNewChart("Actogram");
     addDataToGraph(
       0,
       { time: "time", values: "values" },

@@ -113,6 +113,31 @@
             </summary>
           </details>
         {/each}
+
+        {#each $graphs[$activeGraphTab]?.chartData?.data as cdata, ci}
+          {#each cdata.categories as cat}
+            <div class="colour">
+              {cat}
+              <input
+                class="colourPicker"
+                id={cat}
+                type="color"
+                style="background: #232425"
+                value="#232425"
+              />
+              <div class="sliderContainer">
+                <Slider
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  limits={[0, 1]}
+                  label="Alpha: "
+                  value="0.5"
+                />
+              </div>
+            </div>
+          {/each}
+        {/each}
       </details>
       <!-- The end of the data-->
     {/each}

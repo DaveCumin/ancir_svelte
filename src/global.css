@@ -302,3 +302,24 @@ summary {
 }
 
 /* ------------------------------------------------- */
+/* Tippy tooltip */
+.tippy-box[data-theme~="Ancir"] {
+  background-color: var(--hover-color);
+  color: var(--font-color);
+  box-shadow: 1px 1px 5px var(--font-color);
+}
+.tippy-box[data-theme~="Ancir"][data-placement^="top"] > .tippy-arrow::before {
+  border-top-color: var(--hover-color);
+}
+.tippy-box[data-theme~="Ancir"][data-placement^="bottom"]
+  > .tippy-arrow::before {
+  border-bottom-color: var(--hover-color);
+}
+.tippy-box[data-theme~="Ancir"][data-placement^="left"] > .tippy-arrow::before {
+  border-left-color: var(--hover-color);
+}
+.tippy-box[data-theme~="Ancir"][data-placement^="right"]
+  > .tippy-arrow::before {
+  border-right-color: var(--hover-color);
+}
+/* ------------------------------------------------- */

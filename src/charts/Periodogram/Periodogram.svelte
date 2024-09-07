@@ -9,7 +9,20 @@
   } from "../../data/handleData";
   import { pchisq, qchisq } from "../../utils/CDFs";
   import { mean } from "../../utils/MathsStats";
-  import { tooltip } from "../../utils/Tooltip/tooltip";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+  import "tippy.js/dist/tippy.css";
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
 
   let margin = { top: 20, bottom: 40, left: 80, right: 20 };
 
@@ -187,17 +200,20 @@
           {#each $graphs[$activeGraphTab].chartData.data.periods as src, srcIndex}
             {#each src as period, periodIndex}
               <circle
-                use:tooltip
-                tipcontent={period.toFixed(2) +
-                  ", " +
-                  $graphs[$activeGraphTab].chartData.data.power[srcIndex][
-                    periodIndex
-                  ].toFixed(2) +
-                  " (" +
-                  $graphs[$activeGraphTab].chartData.data.pvalue[srcIndex][
-                    periodIndex
-                  ].toFixed(2) +
-                  ")"}
+                use:tippytip={{
+                  content:
+                    period.toFixed(2) +
+                    ", " +
+                    $graphs[$activeGraphTab].chartData.data.power[srcIndex][
+                      periodIndex
+                    ].toFixed(2) +
+                    " (" +
+                    $graphs[$activeGraphTab].chartData.data.pvalue[srcIndex][
+                      periodIndex
+                    ].toFixed(2) +
+                    ")",
+                  theme: "Ancir",
+                }}
                 cx={$graphs[$activeGraphTab].chartData.xScale(period)}
                 cy={$graphs[$activeGraphTab].chartData.yScale(
                   $graphs[$activeGraphTab].chartData.data.power[srcIndex][

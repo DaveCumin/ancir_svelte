@@ -10,7 +10,7 @@
     <p>
       This is our 'AnCiR' to the need for a simple-to-use (GUI; no coding) tool
       for analysis of circadian rhythms. Currently, the tool only allows for
-      import of csv data and plotting of actigrams.
+      import of csv data and plotting of actograms.
     </p>
 
     <p>
@@ -37,18 +37,18 @@
     </p>
 
     <p>
-      To create an actigram, click on _Plot_>_Actigram_. You can change the data
+      To create an actogram, click on _Plot_>_Actogram_. You can change the data
       that is used by using the dropdown lists under _Data for this plot_ on the
       right hand panel. You can add multiple data sources and change their
       colours. To see the post-processed data useed in the plot, click on the
       hyperlinked data for each source and see it appear in the data tabs below.
     </p>
 
-    <p>The other controls for the actigram should be self-explanatory.</p>
+    <p>The other controls for the actogram should be self-explanatory.</p>
 
     <p>
       The Periodogram plot is what it says it is, and raw is just a plot of the
-      data - with similar controls to the actigram.
+      data - with similar controls to the actogram.
     </p>
 
     <p>Have fun.</p>
@@ -86,10 +86,8 @@
         was adapted to guess the time format of data.
       </li>
       <li>
-        <a
-          href="https://svelte.dev/repl/dd6754a2ad0547c5b1c1ea37c0293fef?version=4.2.10"
-          >Tooltip</a
-        > was adapted for this project.
+        <a href="https://atomiks.github.io/tippyjs/">Tippy</a> was adapted for this
+        project.
       </li>
       <li>
         <a href="https://github.com/EmilTholin/svelte-spinner/">Spinner</a> was taken

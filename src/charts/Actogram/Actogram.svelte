@@ -8,6 +8,7 @@
     getstartTimeOffset,
     getISODate,
     addTime,
+    calculateTimeDifference,
   } from "../../utils/time/TimeUtils";
   import { createSequenceArray, min, max } from "../../utils/MathsStats";
   import {
@@ -19,6 +20,7 @@
     calculateMAD,
     linearRegression,
   } from "../../data/handleData";
+  import { defaultChartData } from "../Actogram/Actogram_defaults.svelte";
   import About from "../../components/About.svelte";
 
   let margin = { top: 50, bottom: 20, left: 80, right: 80 };
@@ -54,12 +56,11 @@
   $: innerWidth = width - margin.left - margin.right;
 
   function calcTotalHeight(margin, dayHeight, betweenHeight) {
-    if ($graphs[$activeGraphTab]?.graph === "Actigram") {
+    if ($graphs[$activeGraphTab]?.graph === "Actogram") {
       let days =
         $graphs[$activeGraphTab].chartData.data[0]?.day[
           $graphs[$activeGraphTab].chartData.data[0]?.day.length - 1
         ];
-      console.log(days);
 
       makePlotData(
         $graphs[$activeGraphTab].sourceData,
@@ -77,7 +78,7 @@
       if (totalHeight < margin.top + margin.bottom) {
         totalHeight = margin.top + margin.bottom;
       }
-      console.log(totalHeight);
+
       return totalHeight;
     }
   }
@@ -91,14 +92,10 @@
   );
 
   function makePlotData(sourceData, binSizeHrs, periodHrs, startTime) {
-    if ($graphs[$activeGraphTab]?.graph === "Actigram") {
+    if ($graphs[$activeGraphTab]?.graph === "Actogram") {
       let xVals, yVals;
 
-      let chartData = {
-        data: [{ time: [], values: [], day: [], scaleLimits: [] }],
-        startOffsets: [],
-        onsets: [],
-      };
+      let chartData = defaultChartData;
 
       //for each source data
       sourceData.forEach((plotData, sourceIndex) => {
@@ -181,7 +178,7 @@
     let startOffsets = [];
     //TODO _high: Change the start time when new data is added; to be the 00:00 of the first day of the data
     if (
-      $graphs[activeGraphT].graph === "Actigram" &&
+      $graphs[activeGraphT].graph === "Actogram" &&
       $graphs[activeGraphT].sourceData.length > 0
     ) {
       //set the up to start with
@@ -255,7 +252,7 @@
     periodHrs,
     binSizeHrs
   ) {
-    if (chartData && $graphs[$activeGraphTab].graph === "Actigram") {
+    if (chartData && $graphs[$activeGraphTab].graph === "Actogram") {
       const dayLength = Math.ceil(periodHrs / binSizeHrs);
 
       const srcLength = $graphs[$activeGraphTab].chartData.data.length;
@@ -393,11 +390,31 @@
     }
   }
 
+  //-- LInear regression for the onsets
+  function doLinearRegressionOnsets(onsetsIN, excludedOnsets, bestMatchTime) {
+    //set up for the linear regression
+    let y = [];
+    let x = [];
+    for (let i = onsetsIN.filterStart - 1; i < onsetsIN.filterEnd; i++) {
+      if (!excludedOnsets.includes(i)) {
+        y.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
+        x.push(
+          bestMatchTime.slice(i, i + 1) -
+            i * $graphs[$activeGraphTab]?.params.periodHrs
+        );
+      }
+    }
+    return linearRegression(y, x);
+  }
+
   //----------------------------------------------------------------------------------------------------
   //Code to find the onsets and offsets
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
   //TODO_high: move this to the Onset.svelte file? or make for each onset
   function findOnOffsets(sourceIndex) {
+    //reset the chart data
+    $graphs[$activeGraphTab].chartData.onsets = [];
+
     //get the data
     const times = $graphs[$activeGraphTab].chartData.data[sourceIndex].time;
     const values = $graphs[$activeGraphTab].chartData.data[sourceIndex].values;
@@ -458,13 +475,25 @@
       }
 
       //remove points beyond Median Absolute Deviations
+      //First calculate the linear fit
+      const linearFitb4MAD = doLinearRegressionOnsets(
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
+        [], //None excluded (keep them all)
+        bestMatchTime
+      );
+      console.log(bestMatchTime);
+      console.log(linearFitb4MAD);
+
+      //Now take this into account when calculating MAD (TODO)
       let excludedOnsets;
       if ($graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD > 0) {
         const N = bestMatchTime.length;
+        console.log(bestMatchTime);
         const bestMatchHrs = bestMatchTime.map(
           (value, index) =>
             value - $graphs[$activeGraphTab]?.params.periodHrs * index
         );
+        console.log(bestMatchHrs);
         const medianBMT = calculateMedian(bestMatchHrs);
         const madBMT = calculateMAD(
           bestMatchHrs,
@@ -497,28 +526,12 @@
 
       const median = calculateMedian(xs);
 
-      //set up for the linear regression
-      let y = [];
-      let x = [];
-      for (
-        let i =
-          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
-            .filterStart - 1;
-        i <
-        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].filterEnd;
-        i++
-      ) {
-        console.log(i);
-        if (!excludedOnsets.includes(i)) {
-          y.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
-          x.push(
-            bestMatchTime.slice(i, i + 1) -
-              i * $graphs[$activeGraphTab]?.params.periodHrs
-          );
-        }
-      }
-      console.log(x);
-      const linearFit = linearRegression(y, x);
+      const linearFit = doLinearRegressionOnsets(
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
+        excludedOnsets,
+        bestMatchTime
+      );
+      console.log(linearFit);
       $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].lmFit =
         linearFit;
 
@@ -530,6 +543,7 @@
           excludeOnsets: excludedOnsets,
           //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
           //TODO _med: need to truncate the line also - as it can go off the chart.
+          //TODO _med: update logic so mad takes the line into account!
           MAD: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD,
           show: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
             .showOnsets,
@@ -708,7 +722,7 @@
   }
 </script>
 
-{#if $graphs[$activeGraphTab]?.graph === "Actigram" && $graphs[$activeGraphTab].sourceData.length > 0}
+{#if $graphs[$activeGraphTab]?.graph === "Actogram" && $graphs[$activeGraphTab].sourceData.length > 0}
   <div
     class="overlay"
     style={mousedown
@@ -718,6 +732,7 @@
 
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
+
   <svg
     id="svgContainer"
     margin-lr={margin.left + margin.right}
@@ -823,6 +838,7 @@
                 />
               {/if}
             {/if}
+
             {#if onset.showLine}
               <line
                 x1={xScale(onset.lmFit.intercept)}
@@ -841,6 +857,31 @@
             {/if}
           {/each}
         {/if}
+      {/each}
+
+      <!-- ANNOTATIONS-->
+      {#each $graphs[$activeGraphTab].chartData?.annotations as an, ai}
+        <rect
+          x={xScale(
+            calculateTimeDifference(
+              $graphs[$activeGraphTab].params.startTime,
+              an.startTime,
+              "yyyy-LL-dd'T'T"
+            ) % $graphs[$activeGraphTab].params.periodHrs
+          )}
+          y={Math.floor(
+            calculateTimeDifference(
+              $graphs[$activeGraphTab].params.startTime,
+              an.startTime,
+              "yyyy-LL-dd'T'T"
+            ) / $graphs[$activeGraphTab].params.periodHrs
+          ) *
+            (dayHeight + betweenHeight)}
+          height={dayHeight}
+          width={xScale(an.lengthHrs)}
+          fill={an.col.hex}
+          fill-opacity={an.col.alpha}
+        />
       {/each}
     </g>
   </svg>

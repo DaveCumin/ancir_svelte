@@ -142,7 +142,7 @@ export function deepCopy(obj) {
 }
 
 //Bin the data into binSize bins
-// xs and ys are the time and values for an actigram
+// xs and ys are the time and values for an actogram
 // binSize is the size of each bin, usually in Hrs
 export function averageBinnedValues(xs, ys, binSize) {
   const Nbins =

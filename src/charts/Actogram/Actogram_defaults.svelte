@@ -1,5 +1,7 @@
 <script context="module">
   import { DateTime } from "luxon";
+  import { getRandomHexColour } from "../AllCharts.js";
+
   //default values for creating a new plot
   export const defaultParams = {
     startTime: DateTime.now()
@@ -19,7 +21,7 @@
   export const defaultchartvalues = { time: "time", values: "values" };
 
   export const defaultother = {
-    col: { hex: "#1B1D50", alpha: 0.5 },
+    col: { hex: getRandomHexColour(), alpha: 0.5 },
     onsets: [],
   };
 
@@ -27,5 +29,16 @@
     data: [{ time: [], values: [], day: [], scaleLimits: [] }],
     startOffsets: [],
     onsets: [],
+    annotations: [],
+  };
+
+  export const defaultAnnotation = {
+    name: "annotation",
+    startTime: DateTime.now()
+      .set({ hour: 12, minute: 30, second: 0, millisecond: 0 })
+      .toISO()
+      .slice(0, 16),
+    lengthHrs: 1,
+    col: { hex: getRandomHexColour(), alpha: 0.5 },
   };
 </script>

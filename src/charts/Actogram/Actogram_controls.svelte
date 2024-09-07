@@ -12,8 +12,13 @@
   import { data, graphs, activeGraphTab, graphTabs } from "../../store";
   import { formatTimeFromISO } from "../../utils/time/TimeUtils";
   import { getRandomHexColour } from "../AllCharts.js";
-
-  import { defaultchartvalues, defaultother } from "./Actigram_defaults.svelte";
+  import { DateTime } from "luxon";
+  import { calculateTimeDifference } from "../../utils/time/TimeUtils";
+  import {
+    defaultchartvalues,
+    defaultother,
+    defaultAnnotation,
+  } from "./Actogram_defaults.svelte";
 
   function addOnset(sourceIndex) {
     $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
@@ -29,10 +34,19 @@
       M: 3,
       N: 3,
       lmFit: { slope: 0, intercept: 0, rSquared: 0 },
-      col: { hex: getRandomHexColour(), alpha: 0.5, rSquared: 0 },
+      col: { hex: getRandomHexColour(), alpha: 0.5 },
       showLine: false,
     };
   }
+
+  function addAnnotation() {
+    const anLen = $graphs[$activeGraphTab].chartData?.annotations.length;
+    console.log(anLen);
+    $graphs[$activeGraphTab].chartData.annotations[anLen] = defaultAnnotation;
+
+    console.log($graphs[$activeGraphTab].chartData);
+  }
+  function removeAnnotation(idx) {}
 
   let datePickVisible = true;
 
@@ -55,7 +69,7 @@
   }
 </script>
 
-{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Actigram"}
+{#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Actogram"}
   <div class="chartControls">
     <div class="sliderContainer">
       <span>Start time: </span>
@@ -185,6 +199,14 @@
         createnewDataForGraph(defaultchartvalues, defaultother);
       }}>+</span
     >
+
+    <span
+      class="addbutton hoverbutton showContextMenu"
+      on:click={(e) => {
+        e.preventDefault();
+        addAnnotation();
+      }}>o</span
+    >
   </div>
   <!-- -->
   <div class="graphDataTree">
@@ -198,7 +220,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
 
           <div
-            class="deleteTable hoverbutton"
+            class="addOnset hoverbutton"
             style="padding: 0.2em 0.5em; margin: -0.2em 0.2em;"
             on:click={(e) => {
               e.preventDefault();
@@ -278,6 +300,59 @@
         <!-- END OF THE EXTRAS-->
       </details>
       <!-- The end of the data-->
+    {/each}
+    <!-- ANNOTATIONS-->
+    {#each $graphs[$activeGraphTab].chartData?.annotations as an, ai}
+      <details open class="dataTable">
+        <summary><InPlaceEdit bind:value={an.name} /> </summary>
+        <div>
+          <span>Start: </span>
+          <input
+            class="dateInput"
+            type="datetime-local"
+            bind:value={$graphs[$activeGraphTab].chartData.annotations[ai]
+              .startTime}
+          />
+        </div>
+        <div
+          class="sliderContainer"
+          style="
+        margin-left: 2em;
+    "
+        >
+          <Slider
+            min={0}
+            max={5}
+            step={0.1}
+            limits={[0, Infinity]}
+            label="Length (hrs):"
+            bind:value={$graphs[$activeGraphTab].chartData.annotations[ai]
+              .lengthHrs}
+          />
+        </div>
+
+        <div class="colour">
+          <input
+            class="colourPicker"
+            id={ai}
+            type="color"
+            style="background: {an.col.hex}"
+            bind:value={$graphs[$activeGraphTab].chartData.annotations[ai].col
+              .hex}
+          />
+          <div class="sliderContainer">
+            <Slider
+              min="0"
+              max="1"
+              step="0.01"
+              limits={[0, 1]}
+              label="Alpha: "
+              bind:value={$graphs[$activeGraphTab].chartData.annotations[ai].col
+                .alpha}
+            />
+          </div>
+        </div>
+      </details>
     {/each}
   </div>
 {/if}

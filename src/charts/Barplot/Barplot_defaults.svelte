@@ -13,6 +13,6 @@
   };
 
   export const defaultChartData = {
-    data: [{ yax: [], category: [], errorbars: [] }],
+    data: [{ categories: [], categoryValues: [], categoryErrors: [] }],
   };
 </script>

@@ -1,8 +1,22 @@
 <script>
-  import Tooltip from "../../utils/Tooltip/Tooltip.svelte";
   import { data, graphs, activeGraphTab, addedNewChartData } from "../../store";
   import { getDataFromSource } from "../../data/handleData";
   import { max, min } from "../../utils/MathsStats";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+  import "tippy.js/dist/tippy.css";
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
+
   function scaleAxes() {
     //find the max and min values
     let tempxmin = Infinity;
@@ -66,28 +80,34 @@
   }
 </script>
 
-<Tooltip tipcontent="Auto scale axes">
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="button" id="scaleRaw" on:click={(e) => scaleAxes()}>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 20 20"
-      stroke-width="1.5"
-      stroke="currentColor"
-    >
-      <path
-        d="M2 2L2 18L18 18"
-        stroke="#292929"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></path>
-    </svg>
-  </div>
-</Tooltip>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div
+  class="button"
+  id="scaleRaw"
+  on:click={(e) => scaleAxes()}
+  use:tippytip={{
+    content: "Auto scale axes",
+    theme: "Ancir",
+  }}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 20 20"
+    stroke-width="1.5"
+    stroke="currentColor"
+  >
+    <path
+      d="M2 2L2 18L18 18"
+      stroke="#292929"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    ></path>
+  </svg>
+</div>
 
 <style>
   .button {

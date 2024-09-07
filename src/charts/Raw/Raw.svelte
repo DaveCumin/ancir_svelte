@@ -5,7 +5,20 @@
   import { getDataFromSource } from "../../data/handleData";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
-  import { tooltip } from "../../utils/Tooltip/tooltip";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+  import "tippy.js/dist/tippy.css";
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
 
   //Do the plot
   const margin = { top: 20, bottom: 60, left: 60, right: 20 };
@@ -79,8 +92,10 @@
           {#each ys as y, yi}
             {#if y !== null && !isNaN(y) && xValsToPlot[sourceI][yi] !== null && !isNaN(xValsToPlot[sourceI][yi])}
               <circle
-                use:tooltip
-                tipcontent={xValsToPlot[sourceI][yi] + ", " + y}
+                use:tippytip={{
+                  content: xValsToPlot[sourceI][yi] + ", " + y,
+                  theme: "Ancir",
+                }}
                 cx={xScale(xValsToPlot[sourceI][yi])}
                 cy={yScale(y)}
                 r={$graphs[$activeGraphTab].sourceData[sourceI].size}

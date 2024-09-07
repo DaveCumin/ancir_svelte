@@ -99,7 +99,7 @@ export function getPeriod(timeData, timefmt) {
 }
 
 // Takes in an inputted value (ISO format) and the first time and format of
-//data. Calculates the offset for actigrams (and other plots).
+//data. Calculates the offset for actograms (and other plots).
 export function getstartTimeOffset(inputTime, firstTime, timeFormat) {
   let start = DateTime.fromISO(inputTime);
   let end = DateTime.fromFormat(firstTime, convertFormat(timeFormat));

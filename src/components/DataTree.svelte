@@ -15,7 +15,20 @@
   } from "./ProcessStep.svelte";
   import { getFieldType } from "../data/handleData";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
-  import { tooltip } from "../utils/Tooltip/tooltip";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+  import "tippy.js/dist/tippy.css";
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
 
   //show the data in tables
   function showDataTable(ID) {
@@ -111,8 +124,10 @@
               e.preventDefault();
               removeData(datum.id);
             }}
-            use:tooltip
-            tipcontent={"Delete " + datum.displayName}
+            use:tippytip={{
+              content: "Delete " + datum.displayName,
+              theme: "Ancir",
+            }}
           >
             🗑️
           </div>
@@ -124,8 +139,10 @@
               e.preventDefault();
               showDataTable(datum.id);
             }}
-            use:tooltip
-            tipcontent={"View/edit " + datum.displayName + " as table"}
+            use:tippytip={{
+              content: "View/edit " + datum.displayName + " as table",
+              theme: "Ancir",
+            }}
           >
             📝
           </div>
@@ -145,8 +162,10 @@
                     e.preventDefault();
                     createContext(datum.id, key);
                   }}
-                  use:tooltip
-                  tipcontent={"Add process to " + datum.data[key].name}>+</span
+                  use:tippytip={{
+                    content: "Add process to " + datum.data[key].name,
+                    theme: "Ancir",
+                  }}>+</span
                 >
               {/if}
             </summary>
