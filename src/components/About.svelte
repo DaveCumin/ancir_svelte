@@ -90,6 +90,12 @@
         project.
       </li>
       <li>
+        <a
+          href="https://github.com/ytliu0/p-value_calculators/blob/master/statFunctions.js"
+          >Stats functions from</a
+        > @ytliu0.
+      </li>
+      <li>
         <a href="https://github.com/EmilTholin/svelte-spinner/">Spinner</a> was taken
         to use for the spinner.
       </li>
