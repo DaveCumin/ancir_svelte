@@ -23,25 +23,21 @@
     <h4>For users</h4>
 
     <p>
-      AnCiR should start with some sample data already in the <strong
-        >Data</strong
-      > section on the left hand side. If you want to generate more sample data,
-      just click on _Data_>_Create_ and a new Sample set should appear. Similarly,
-      if you have your own .csv file, then you can import it and it should show up
-      in the list.
+      If you want to generate sample data, just click on _Data_>_Create_ and a
+      new Sample set should appear. Similarly, if you have your own .csv file,
+      then you can import it and it should show up in the list.
     </p>
 
     <p>
-      Clicking on the name of the data table should display the contents in the
-      bottom viewer, so you can see what the data look like.
+      Clicking on the icon next to the name of data table should display the
+      contents in the bottom viewer, so you can see what the data look like.
     </p>
 
     <p>
       To create an actogram, click on _Plot_>_Actogram_. You can change the data
       that is used by using the dropdown lists under _Data for this plot_ on the
       right hand panel. You can add multiple data sources and change their
-      colours. To see the post-processed data useed in the plot, click on the
-      hyperlinked data for each source and see it appear in the data tabs below.
+      colours.
     </p>
 
     <p>The other controls for the actogram should be self-explanatory.</p>
@@ -86,8 +82,7 @@
         was adapted to guess the time format of data.
       </li>
       <li>
-        <a href="https://atomiks.github.io/tippyjs/">Tippy</a> was adapted for this
-        project.
+        <a href="https://atomiks.github.io/tippyjs/">Tippy</a> was used in this project.
       </li>
       <li>
         <a
