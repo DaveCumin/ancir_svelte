@@ -23,7 +23,4 @@
   {#each $statusData as status}
     <p>{@html status.display}</p>
   {/each}
-  <p>debugging</p>
-  <button on:click={() => console.log($data)}>data</button>
-  <button on:click={() => console.log($graphs)}>graphs</button>
 </div>

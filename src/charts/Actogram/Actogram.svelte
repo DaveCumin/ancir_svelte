@@ -397,14 +397,14 @@
     let x = [];
     for (let i = onsetsIN.filterStart - 1; i < onsetsIN.filterEnd; i++) {
       if (!excludedOnsets.includes(i)) {
-        y.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
-        x.push(
+        x.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
+        y.push(
           bestMatchTime.slice(i, i + 1) -
             i * $graphs[$activeGraphTab]?.params.periodHrs
         );
       }
     }
-    return linearRegression(y, x);
+    return linearRegression(x, y);
   }
 
   //----------------------------------------------------------------------------------------------------
@@ -481,24 +481,30 @@
         [], //None excluded (keep them all)
         bestMatchTime
       );
-      console.log(bestMatchTime);
-      console.log(linearFitb4MAD);
 
-      //Now take this into account when calculating MAD (TODO)
+      //Now take this into account when calculating MAD
+      //TODO_med: Account for breaks across periods (discrete jumps but same period)
       let excludedOnsets;
       if ($graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD > 0) {
         const N = bestMatchTime.length;
-        console.log(bestMatchTime);
         const bestMatchHrs = bestMatchTime.map(
           (value, index) =>
-            value - $graphs[$activeGraphTab]?.params.periodHrs * index
+            value -
+            $graphs[$activeGraphTab]?.params.periodHrs * index -
+            (linearFitb4MAD.intercept + linearFitb4MAD.slope * index)
         );
-        console.log(bestMatchHrs);
+        console.log(
+          bestMatchTime.map(
+            (value, index) =>
+              value - $graphs[$activeGraphTab]?.params.periodHrs * index
+          )
+        );
         const medianBMT = calculateMedian(bestMatchHrs);
         const madBMT = calculateMAD(
           bestMatchHrs,
           calculateMedian(bestMatchHrs)
         );
+
         excludedOnsets = bestMatchHrs
           .map((value, index) => ({ value, index }))
           .filter(
@@ -660,7 +666,6 @@
     const day = Math.floor(
       clickedTime / $graphs[$activeGraphTab].params.periodHrs
     );
-
     //get the bin (the time, knowing what the binsize is)
     let bin = Math.round(
       (clickedTime - $graphs[$activeGraphTab].chartData.data[0].time[0]) /
@@ -896,5 +901,8 @@
     padding: 5px;
     border-radius: 10px;
     box-shadow: 0px 0px 15px -5px var(--font-color);
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
   }
 </style>

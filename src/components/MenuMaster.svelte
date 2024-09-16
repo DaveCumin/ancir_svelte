@@ -115,61 +115,6 @@
   //----------------------------
 
   onMount(async () => {
-    // Wait for graph files to be loaded
-    await graphFilesLoaded;
-
-    //----------------------------
-    //make actogram
-    makeNewChart("Actogram");
-    addDataToGraph(
-      0,
-      { time: "time", values: "values" },
-      {
-        col: { hex: getRandomHexColour(), alpha: 0.5 },
-        onsets: [
-          {
-            type: "onset",
-            showOnsets: true,
-            excludeOnsets: [],
-            MAD: 2,
-            filterStart: 1,
-            filterEnd: 28,
-            centileThresh: 80,
-            M: 3,
-            N: 3,
-            lmFit: { slope: 0, intercept: 0, rSquared: 0 },
-            col: { hex: getRandomHexColour(), alpha: 0.5 },
-            showLine: true,
-          },
-        ],
-      }
-    );
-
-    //create new graph
-    makeNewChart("Raw");
-    addDataToGraph(
-      0,
-      { x: "any", y: "any" },
-      {
-        col: { hex: getRandomHexColour(), alpha: 0.5 },
-        size: 2,
-        strokeWidth: 1,
-        strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
-      }
-    );
-
-    makeNewChart("Periodogram");
-    addDataToGraph(
-      0,
-      { time: "any", values: "any" },
-      {
-        col: { hex: getRandomHexColour(), alpha: 0.5 },
-      }
-    );
-
-    $activeGraphTab = 0;
-    //----------------------------
-
     //do click stuff
     const handleClickOutside = (event) => {
       try {

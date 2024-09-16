@@ -20,7 +20,110 @@
   import CreateNewData from "./components/CreateNewData.svelte";
   import Styling from "./components/Styling.svelte";
 
+  import { onMount } from "svelte";
+
   console.log("VERSION: " + version);
+
+  //For the startup stuff --------------------------------
+  import {
+    graphMap,
+    makeNewChart,
+    getRandomHexColour,
+    graphFilesLoaded,
+  } from "./charts/AllCharts.js";
+  import { addDataToGraph } from "./data/handleData";
+  import { generateData } from "./data/simulate.js";
+  import { DateTime } from "luxon";
+  import { data, statusData } from "./store";
+
+  onMount(async () => {
+    await graphFilesLoaded;
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      // Cleanup event listener when the component is destroyed
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  });
+  function handleKeydown(e) {
+    // only read/handle the key if the modal is not open
+    if (e.ctrlKey && e.shiftKey && e.key === "S") {
+      e.preventDefault();
+      console.log("populate with example data and graphs");
+
+      //----------------------------
+      //Generate data
+      const newDataEntry = generateData(
+        28,
+        15,
+        DateTime.now()
+          .set({
+            hour: 0,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+          })
+          .toJSDate(),
+        [24, 28],
+        [100, 150],
+        $data.length
+      );
+      console.log(newDataEntry);
+      // Add the newDataEntry to the data array using `data.update`
+      $data = [...$data, newDataEntry];
+      console.log($data);
+      //----------------------------
+      //make actogram
+      makeNewChart("Actogram");
+      addDataToGraph(
+        0,
+        { time: "time", values: "values" },
+        {
+          col: { hex: getRandomHexColour(), alpha: 0.5 },
+          onsets: [
+            {
+              type: "onset",
+              showOnsets: true,
+              excludeOnsets: [],
+              MAD: 2,
+              filterStart: 1,
+              filterEnd: 28,
+              centileThresh: 80,
+              M: 3,
+              N: 3,
+              lmFit: { slope: 0, intercept: 0, rSquared: 0 },
+              col: { hex: getRandomHexColour(), alpha: 0.5 },
+              showLine: true,
+            },
+          ],
+        }
+      );
+
+      //create new graph
+      makeNewChart("Raw");
+      addDataToGraph(
+        0,
+        { x: "any", y: "any" },
+        {
+          col: { hex: getRandomHexColour(), alpha: 0.5 },
+          size: 2,
+          strokeWidth: 1,
+          strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
+        }
+      );
+
+      makeNewChart("Periodogram");
+      addDataToGraph(
+        0,
+        { time: "any", values: "any" },
+        {
+          col: { hex: getRandomHexColour(), alpha: 0.5 },
+        }
+      );
+
+      $activeGraphTab = 0;
+    }
+  }
+  //------------------------------------------------
 </script>
 
 <svelte:head>

@@ -9,9 +9,11 @@
     let tip = tippy(node, params);
     return {
       update: (newParams) => {
+        // @ts-ignore
         tip.setProps(newParams);
       },
       destroy: () => {
+        // @ts-ignore
         tip.destroy();
       },
     };
@@ -32,6 +34,7 @@
 
     if ($graphs[$activeGraphTab]?.graph === "Raw") {
       $graphs[$activeGraphTab].sourceData.forEach((plotData, sourceIndex) => {
+        // @ts-ignore
         const theDataIndex = $data.findIndex((d) => d.id === plotData.tableID);
         //get the x data
         if (plotData.chartvalues.x.field != "") {
@@ -71,6 +74,7 @@
       $graphs[$activeGraphTab].params.yDomainMax = tempymax;
     }
   }
+  // @ts-ignore
   $: updateAxes($addedNewChartData);
   function updateAxes(sem) {
     if (sem) {

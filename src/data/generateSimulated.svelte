@@ -3,95 +3,9 @@
   import Dialog from "../components/Dialog.svelte";
   import { data, menuModalType } from "../store";
   import Slider from "../utils/Slider.svelte";
-  import {
-    forceFormat,
-    guessDateofArray,
-    getPeriod,
-  } from "../utils/time/TimeUtils";
   import { DateTime } from "luxon";
   import { onMount } from "svelte";
-
-  //create the first set of generated data on startup
-  onMount(() => {
-    generateData(
-      28,
-      15,
-      DateTime.now()
-        .set({
-          hour: 0,
-          minute: 0,
-          second: 0,
-          millisecond: 0,
-        })
-        .toJSDate(),
-      [24, 28],
-      [100, 150]
-    );
-  });
-
-  function generateData(Ndays, fs_min, startDate, periods, maxheights) {
-    // Create an empty data object for the new entry
-
-    const newDataEntry = {
-      id: $data.length, // Assign a unique ID
-      importedFrom: `simulated(${Ndays},${maxheights[0]})`,
-      displayName: `Simulated_${$data.length + 1}`,
-      datalength: Ndays * 24 * (60 / fs_min),
-      data: {},
-    };
-
-    //Make the time data
-    const timeData = [];
-    for (let i = 0; i < newDataEntry.datalength; i++) {
-      const time = new Date(
-        startDate.getTime() + i * fs_min * 60 * 1000
-      ).toLocaleString("en-US");
-      timeData.push(time);
-    }
-
-    const timefmt = guessDateofArray(timeData);
-    const processedTimeData = forceFormat(timeData, timefmt);
-    const timePeriod = getPeriod(timeData, timefmt);
-
-    // Create time entry in newDataEntry.data
-    newDataEntry.data.time = {
-      name: "time",
-      type: "time",
-      data: timeData,
-      timeData: processedTimeData,
-      timeFormat: timefmt,
-      recordPeriod: timePeriod,
-    };
-
-    // Generate value data (value0 and value1)
-    for (let i = 0; i < periods.length; i++) {
-      const valueKey = `generated_${i}`;
-      const valueData = [];
-      const max = maxheights[i];
-      const period = periods[i];
-      const periodL = period * (60 / fs_min); //the length of the period
-      for (let j = 0; j < newDataEntry.datalength; j++) {
-        const isLowPeriod = j % periodL < periodL / 2;
-        const mult = isLowPeriod ? max * 0.05 : max;
-
-        // Generate random value between 0 and mult
-        const randomValue = Math.random() * mult;
-        valueData.push(Math.round(randomValue));
-      }
-
-      // Create value entry in newDataEntry.data
-      newDataEntry.data[valueKey] = {
-        name: `value${i}`,
-        type: "value",
-        data: valueData,
-      };
-    }
-
-    // Add the newDataEntry to the data array
-    data.update((currentData) => [...currentData, newDataEntry]);
-    //close the modal
-    $menuModalType = null;
-  }
+  import { generateData } from "./simulate";
 
   let Ndays = 28;
   let fs_min = 15;
@@ -117,6 +31,22 @@
     N_simulated += 1;
     periods.push(24);
     maxheights.push(100);
+  }
+
+  function handleGenerateData(Ndays, fs_min, start, periods, maxheights) {
+    const newDataEntry = generateData(
+      Ndays,
+      fs_min,
+      start,
+      periods,
+      maxheights,
+      $data.length
+    );
+    // Add the newDataEntry to the data array using `data.update`
+    $data = [...$data, newDataEntry];
+
+    // Close the modal
+    $menuModalType = null; // Properly set the modal to null
   }
 </script>
 
@@ -189,7 +119,8 @@
     {/each}
 
     <button
-      on:click={() => generateData(Ndays, fs_min, start, periods, maxheights)}
+      on:click={() =>
+        handleGenerateData(Ndays, fs_min, start, periods, maxheights)}
       >Generate</button
     >
   </Dialog>
