@@ -57,28 +57,28 @@
       style="padding:0"
       type="color"
       bind:value={userStyle["--font-color"]}
-      on:input={() => changeStyle(selectedTheme)}
+      on:input={() => changeStyle(get(selectedTheme))}
     />
     <br />
     <label>Hover color</label><input
       style="padding:0"
       type="color"
       bind:value={userStyle["--hover-color"]}
-      on:input={() => changeStyle(selectedTheme)}
+      on:input={() => changeStyle(get(selectedTheme))}
     />
     <br />
     <label>Primary color</label><input
       style="padding:0"
       type="color"
       bind:value={userStyle["--primary-color"]}
-      on:input={() => changeStyle(selectedTheme)}
+      on:input={() => changeStyle(get(selectedTheme))}
     />
     <br />
     <label>Secondary color</label><input
       style="padding:0"
       type="color"
       bind:value={userStyle["--secondary-color"]}
-      on:input={() => changeStyle(selectedTheme)}
+      on:input={() => changeStyle(get(selectedTheme))}
     />
   </Dialog>
 {/if}

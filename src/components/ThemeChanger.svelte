@@ -35,6 +35,7 @@
       value="dark"
       on:change={() => changeStyle("dark")}
     />
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="toggle toggle-yes">
       <div class="inside"></div>
     </label>
@@ -48,7 +49,6 @@
     margin-right: 10px;
     margin-top: -3em;
     background: var(--bg-color);
-    display: inline-block;
     padding: 1px 3px;
     border-radius: 20px;
     position: relative;

@@ -74,6 +74,7 @@
     <div class="sliderContainer">
       <span>Start time: </span>
       <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
         class="datepicklabel datepicklabelshow"
         style="display: inline-block; 
@@ -200,6 +201,9 @@
       }}>+</span
     >
 
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <span
       class="addbutton hoverbutton showContextMenu"
       on:click={(e) => {
@@ -230,6 +234,8 @@
             📍
           </div>
 
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="deleteTable hoverbutton"
             on:click={(e) => {

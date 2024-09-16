@@ -23,7 +23,7 @@
      * Disable this if you'd like to use dynamic types.
      */
     "checkJs": true,
-    "types": ["svelte"], 
+    "types": ["svelte"]
   },
   /**
    * Use global.d.ts instead of compilerOptions.types

@@ -25,11 +25,11 @@ export var contextMenu = writable({
 //THEME
 export var selectedTheme = writable("light");
 export var userStyle = writable({
-  "--bg-color": "#fff",
-  "--font-color": "#424242",
-  "--hover-color": "#eee",
-  "--primary-color": "lightblue",
-  "--secondary-color": "#888888",
+  "--bg-color": "pink",
+  "--font-color": "blue",
+  "--hover-color": "green",
+  "--primary-color": "orange",
+  "--secondary-color": "lime",
 });
 
 //STATUS DATA
