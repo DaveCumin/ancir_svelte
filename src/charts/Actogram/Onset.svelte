@@ -4,6 +4,19 @@
   import { data, graphs, activeGraphTab } from "../../store";
   import Slider from "../../utils/Slider.svelte";
   import Sliderdouble from "../../utils/Sliderdouble.svelte";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
 
   export let sourceIndex = 0;
 
@@ -33,6 +46,10 @@
         on:click={(e) => {
           e.preventDefault();
           removeOnsetData(sourceIndex, o);
+        }}
+        use:tippytip={{
+          content: "Delete onsets",
+          theme: "Ancir",
         }}
       >
         🗑️

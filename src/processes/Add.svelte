@@ -7,7 +7,7 @@
     //ADDS A SET VALUE TO DATA
     var arr = [...startVals];
     for (let i = 0; i < arr.length; i++) {
-      arr[i] = arr[i] + params.val;
+      arr[i] = Number(arr[i]) + Number(params.val);
     }
 
     return arr;

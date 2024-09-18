@@ -10,7 +10,6 @@
   import { pchisq, qchisq } from "../../utils/CDFs";
   import { mean } from "../../utils/MathsStats";
   import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
-  import "tippy.js/dist/tippy.css";
 
   function tippytip(node, params) {
     let tip = tippy(node, params);

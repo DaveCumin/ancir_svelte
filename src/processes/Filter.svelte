@@ -1,11 +1,14 @@
 <script context="module">
+  import { min, max } from "../utils/MathsStats";
+
   export { Filter, forTypes, startParams };
   const forTypes = ["value", "time"];
-  const startParams = { min: 0, max: 100 };
+  const startParams = { min: -Infinity, max: Infinity };
+
   // Define the function
   function Filter(startVals = [1, 2, 3], params = { min: 0, max: 12 }) {
-    const dataMin = Math.min(...startVals);
-    const dataMax = Math.max(...startVals);
+    const dataMin = min(startVals);
+    const dataMax = max(startVals);
 
     var arr = [...startVals];
     for (let i = 0; i < arr.length; i++) {
@@ -33,9 +36,10 @@
 
   export let paramsStart;
   export let typeTime;
+  export let dataIN;
 
-  const dataMin = 0;
-  const dataMax = 10000;
+  const dataMin = min(dataIN);
+  const dataMax = max(dataIN);
 
   export let params = { min: dataMin, max: dataMax };
   if (Object.keys(paramsStart).length > 0) {
@@ -52,27 +56,31 @@
 
 {#if typeTime.type === "value"}
   <Slider
-    min={dataMin - 1}
-    max={dataMax + 1}
+    min={dataMin}
+    max={dataMax}
+    limits={[dataMin, dataMax]}
     bind:value={params.min}
     label="Min:"
   />
   <Slider
-    min={dataMin - 1}
-    max={dataMax + 1}
+    min={dataMin}
+    max={dataMax}
+    limits={[dataMin, dataMax]}
     bind:value={params.max}
     label="Max:"
   />
 {:else if typeTime.type === "time"}
   <Slider
-    min={dataMin - 1}
-    max={dataMax + 1}
+    min={dataMin}
+    max={dataMax}
+    limits={[dataMin, dataMax]}
     bind:value={params.min}
     label="Min (hrs):"
   />
   <Slider
-    min={dataMin - 1}
-    max={dataMax + 1}
+    min={dataMin}
+    max={dataMax}
+    limits={[dataMin, dataMax]}
     bind:value={params.max}
     label="Max (hrs):"
   />

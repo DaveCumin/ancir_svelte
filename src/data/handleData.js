@@ -5,6 +5,7 @@ import {
   contextMenu,
   addedNewChartData,
 } from "../store";
+import { componentMap } from "../components/ProcessStep.svelte";
 // @ts-ignore
 import { getRandomHexColour } from "../charts/AllCharts.js";
 import { get } from "svelte/store";
@@ -35,18 +36,47 @@ export function getFieldNames(source) {
 }
 
 //get the data from graph source
-export function getDataFromSource(sourceIndex, vals) {
+export function getRawData(sourceIndex, vals) {
   const sourceData = get(graphs)[get(activeGraphTab)].sourceData[sourceIndex];
-
   const tableID = sourceData.tableID;
+  let rawData = getDataFromTable(tableID, vals.field);
+  return rawData;
+}
+export function getDataFromSource(sourceIndex, vals) {
+  //get the raw data
+  let dataFromSource = getRawData(sourceIndex, vals);
+  //now apply the processes, if any
+  for (let p = 0; p < vals.processSteps.length; p++) {
+    const processName = vals.processSteps[p].process;
+    const processFunction = componentMap[processName].func;
+    // Check if the function exists in the processMap
+    if (typeof processFunction === "function") {
+      dataFromSource = processFunction(
+        dataFromSource,
+        vals.processSteps[p].parameters
+      ); //CALL THE FUNCTION WITH PARAMS
+    } else {
+      // TODO _low: MAKE THIS AN ERROR AND HANDLE IT BETTER (unlikely to enter here, realistically)
+      console.error(`Function '${processName}' does not exist.`);
+    }
+  }
 
-  return getDataFromTable(tableID, vals.field);
+  return dataFromSource;
 }
 
 //get the type of a data field
 export function getFieldType(tableID, field) {
   const tempData =
     get(data)[get(data).findIndex((d) => d.id === tableID)].data[field];
+  return tempData.type;
+}
+
+export function getFieldTypeFromGraph(graphID, sourceID, keyIN) {
+  const theGraph = get(graphs)[get(graphs).findIndex((g) => g.id === graphID)];
+  const tempData =
+    get(data)[
+      get(data).findIndex((d) => d.id === theGraph.sourceData[sourceID].tableID)
+    ].data[theGraph.sourceData[sourceID].chartvalues[keyIN].field];
   return tempData.type;
 }
 
@@ -101,7 +131,8 @@ export function addDataToGraph(
     chartvalues[key] = {
       field: Object.keys(
         get(data)[get(data).findIndex((d) => d.id === tableID_IN)].data
-      )[cdindex], //{insert fieldnames in order},
+      )[cdindex], //{insert fieldnames in order}
+      processSteps: [],
     };
   });
 

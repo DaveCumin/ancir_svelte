@@ -1,8 +1,6 @@
 <script>
   // @ts-nocheck
 
-  import { activeGraphTab } from "./store.js";
-
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import GenerateSimulated from "./data/GenerateSimulated.svelte";
   import DataTree from "./components/DataTree.svelte";
@@ -34,7 +32,7 @@
   import { addDataToGraph } from "./data/handleData";
   import { generateData } from "./data/simulate.js";
   import { DateTime } from "luxon";
-  import { data, statusData } from "./store";
+  import { data, statusData, activeGraphTab, graphs } from "./store";
 
   onMount(async () => {
     await graphFilesLoaded;
@@ -46,6 +44,12 @@
   });
   function handleKeydown(e) {
     // only read/handle the key if the modal is not open
+    if (e.ctrlKey && e.shiftKey && e.key === "G") {
+      console.log($graphs);
+    }
+    if (e.ctrlKey && e.shiftKey && e.key === "D") {
+      console.log($data);
+    }
     if (e.ctrlKey && e.shiftKey && e.key === "S") {
       e.preventDefault();
       console.log("populate with example data and graphs");

@@ -6,7 +6,6 @@
   import { tick } from "svelte";
   import Raw_tools from "../charts/Raw/Raw_tools.svelte";
   import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
-  import "tippy.js/dist/tippy.css";
 
   function tippytip(node, params) {
     let tip = tippy(node, params);

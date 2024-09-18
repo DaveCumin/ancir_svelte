@@ -1,6 +1,6 @@
 <script context="module">
   // @ts-nocheck
-  import { data } from "../store.js";
+  import { data, graphs } from "../store.js";
   import { get } from "svelte/store";
 
   //---------------------------------------------------------------------
@@ -33,8 +33,8 @@
 
   let selectedSettings = null;
 
-  //add a process when context menu is clicked clicked
-  export function addProcess(PROCESS, ID, FIELDNAME) {
+  //add a process to data when context menu is clicked clicked
+  export function addProcessToData(PROCESS, ID, FIELDNAME) {
     // Update your data array with the result
     selectedSettings = {
       process: PROCESS,
@@ -72,7 +72,7 @@
     return dataIN;
   }
 
-  // FUNCTION THAT UPDATES THE PROCESSED DATA, AND ANY GRAPHED DATA IF THERE ARE
+  // FUNCTION THAT UPDATES THE PROCESSED DATA
   export function updateDataProcess(tableID, field) {
     // Initial values, from store
     let result =
@@ -94,10 +94,65 @@
 
       // Check if the data entry and key exist
       if (datum && datum.data[field]) {
-        // Add a new process step to the selected key
+        // Add a new process step to the selected key¸¸¸¸
         datum.data[field].data = result;
       }
       return newData;
+    });
+  }
+
+  //UPDATE PROCESS ON GRAPH
+  export function updateGraphProcess(graphID, sourceID, keyIN, psID, params) {
+    graphs.update((currentGraphs) => {
+      const newGraphs = [...currentGraphs];
+      const graph = newGraphs.find((entry) => entry.id === graphID);
+
+      // Check if the data entry and key exist
+      if (graph && graph.sourceData[sourceID].chartvalues[keyIN]) {
+        graph.sourceData[sourceID].chartvalues[keyIN].processSteps[
+          psID
+        ].parameters = params;
+      }
+      return newGraphs;
+    });
+  }
+
+  export function removeGraphProcess(graphID, sourceID, keyIN, psID) {
+    graphs.update((currentGraphs) => {
+      const newGraphs = [...currentGraphs];
+      const graph = newGraphs.find((entry) => entry.id === graphID);
+
+      // Check if the data entry and key exist
+      if (graph && graph.sourceData[sourceID].chartvalues[keyIN]) {
+        graph.sourceData[sourceID].chartvalues[keyIN].processSteps.splice(
+          psID,
+          1
+        );
+      }
+      return newGraphs;
+    });
+  }
+
+  //add a process to data when context menu is clicked clicked
+  export function addProcessToGraph(PROCESS, graphID, sourceID, keyIN) {
+    // Update your data array with the result
+    selectedSettings = {
+      process: PROCESS,
+      parameters: componentMap[PROCESS].startParams,
+    };
+
+    graphs.update((currentGraphs) => {
+      // Find the data entry with the specified ID
+      const newGraphs = [...currentGraphs];
+      const graph = newGraphs.find((entry) => entry.id === graphID);
+
+      // Check if the data entry and key exist
+      if (graph && graph.sourceData[sourceID].chartvalues[keyIN]) {
+        graph.sourceData[sourceID].chartvalues[keyIN].processSteps.push(
+          selectedSettings
+        );
+      }
+      return newGraphs;
     });
   }
 </script>

@@ -2,19 +2,60 @@
   // @ts-nocheck
 
   import Slider from "../../utils/Slider.svelte";
-  import { data, graphs, activeGraphTab, graphTabs } from "../../store";
+  import {
+    data,
+    graphs,
+    activeGraphTab,
+    graphTabs,
+    contextMenu,
+  } from "../../store";
   import InPlaceEdit from "../../utils/InPlaceEdit.svelte";
   import {
     getFieldNames,
     removeGraphData,
     createnewDataForGraph,
+    getFieldTypeFromGraph,
+    getDataFromSource,
+    getRawData,
   } from "../../data/handleData";
   import { getRandomHexColour } from "../AllCharts.js";
-
+  import {
+    addProcessToGraph,
+    removeGraphProcess,
+    updateGraphProcess,
+    componentMap,
+  } from "../../components/ProcessStep.svelte";
   import {
     defaultchartvalues,
     defaultother,
   } from "./Periodogram_defaults.svelte";
+
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
+
+  function createContext(graphID, sourceID, keyIN) {
+    const type = getFieldTypeFromGraph(graphID, sourceID, keyIN);
+    const tempLabels = Object.keys(componentMap);
+    for (let i = 0; i < tempLabels.length; i++) {
+      if (componentMap[tempLabels[i]].forTypes.includes(type)) {
+        //only add to the menu those processes appropriate for the type
+        $contextMenu.labels[i] = tempLabels[i];
+        $contextMenu.funcs[i] = () =>
+          addProcessToGraph(tempLabels[i], graphID, sourceID, keyIN);
+      }
+    }
+  }
 </script>
 
 {#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Periodogram"}
@@ -96,7 +137,11 @@
       on:click={(e) => {
         e.preventDefault();
         createnewDataForGraph(defaultchartvalues, defaultother);
-      }}>+</span
+      }}
+      use:tippytip={{
+        content: "Add data to graph",
+        theme: "Ancir",
+      }}>📊</span
     >
   </div>
   <!-- -->
@@ -115,6 +160,10 @@
               e.preventDefault();
               removeGraphData(sourceIndex);
             }}
+            use:tippytip={{
+              content: "Remove data from graph",
+              theme: "Ancir",
+            }}
           >
             🗑️
           </div>
@@ -126,14 +175,32 @@
         </div>
 
         {#each Object.keys(source.chartvalues) as key}
-          <details open class="field no-arrow">
+          <details closed class="field">
             <summary
               >{key}:
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-click-events-have-key-events -->
 
-              <span
-                ><select
+              <span>
+                <div
+                  class="deleteTable hoverbutton showContextMenu"
+                  on:click={(e) => {
+                    e.preventDefault();
+                    createContext(
+                      $graphs[$activeGraphTab].id,
+                      sourceIndex,
+                      key
+                    );
+                  }}
+                  use:tippytip={{
+                    content: "Add process to " + key,
+                    theme: "Ancir",
+                  }}
+                >
+                  🛠️
+                </div>
+
+                <select
                   class="selectField"
                   bind:value={source.chartvalues[key].field}
                 >
@@ -143,9 +210,59 @@
                         .data[fields].name}</option
                     >
                   {/each}
-                </select></span
-              >
+                </select>
+              </span>
             </summary>
+            {#each source.chartvalues[key].processSteps as ps, psID}
+              <details open class="process">
+                <summary
+                  >{ps.process}
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <div
+                    class="deleteProcess hoverbutton"
+                    on:click={(e) => {
+                      e.preventDefault();
+                      removeGraphProcess(
+                        $graphs[$activeGraphTab].id,
+                        sourceIndex,
+                        key,
+                        psID
+                      );
+                    }}
+                  >
+                    🗑️
+                  </div>
+                </summary>
+
+                <div class="processDetails">
+                  <svelte:component
+                    this={componentMap[ps.process].component}
+                    paramsStart={ps.parameters}
+                    typeTime={{
+                      type: getFieldTypeFromGraph(
+                        $graphs[$activeGraphTab].id,
+                        sourceIndex,
+                        key
+                      ),
+                    }}
+                    dataIN={getRawData(
+                      sourceIndex,
+                      $graphs[$activeGraphTab].sourceData[sourceIndex]
+                        .chartvalues[key]
+                    )}
+                    on:update={(event) =>
+                      updateGraphProcess(
+                        $graphs[$activeGraphTab].id,
+                        sourceIndex,
+                        key,
+                        psID,
+                        event.detail.params
+                      )}
+                  />
+                </div>
+              </details>
+            {/each}
           </details>
         {/each}
         <!-- EXTRAS-->

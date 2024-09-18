@@ -6,6 +6,7 @@
     data,
   } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
+  import { saveStoreData } from "../utils/SaveLoadStore.svelte";
   import { forceFormat } from "../utils/time/TimeUtils";
 
   // make a sequence of integers
@@ -111,6 +112,58 @@
     data: {}, //This is to not throw an error when the Dialog is closed
   };
   $: Nrows = theDataToEdit.datalength;
+
+  function saveData() {
+    let headers = [];
+    headers.push(
+      ...Object.keys(theDataToEdit.data).flatMap((key) => {
+        if (theDataToEdit.data[key].type === "time") {
+          return [
+            theDataToEdit.data[key].name,
+            `${theDataToEdit.data[key].name}_calculated`,
+          ];
+        } else {
+          return theDataToEdit.data[key].name;
+        }
+      })
+    );
+
+    //Make the rows of data
+    let rows = [];
+    const rowCount = theDataToEdit.data.time.data.length; // Assuming all time fields have the same length
+    // Iterate over each row
+    for (let i = 0; i < rowCount; i++) {
+      let row = [];
+      Object.keys(theDataToEdit.data).forEach((key) => {
+        if (theDataToEdit.data[key].type === "time") {
+          row.push(
+            `"${theDataToEdit.data[key].data[i]}"`, // Raw time value with quote marks
+            theDataToEdit.data[key].timeData[i] // Calculated time value
+          );
+        } else {
+          row.push(theDataToEdit.data[key].data[i]);
+        }
+      });
+      rows.push(row);
+    }
+
+    // Convert headers and rows to CSV format
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
+
+    // Create a downloadable CSV file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${theDataToEdit.displayName}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 </script>
 
 <div id="tableTabs" style="margin: 0 1em;">
@@ -177,6 +230,7 @@
         max={Nrows}
       />
       of {Nrows}
+      <div class="savedata hoverbutton" on:click={() => saveData()}>💾</div>
     </div>
 
     <table>

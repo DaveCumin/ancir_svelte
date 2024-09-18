@@ -8,8 +8,23 @@
     getFieldNames,
     removeGraphData,
     createnewDataForGraph,
+    getFieldTypeFromGraph,
+    getDataFromSource,
+    getRawData,
   } from "../../data/handleData";
-  import { data, graphs, activeGraphTab, graphTabs } from "../../store";
+  import {
+    addProcessToGraph,
+    removeGraphProcess,
+    updateGraphProcess,
+    componentMap,
+  } from "../../components/ProcessStep.svelte";
+  import {
+    data,
+    graphs,
+    activeGraphTab,
+    graphTabs,
+    contextMenu,
+  } from "../../store";
   import { formatTimeFromISO } from "../../utils/time/TimeUtils";
   import { getRandomHexColour } from "../AllCharts.js";
   import { DateTime } from "luxon";
@@ -19,6 +34,31 @@
     defaultother,
     defaultAnnotation,
   } from "./Actogram_defaults.svelte";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
+  function createContext(graphID, sourceID, keyIN) {
+    const type = getFieldTypeFromGraph(graphID, sourceID, keyIN);
+    const tempLabels = Object.keys(componentMap);
+    for (let i = 0; i < tempLabels.length; i++) {
+      if (componentMap[tempLabels[i]].forTypes.includes(type)) {
+        //only add to the menu those processes appropriate for the type
+        $contextMenu.labels[i] = tempLabels[i];
+        $contextMenu.funcs[i] = () =>
+          addProcessToGraph(tempLabels[i], graphID, sourceID, keyIN);
+      }
+    }
+  }
 
   function addOnset(sourceIndex) {
     $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
@@ -198,7 +238,11 @@
       on:click={(e) => {
         e.preventDefault();
         createnewDataForGraph(defaultchartvalues, defaultother);
-      }}>+</span
+      }}
+      use:tippytip={{
+        content: "Add data to graph",
+        theme: "Ancir",
+      }}>📊</span
     >
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -209,7 +253,11 @@
       on:click={(e) => {
         e.preventDefault();
         addAnnotation();
-      }}>o</span
+      }}
+      use:tippytip={{
+        content: "Add annotation to graph",
+        theme: "Ancir",
+      }}>✍</span
     >
   </div>
   <!-- -->
@@ -225,10 +273,14 @@
 
           <div
             class="addOnset hoverbutton"
-            style="padding: 0.2em 0.5em; margin: -0.2em 0.2em;"
+            style="padding: 0.2em 0.5em; margin: -0.2em 0.2em; float: right;"
             on:click={(e) => {
               e.preventDefault();
               addOnset(sourceIndex);
+            }}
+            use:tippytip={{
+              content: "Add onsets",
+              theme: "Ancir",
             }}
           >
             📍
@@ -242,6 +294,10 @@
               e.preventDefault();
               removeGraphData(sourceIndex);
             }}
+            use:tippytip={{
+              content: "Delete data from graph",
+              theme: "Ancir",
+            }}
           >
             🗑️
           </div>
@@ -253,14 +309,31 @@
         </div>
 
         {#each Object.keys(source.chartvalues) as key}
-          <details open class="field no-arrow">
+          <details open class="field">
             <summary
               >{key}:
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-click-events-have-key-events -->
 
               <span
-                ><select
+                ><div
+                  class="deleteTable hoverbutton showContextMenu"
+                  on:click={(e) => {
+                    e.preventDefault();
+                    createContext(
+                      $graphs[$activeGraphTab].id,
+                      sourceIndex,
+                      key
+                    );
+                  }}
+                  use:tippytip={{
+                    content: "Add process to " + key,
+                    theme: "Ancir",
+                  }}
+                >
+                  🛠️
+                </div>
+                <select
                   class="selectField"
                   bind:value={source.chartvalues[key].field}
                 >
@@ -273,6 +346,56 @@
                 </select></span
               >
             </summary>
+            {#each source.chartvalues[key].processSteps as ps, psID}
+              <details open class="process">
+                <summary
+                  >{ps.process}
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <div
+                    class="deleteProcess hoverbutton"
+                    on:click={(e) => {
+                      e.preventDefault();
+                      removeGraphProcess(
+                        $graphs[$activeGraphTab].id,
+                        sourceIndex,
+                        key,
+                        psID
+                      );
+                    }}
+                  >
+                    🗑️
+                  </div>
+                </summary>
+
+                <div class="processDetails">
+                  <svelte:component
+                    this={componentMap[ps.process].component}
+                    paramsStart={ps.parameters}
+                    typeTime={{
+                      type: getFieldTypeFromGraph(
+                        $graphs[$activeGraphTab].id,
+                        sourceIndex,
+                        key
+                      ),
+                    }}
+                    dataIN={getRawData(
+                      sourceIndex,
+                      $graphs[$activeGraphTab].sourceData[sourceIndex]
+                        .chartvalues[key]
+                    )}
+                    on:update={(event) =>
+                      updateGraphProcess(
+                        $graphs[$activeGraphTab].id,
+                        sourceIndex,
+                        key,
+                        psID,
+                        event.detail.params
+                      )}
+                  />
+                </div>
+              </details>
+            {/each}
           </details>
         {/each}
         <!-- EXTRAS-->

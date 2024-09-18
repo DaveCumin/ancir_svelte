@@ -9,14 +9,13 @@
     contextMenu,
   } from "../store";
   import {
-    addProcess,
+    addProcessToData,
     updateDataProcess,
     componentMap,
   } from "./ProcessStep.svelte";
   import { getFieldType } from "../data/handleData";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
   import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
-  import "tippy.js/dist/tippy.css";
 
   function tippytip(node, params) {
     let tip = tippy(node, params);
@@ -102,7 +101,8 @@
       if (componentMap[tempLabels[i]].forTypes.includes(type)) {
         //only add to the menu those processes appropriate for the type
         $contextMenu.labels[i] = tempLabels[i];
-        $contextMenu.funcs[i] = () => addProcess(tempLabels[i], id, fieldName);
+        $contextMenu.funcs[i] = () =>
+          addProcessToData(tempLabels[i], id, fieldName);
       }
     }
   }
@@ -165,7 +165,7 @@
                   use:tippytip={{
                     content: "Add process to " + datum.data[key].name,
                     theme: "Ancir",
-                  }}>+</span
+                  }}>🛠️</span
                 >
               {/if}
             </summary>
@@ -202,8 +202,8 @@
                       paramsStart={ps.parameters}
                       typeTime={{
                         type: $data[datumID].data[key].type,
-                        tocheck: { tableID: datum.id, key: key },
                       }}
+                      dataIN={$data[datumID].data[key].data}
                       on:update={(event) =>
                         updateProcess(datum.id, key, psID, event.detail.params)}
                     />
