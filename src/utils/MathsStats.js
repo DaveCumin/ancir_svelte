@@ -35,21 +35,27 @@ export function mean(data) {
 export function max(data) {
   let maxVal = Number.NEGATIVE_INFINITY;
   for (let i = 0; i < data.length; i++) {
-    let val = parseFloat(data[i]) || 0; // Ensure to handle falsy values correctly
+    let val = safeParse(data[i]); // Ensure to handle falsy values correctly
     if (val > maxVal) {
       maxVal = val;
     }
   }
-  return maxVal;
+  return maxVal > Number.NEGATIVE_INFINITY ? maxVal : NaN;
 }
 
 export function min(data) {
   let minVal = Number.POSITIVE_INFINITY;
   for (let i = 0; i < data.length; i++) {
-    let val = parseFloat(data[i]) || 0; // Ensure to handle falsy values correctly
+    let val = safeParse(data[i]); // Ensure to handle falsy values correctly
     if (val < minVal) {
       minVal = val;
     }
   }
-  return minVal;
+  return minVal < Number.POSITIVE_INFINITY ? minVal : NaN;
+}
+
+//Safely parse a string into a number, with a fallback/default
+function safeParse(data, DEFAULT = NaN) {
+  const parsed = parseFloat(data);
+  return parsed === undefined || Number.isNaN(parsed) ? DEFAULT : parsed;
 }

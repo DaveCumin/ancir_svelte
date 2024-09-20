@@ -49,7 +49,7 @@ async function loadGraphFiles() {
         prototypechartvalues: defaults.defaultchartvalues || {},
         prototypeother: defaults.defaultother || {},
         chartData: defaults.defaultChartData || {},
-        extras: {},
+        extras: [],
       };
     }
   }

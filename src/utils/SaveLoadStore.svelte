@@ -66,18 +66,17 @@
   }
 
   function loadTheData(jsonString) {
-    console.log("TODO: load script not working ");
-
     const loadedObject = JSON.parse(jsonString);
-
+    console.log(JSON.stringify(loadedObject, null, 2));
     const modifiedObject = {};
 
     for (const key in loadedObject) {
       if (loadedObject.hasOwnProperty(key)) {
-        const modifiedKey = key.substring(1); // Remove the first letter
-        modifiedObject[modifiedKey] = loadedObject[key];
-
-        eval(`${modifiedKey}.update((current) => {return loadedObject[key]});`);
+        const modifiedKey = key.substring(1); // Remove the first letter (underscore)
+        modifiedObject[modifiedKey] = loadedObject[key]; //Load the data in
+        console.log(key);
+        console.log(loadedObject[key]);
+        eval(`${modifiedKey}.set(structuredClone(loadedObject[key]));`);
       }
     }
   }
@@ -91,7 +90,6 @@
       reader.onload = function (e) {
         const jsonString = e.target.result;
         const resultObject = loadTheData(jsonString);
-        console.log(resultObject);
       };
 
       reader.readAsText(file);

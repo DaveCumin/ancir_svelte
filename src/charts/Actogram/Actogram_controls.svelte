@@ -4,6 +4,8 @@
   import Slider from "../../utils/Slider.svelte";
   import InPlaceEdit from "../../utils/InPlaceEdit.svelte";
   import Onset from "./Onset.svelte";
+  import DateTimeSelect from "../../utils/time/DateTimeSelect.svelte";
+  import { getISODate } from "../../utils/time/TimeUtils.js";
   import {
     getFieldNames,
     removeGraphData,
@@ -80,32 +82,22 @@
   }
 
   function addAnnotation() {
-    const anLen = $graphs[$activeGraphTab].chartData?.annotations.length;
-    console.log(anLen);
-    $graphs[$activeGraphTab].chartData.annotations[anLen] = defaultAnnotation;
-
+    //if the first then create it
+    if (!$graphs[$activeGraphTab].extras?.annotations) {
+      $graphs[$activeGraphTab].extras.annotations = [];
+    }
+    const anLen = $graphs[$activeGraphTab]?.extras.annotations.length;
+    $graphs[$activeGraphTab].extras.annotations[anLen] =
+      structuredClone(defaultAnnotation); //Make a new copy!!
+    $graphs[$activeGraphTab].extras.annotations[anLen].id = anLen + 1; //set ID
+    $graphs[$activeGraphTab].extras.annotations[anLen].startTime =
+      $graphs[$activeGraphTab].params.startTime;
     console.log($graphs[$activeGraphTab].chartData);
   }
-  function removeAnnotation(idx) {}
-
-  let datePickVisible = true;
-
-  //TODO_med: something not quite right with the datepicker. Also, it doesn't update the graph when changed.
-  function toggleOpenDatePick() {
-    datePickVisible = !datePickVisible;
-
-    const datePickLabel = document.querySelector(".datepicklabel");
-    const dateInput = document.querySelector(".dateInput");
-
-    if (datePickVisible) {
-      datePickLabel.style.display = "inline-block";
-      dateInput.style.width = "0px";
-      dateInput.style.height = "0px";
-    } else {
-      datePickLabel.style.display = "none";
-      dateInput.style.width = "60%";
-      dateInput.style.height = "100%";
-    }
+  function removeAnnotation(idx) {
+    $graphs[$activeGraphTab].extras.annotations = $graphs[
+      $activeGraphTab
+    ].extras.annotations.splice(idx, 1);
   }
 </script>
 
@@ -115,37 +107,13 @@
       <span>Start time: </span>
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div
-        class="datepicklabel datepicklabelshow"
-        style="display: inline-block; 
-      margin-right: 2px; 
-      margin-left: auto;
-      text-align: center;"
-        on:click={(e) => {
-          toggleOpenDatePick();
-        }}
-      >
-        {formatTimeFromISO($graphs[$activeGraphTab].params.startTime)}
+      <!-- TODO_HIGH: Fix this datetimepick and the starttime issues! -->
+      <div style="margin-left: auto;">
+        <DateTimeSelect
+          label=""
+          bind:thedatetime={$graphs[$activeGraphTab].params.startTime}
+        />
       </div>
-      <input
-        class="dateInput"
-        style="
-      width: 0px;
-      height: 0px;"
-        type="datetime-local"
-        id="startTime"
-        name="startTime"
-        bind:value={$graphs[$activeGraphTab].params.startTime}
-        on:change={(e) => {
-          console.log("value = " + e.target.value);
-          console.log("pre st = " + $graphs[$activeGraphTab].params.startTime);
-        }}
-        on:keydown={(e) => {
-          if (e.key === "Enter") {
-            toggleOpenDatePick();
-          }
-        }}
-      />
     </div>
 
     <div class="sliderContainer">
@@ -249,7 +217,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <span
-      class="addbutton hoverbutton showContextMenu"
+      class="addbutton hoverbutton"
       on:click={(e) => {
         e.preventDefault();
         addAnnotation();
@@ -430,18 +398,35 @@
       </details>
       <!-- The end of the data-->
     {/each}
-    <!-- ANNOTATIONS-->
-    {#each $graphs[$activeGraphTab].chartData?.annotations as an, ai}
-      <details open class="dataTable">
-        <summary><InPlaceEdit bind:value={an.name} /> </summary>
-        <div>
+    <!-- ANNOTATIONS  -->
+    {#each $graphs[$activeGraphTab]?.extras?.annotations ?? [] as an, ai (an.id)}
+      <details open class="dataTable" id={ai}>
+        <summary
+          ><InPlaceEdit bind:value={an.name} />
+          <div
+            class="deleteTable hoverbutton"
+            on:click={(e) => {
+              e.preventDefault();
+              removeAnnotation(ai);
+            }}
+            use:tippytip={{
+              content: "Delete annotation " + an.name,
+              theme: "Ancir",
+            }}
+          >
+            🗑️
+          </div>
+        </summary>
+        <div
+          class="sliderContainer"
+          style="
+        margin-left: 2em;
+    "
+        >
           <span>Start: </span>
-          <input
-            class="dateInput"
-            type="datetime-local"
-            bind:value={$graphs[$activeGraphTab].chartData.annotations[ai]
-              .startTime}
-          />
+          <div style="margin-left: auto;">
+            <DateTimeSelect label="" bind:thedatetime={an.startTime} />
+          </div>
         </div>
         <div
           class="sliderContainer"
@@ -455,8 +440,7 @@
             step={0.1}
             limits={[0, Infinity]}
             label="Length (hrs):"
-            bind:value={$graphs[$activeGraphTab].chartData.annotations[ai]
-              .lengthHrs}
+            bind:value={an.lengthHrs}
           />
         </div>
 
@@ -466,8 +450,7 @@
             id={ai}
             type="color"
             style="background: {an.col.hex}"
-            bind:value={$graphs[$activeGraphTab].chartData.annotations[ai].col
-              .hex}
+            bind:value={an.col.hex}
           />
           <div class="sliderContainer">
             <Slider
@@ -476,8 +459,7 @@
               step="0.01"
               limits={[0, 1]}
               label="Alpha: "
-              bind:value={$graphs[$activeGraphTab].chartData.annotations[ai].col
-                .alpha}
+              bind:value={an.col.alpha}
             />
           </div>
         </div>
@@ -485,21 +467,3 @@
     {/each}
   </div>
 {/if}
-
-<style>
-  .datepicklabelshow {
-    display: inline-block;
-  }
-  .datepicklabel {
-    display: none;
-    cursor: pointer;
-  }
-
-  .dateInput:hover {
-    background: #eee;
-  }
-
-  ::-webkit-calendar-picker-indicator:hover {
-    cursor: pointer;
-  }
-</style>

@@ -8,6 +8,7 @@
     forceFormat,
     getPeriod,
   } from "../utils/time/TimeUtils";
+  import { awdTocsv } from "./awdConvert";
   import Papa from "papaparse";
 
   const specialValues = ["NaN", "NA", "null"];
@@ -111,10 +112,26 @@
         complete: function (results, file) {
           console.log("Parsing complete:", results, file);
           console.log(results);
+
+          //Deal with awd data
+          if (file.name.toLowerCase().endsWith(".awd")) {
+            console.log("doAWDstuffhere");
+            results.errors = [];
+            //get more data to preview before continuing
+            if (previewIN == skipLines + previewTableNrows + useHeaders) {
+              parseFile(14);
+            } else {
+              console.log("make data here");
+              results.data = awdTocsv(results.data);
+            }
+          }
+          console.log("RESULTS", results);
+          //for non awd files, continue
           if (results.errors.length > 0) {
             errorInfile = true;
           }
           dealWithData(results.data);
+
           resolve(); // Resolve the Promise when parsing is complete
         },
       });
@@ -206,9 +223,6 @@
   // put the data into the tool store
   //TODO_med: check the logic here, as the Sampling freq isn't updating properly for times.
   function doBasicFileImport(result, fname) {
-    console.log(result);
-    console.log(fname);
-
     //set up the high-level structure
     let dataOUT = {
       id: getID(),
@@ -307,7 +321,7 @@
     <input
       type="file"
       id="fileInput"
-      accept=".csv, .txt, .TXT"
+      accept=".csv, .txt, .TXT, .awd"
       style="display:none;"
       bind:files={filesToImport}
     />

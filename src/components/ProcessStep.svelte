@@ -73,6 +73,7 @@
   }
 
   // FUNCTION THAT UPDATES THE PROCESSED DATA
+  //TODO_MED: change this to be an edit of generated columns.
   export function updateDataProcess(tableID, field) {
     // Initial values, from store
     let result =
@@ -81,8 +82,8 @@
 
     // Iterate through the JSON array and execute the processes
     let processes = get(data).find((entry) => entry.id === tableID).data[field]
-      .processSteps;
-    if (processes.length > 0) {
+      ?.processSteps;
+    if (processes?.length > 0) {
       result = processData(processes, result);
     }
 

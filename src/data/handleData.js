@@ -9,7 +9,7 @@ import { componentMap } from "../components/ProcessStep.svelte";
 // @ts-ignore
 import { getRandomHexColour } from "../charts/AllCharts.js";
 import { get } from "svelte/store";
-import { max } from "../utils/MathsStats";
+import { min, max } from "../utils/MathsStats";
 
 //Get data from the data structure
 export function getDataFromTable(tableID, key) {
@@ -175,24 +175,26 @@ export function deepCopy(obj) {
 //Bin the data into binSize bins
 // xs and ys are the time and values for an actogram
 // binSize is the size of each bin, usually in Hrs
-export function averageBinnedValues(xs, ys, binSize) {
-  const Nbins =
-    Math.ceil((max(xs.filter((x) => (x ? x : 0))) + binSize) / binSize) || 1;
+export function averageBinnedValues(xs, ys, binSize, startAt = 0) {
+  const minx = Number(startAt) + 1 ? startAt : min(xs);
+  const maxx = max(xs);
+  const Nbins = Math.ceil((maxx - minx) / binSize) || 1;
 
   const xout = new Array(Nbins);
   const yout = new Array(Nbins);
   const counts = new Array(Nbins);
 
   for (let b = 0; b < Nbins; b++) {
-    xout[b] = b * binSize + binSize / 2; // put in the mid-values for time
+    xout[b] = minx + (b * binSize + binSize / 2);
     yout[b] = 0;
     counts[b] = 0;
   }
 
   //put values in bins
   for (let i = 0; i < xs.length; i++) {
-    const binIndex = Math.floor(xs[i] / binSize);
-    if (ys[i]) {
+    const binIndex = Math.floor((xs[i] - minx) / binSize);
+    if (Number(ys[i]) + 1 && Number(xs[i]) + 1) {
+      //check that both x and y are numbers
       yout[binIndex] += ys[i];
       counts[binIndex]++;
     }
@@ -201,6 +203,7 @@ export function averageBinnedValues(xs, ys, binSize) {
   //get the average of the values
   const averageY = yout.map((sum, index) => {
     return counts[index] > 0 ? sum / counts[index] : 0;
+    //TODO_HIGH: need to change the above to return NaN, not 0, and then have the actogram (and others) deal with that!!
   });
 
   return { time: xout, values: averageY };

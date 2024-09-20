@@ -163,9 +163,9 @@
                     createContext(datum.id, key);
                   }}
                   use:tippytip={{
-                    content: "Add process to " + datum.data[key].name,
+                    content: "Edit the created column, " + datum.data[key].name,
                     theme: "Ancir",
-                  }}>🛠️</span
+                  }}>✏️</span
                 >
               {/if}
             </summary>

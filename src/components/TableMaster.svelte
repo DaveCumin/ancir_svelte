@@ -7,13 +7,14 @@
     forceFormat,
     getPeriod,
   } from "../utils/time/TimeUtils.js";
-  import { updateDataProcess } from "../components/ProcessStep.svelte";
 
   $: showTableDetails = $activeTableTab >= 0 ? true : false;
+
   $: currentTableData =
     $data[$data.findIndex((d) => d.id === $dataIDsforTables[$activeTableTab])];
 
   function updateTimeFormat(k) {
+    console.log($data);
     console.log(currentTableData);
     //Update the timeData
     $data[
@@ -29,7 +30,6 @@
       currentTableData.data[k].data,
       currentTableData.data[k].timeFormat
     );
-    updateDataProcess($dataIDsforTables[$activeTableTab], k);
   }
 
   function guessFormat(k) {
@@ -75,6 +75,8 @@
                     type="text"
                     bind:value={currentTableData.data[k].timeFormat}
                     on:change={(e) => {
+                      console.log(currentTableData);
+                      console.log($data);
                       updateTimeFormat(k);
                     }}
                   />

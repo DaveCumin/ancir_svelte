@@ -4,10 +4,7 @@
 
   //default values for creating a new plot
   export const defaultParams = {
-    startTime: DateTime.now()
-      .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-      .toISO()
-      .slice(0, 16),
+    startTime: "",
     periodHrs: 24,
     binSizeHrs: 0.25,
     width: 800,
@@ -29,15 +26,17 @@
     data: [{ time: [], values: [], day: [], scaleLimits: [] }],
     startOffsets: [],
     onsets: [],
-    annotations: [],
   };
 
   export const defaultAnnotation = {
+    id: -1,
     name: "annotation",
-    startTime: DateTime.now()
-      .set({ hour: 12, minute: 30, second: 0, millisecond: 0 })
-      .toISO()
-      .slice(0, 16),
+    startTime: DateTime.fromISO(
+      DateTime.now()
+        .set({ hour: 12, minute: 30, second: 0, millisecond: 0 })
+        .toISO()
+        .slice(0, 16)
+    ),
     lengthHrs: 1,
     col: { hex: getRandomHexColour(), alpha: 0.5 },
   };

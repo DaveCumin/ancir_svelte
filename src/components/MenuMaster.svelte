@@ -38,7 +38,7 @@
     return thecharts;
   }
 
-  $: menuItems = makeMenu($activeGraphTab);
+  let menuItems = makeMenu($activeGraphTab);
 
   function makeMenu(tab) {
     return [
@@ -124,10 +124,10 @@
         ) {
         } else {
           hideAllMenus();
+          menuItems = makeMenu($activeGraphTab);
         }
       } catch (error) {
         hideAllMenus();
-        //console.log(error)
       }
     };
 

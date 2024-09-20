@@ -1,7 +1,7 @@
 <script>
   // @ts-nocheck
-
   import { data, graphs, activeGraphTab, statusData } from "../../store";
+  import { DateTime } from "luxon";
   import { scaleLinear } from "d3-scale";
   import Axis from "../Axis.svelte";
   import {
@@ -9,6 +9,7 @@
     getISODate,
     addTime,
     calculateTimeDifference,
+    formatDate,
   } from "../../utils/time/TimeUtils";
   import { createSequenceArray, min, max } from "../../utils/MathsStats";
   import {
@@ -93,9 +94,13 @@
 
   function makePlotData(sourceData, binSizeHrs, periodHrs, startTime) {
     if ($graphs[$activeGraphTab]?.graph === "Actogram") {
+      //start with the default data
+      let chartData = defaultChartData;
+
       let xVals, yVals;
 
-      let chartData = defaultChartData;
+      //update the offsets
+      chartData.startOffsets = updateOffsets(startTime, $activeGraphTab);
 
       //for each source data
       sourceData.forEach((plotData, sourceIndex) => {
@@ -109,13 +114,31 @@
           yVals = getDataFromSource(sourceIndex, plotData.chartvalues.values);
         }
 
+        //Remove NaNs from all
+        //find where there are NaNs
+        let nans = [];
+        for (let i = 0; i < xVals.length; i++) {
+          if (isNaN(xVals[i]) || isNaN(yVals[i])) {
+            nans.push(i);
+          }
+        }
+        //remove the NaNs
+        xVals = xVals.filter((_, i) => !nans.includes(i));
+        yVals = yVals.filter((_, i) => !nans.includes(i));
+
+        //Add the offset
+        xVals = xVals.map(
+          (x) => Number(x) + Number(chartData.startOffsets[sourceIndex])
+        );
+
         //do the binning
+        console.log("xVals", xVals);
+        console.log("max xVals", max(xVals));
+        console.log("offset:", chartData.startOffsets[sourceIndex]);
+
         const binnedData = averageBinnedValues(xVals, yVals, binSizeHrs);
-
-        //update the offsets
-        chartData.startOffsets = updateOffsets(startTime, $activeGraphTab);
-
-        //set up the plot data
+        console.log("binnedData", binnedData);
+        //set up the plot data for any new sources
         if (sourceIndex > 0) {
           chartData.data[sourceIndex] = {
             time: [],
@@ -124,11 +147,13 @@
             scaleLimits: [],
           };
         }
+        //populate with the binned data
         chartData.data[sourceIndex].time = binnedData.time;
         chartData.data[sourceIndex].values = binnedData.values;
 
         //create the days and set up the limits (per day) - done here to avoid another loop in the plotting
         let sameday = Math.floor(binnedData.time[0] / periodHrs);
+
         for (let i = 0; i < binnedData.time.length; i++) {
           const currentDay = Math.floor(binnedData.time[i] / periodHrs);
 
@@ -137,11 +162,13 @@
           if (currentDay === sameday) {
             const value = binnedData.values[i];
 
+            //If there are no scale limited then start with the current value
             if (!chartData.data[sourceIndex].scaleLimits[currentDay]) {
               chartData.data[sourceIndex].scaleLimits[currentDay] = {
                 min: value,
                 max: value,
               };
+              //Otherwise, update the min and max values
             } else {
               chartData.data[sourceIndex].scaleLimits[currentDay].min =
                 Math.min(
@@ -176,12 +203,11 @@
 
   function updateOffsets(startTime, activeGraphT) {
     let startOffsets = [];
-    //TODO _high: Change the start time when new data is added; to be the 00:00 of the first day of the data
     if (
       $graphs[activeGraphT].graph === "Actogram" &&
       $graphs[activeGraphT].sourceData.length > 0
     ) {
-      //set the up to start with
+      //set up zeros to start with
       startOffsets = Array.from(
         { length: $graphs[activeGraphT].sourceData.length },
         () => 0
@@ -202,32 +228,40 @@
         if ($data[theDataIndex].data[plotTimeField].type == "time") {
           const tempDate = $data[theDataIndex].data[plotTimeField].data[0];
 
+          console.log("tempDate", tempDate);
+          console.log(
+            getISODate(
+              tempDate,
+              $data[theDataIndex].data[plotTimeField].timeFormat
+            )
+          );
+
+          //initialise the start time if not yet set
+          if (startTime === "") {
+            startTime = DateTime.fromISO(
+              getISODate(
+                tempDate,
+                $data[theDataIndex].data[plotTimeField].timeFormat
+              )
+            )
+              .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+              .toISO()
+              .slice(0, 16);
+            $graphs[$activeGraphTab].params.startTime =
+              DateTime.fromISO(startTime); // make sure it's always a DateTime object
+          }
+
           startOffsets[sinx] = getstartTimeOffset(
             startTime,
             tempDate,
             $data[theDataIndex].data[plotTimeField].timeFormat
           );
-
-          //do a check that it's not more than periodHrs*binSize away
-          const max =
-            $graphs[$activeGraphTab].params.periodHrs *
-            $graphs[$activeGraphTab].params.doublePlot;
-
-          //Check that the offset time isn't more than the graph width, otherwise force a reset.
-          if (startOffsets[sinx] >= max) {
-            startOffsets[sinx] = 0;
-            $graphs[$activeGraphTab].params.startTime = getISODate(
-              tempDate,
-              $data[theDataIndex].data[plotTimeField].timeFormat
-            );
-          }
         }
       }
     } else {
-      //set the up to start with
+      //set the up empty startOffsets
       startOffsets = Array.from({ length: 1 }, () => 0);
     }
-
     $graphs[$activeGraphTab].chartData.startOffsets = startOffsets;
 
     return startOffsets;
@@ -237,6 +271,7 @@
   //----------------------------------------------------------------------------------------------------
 
   //make the paths
+  //TODO_med: This works when the startTime is midnight, but there is a bug when the time is anything else - the whole chart shifts, rather than the data flowing.
   $: actPaths = createActipathArray(
     $graphs[$activeGraphTab]?.chartData,
     $graphs[$activeGraphTab]?.params.dayHeight,
@@ -267,7 +302,7 @@
 
       const halfbarwidthScaled = xScale(binSize / 2);
 
-      //the paths will be an array of arrays, length [sources][days]
+      //the paths (and yScales) will be an array of arrays, length [sources][days]
       actPaths = [];
       yScales = []; //needed for the Axis on each day
 
@@ -350,7 +385,7 @@
             i++
           ) {
             const x = chartData.data[srcIndex].time[i] - d * periodHrs;
-            const y = chartData.data[srcIndex].values[i];
+            const y = chartData.data[srcIndex].values[i] || 0; //Take care of NaN values TODO_MED: make a discontinuity, like https://observablehq.com/@d3/line-chart-missing-data
 
             const yout = yScale(y) + ydayoffset;
 
@@ -493,12 +528,7 @@
             $graphs[$activeGraphTab]?.params.periodHrs * index -
             (linearFitb4MAD.intercept + linearFitb4MAD.slope * index)
         );
-        console.log(
-          bestMatchTime.map(
-            (value, index) =>
-              value - $graphs[$activeGraphTab]?.params.periodHrs * index
-          )
-        );
+
         const medianBMT = calculateMedian(bestMatchHrs);
         const madBMT = calculateMAD(
           bestMatchHrs,
@@ -864,22 +894,24 @@
         {/if}
       {/each}
 
-      <!-- ANNOTATIONS-->
-      {#each $graphs[$activeGraphTab].chartData?.annotations as an, ai}
+      <!-- ANNOTATIONS -->
+      {#each $graphs[$activeGraphTab].extras?.annotations ?? [] as an, ai}
         <rect
           x={xScale(
-            calculateTimeDifference(
-              $graphs[$activeGraphTab].params.startTime,
-              an.startTime,
-              "yyyy-LL-dd'T'T"
-            ) % $graphs[$activeGraphTab].params.periodHrs
+            DateTime.fromISO(an.startTime)
+              .diff(
+                DateTime.fromISO($graphs[$activeGraphTab].params.startTime),
+                "hours"
+              )
+              .hours.toFixed(4) % $graphs[$activeGraphTab].params.periodHrs
           )}
           y={Math.floor(
-            calculateTimeDifference(
-              $graphs[$activeGraphTab].params.startTime,
-              an.startTime,
-              "yyyy-LL-dd'T'T"
-            ) / $graphs[$activeGraphTab].params.periodHrs
+            DateTime.fromISO(an.startTime)
+              .diff(
+                DateTime.fromISO($graphs[$activeGraphTab].params.startTime),
+                "hours"
+              )
+              .hours.toFixed(4) / $graphs[$activeGraphTab].params.periodHrs
           ) *
             (dayHeight + betweenHeight)}
           height={dayHeight}

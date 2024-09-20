@@ -4,6 +4,13 @@ import { guessFormat } from "./guessTimeFormat";
 import { min, max } from "../MathsStats";
 const decimalPlaces = 4;
 
+export function formatDate(dateIN) {
+  dateIN = DateTime.fromISO(dateIN);
+
+  const formattedDate = dateIN.toLocaleString(DateTime.DATETIME_MED);
+  return formattedDate;
+}
+
 function convertFormat(formatIN) {
   //moment format string to luxon format string (https://moment.github.io/luxon/#/parsing?id=table-of-tokens)
   const map = {
