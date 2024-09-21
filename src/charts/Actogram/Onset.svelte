@@ -41,6 +41,9 @@
         <option value="offset">Offset</option>
         <!-- <option value="acrophase">Acrophase</option>-->
       </select>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="deleteTable hoverbutton"
         on:click={(e) => {
@@ -55,11 +58,14 @@
         🗑️
       </div>
       <br />
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>show:</label><input
         type="checkbox"
         bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
           .showOnsets}
       />
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <span
         style="cursor:text"
         on:click={(e) => {
@@ -109,6 +115,7 @@
         </div>
       </div>
       <div>
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label>Show Line</label><input
           type="checkbox"
           bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
@@ -116,6 +123,10 @@
           ].showLine}
         />
         <br />
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <span
           style="cursor:text"
           on:click={(e) => {
@@ -124,7 +135,11 @@
           >R-squared: {$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
             o
           ].lmFit.rSquared.toFixed(2)}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
         </span>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span
           style="cursor:text"
           on:click={(e) => {
@@ -137,6 +152,7 @@
       </div>
       <details>
         <summary>
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label>Advanced</label>
         </summary>
         <div style="padding:5px">

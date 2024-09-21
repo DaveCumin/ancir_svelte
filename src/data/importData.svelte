@@ -346,12 +346,14 @@
     {#if errorInfile}
       <p>{filesToImport[0].name}</p>
       <button on:click={openFileChoose}>Change file</button>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>Header:</label><input
         type="checkbox"
         label="headers"
         bind:checked={useHeaders}
         on:change={() => parseFile(skipLines + previewTableNrows + useHeaders)}
       />
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>Skip lines:</label><input
         type="number"
         bind:value={skipLines}
@@ -363,12 +365,14 @@
     {:else if Object.keys(tempData).length}
       <p>{filesToImport[0].name}</p>
       <button on:click={openFileChoose}>Change file</button>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>Header:</label><input
         type="checkbox"
         label="headers"
         bind:checked={useHeaders}
         on:change={() => parseFile(skipLines + previewTableNrows + useHeaders)}
       />
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>Skip lines:</label><input
         type="number"
         bind:value={skipLines}

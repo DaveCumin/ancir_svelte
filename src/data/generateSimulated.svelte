@@ -82,13 +82,24 @@
     </div>
     <hr />
     <h2>Data:</h2>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <span class="addSimDataButton" on:click={() => addSimData()}>
       ➕ <!-- Plus sign symbol -->
     </span>
     {#each Array.from({ length: N_simulated }) as _, i}
       <div class="datum">
         <div class="dataTitle">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div>value{i}:</div>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div class="removeData hoverbutton" on:click={() => removeSimData(i)}>
             🗑️ <!-- Trash bin symbol -->
           </div>
@@ -147,7 +158,6 @@
     margin: 0 0px 10px 0px;
   }
   .removeData {
-    display: inline-block;
     float: right;
     cursor: pointer;
     margin-top: -1.3em;

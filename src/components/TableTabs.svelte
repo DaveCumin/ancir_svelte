@@ -230,6 +230,8 @@
         max={Nrows}
       />
       of {Nrows}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="savedata hoverbutton" on:click={() => saveData()}>💾</div>
     </div>
 
@@ -354,23 +356,9 @@
     margin-left: 5px;
   }
 
-  th,
   td {
     border: 1px solid var(--hover-color);
     text-align: left;
     padding: 8px;
-  }
-
-  thead th {
-    background-color: var(--hover-color);
-  }
-
-  .showmorebutton {
-    display: flex;
-    padding: 0px 10px 5px;
-    margin: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    background-color: var(--bg-color);
   }
 </style>

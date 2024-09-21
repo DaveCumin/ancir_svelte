@@ -17,6 +17,7 @@
       value="light"
       on:change={() => changeStyle("light")}
     />
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="toggle toggle-yes">
       <div class="inside"></div>
     </label>
@@ -26,6 +27,7 @@
       value="user"
       on:change={() => changeStyle("user")}
     />
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="toggle toggle-yes">
       <div class="inside"></div>
     </label>

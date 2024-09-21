@@ -37,5 +37,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-label-has-associated-control -->
 <label>From:</label><input bind:value={params.from} />
+<!-- svelte-ignore a11y-label-has-associated-control -->
 <label>To:</label><input bind:value={params.to} />

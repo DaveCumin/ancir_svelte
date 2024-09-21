@@ -12,6 +12,7 @@
   function showpicker() {
     picker.showPicker();
   }
+
   function handleInput(event) {
     // Update thedatetime
     thedatetime = DateTime.fromISO(event.target.value);
@@ -19,7 +20,10 @@
 </script>
 
 <div class="datetimeselect">
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label>{label}</label>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <span on:click={showpicker}>{formatDate(thedatetime)}</span>
   <input
     bind:this={picker}
@@ -28,6 +32,8 @@
     bind:value={thedatetime}
     on:input={handleInput}
   />
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <span class="icon" on:click={showpicker}>🗓️</span>
 </div>
 
