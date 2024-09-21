@@ -804,7 +804,7 @@
   >
     <g transform={`translate(${margin.left},${margin.top})`}>
       {#if actPaths.length > 0}
-        {#each actPaths as src, srcIndex}
+        {#each $graphs[$activeGraphTab].sourceData as src, srcIndex}
           {#if $graphs[$activeGraphTab].sourceData[srcIndex].show}
             {#each createSequenceArray(0, actPaths[srcIndex].length - 1) as d}
               <path
