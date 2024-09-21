@@ -19,6 +19,7 @@
 
   export const defaultother = {
     col: { hex: getRandomHexColour(), alpha: 0.5 },
+    show: true,
     onsets: [],
   };
 

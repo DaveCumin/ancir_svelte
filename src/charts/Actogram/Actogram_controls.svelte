@@ -213,6 +213,9 @@
       }}>📊</span
     >
 
+    <!-- Add some space between the buttons-->
+    <span style="margin: 2px 5px;" class="addbutton hoverbutton"></span>
+
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -367,6 +370,7 @@
           </details>
         {/each}
         <!-- EXTRAS-->
+
         <!-- COLOUR-->
         <div class="colour">
           <input
@@ -389,6 +393,15 @@
                 .alpha}
             />
           </div>
+        </div>
+        <!-- SHOW -->
+        <div style="margin-left:2em;">
+          <!-- svelte-ignore a11y-missing-attribute -->
+          <a style="align-self: center;">Show data: </a>
+          <input
+            type="checkbox"
+            bind:checked={$graphs[$activeGraphTab].sourceData[sourceIndex].show}
+          />
         </div>
 
         <!-- ONSETS-->

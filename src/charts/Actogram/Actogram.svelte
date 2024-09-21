@@ -805,29 +805,34 @@
     <g transform={`translate(${margin.left},${margin.top})`}>
       {#if actPaths.length > 0}
         {#each actPaths as src, srcIndex}
-          {#each createSequenceArray(0, actPaths[srcIndex].length - 1) as d}
-            <path
-              d={actPaths[srcIndex][d]}
-              fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
-              fill-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
-                .alpha}
-            />
-            {#if $graphs[$activeGraphTab].params.showAxes}
-              <Axis
-                {innerHeight}
-                yoffset={d * (dayHeight + betweenHeight)}
-                xoffset={15 * srcIndex}
-                width={width - margin.left - margin.right - 15}
-                scale={yScales[srcIndex][d]}
-                position={srcIndex === 0 ? "left" : "right"}
-                nticks={dayHeight / 30 + 1}
-                colour={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+          {#if $graphs[$activeGraphTab].sourceData[srcIndex].show}
+            {#each createSequenceArray(0, actPaths[srcIndex].length - 1) as d}
+              <path
+                d={actPaths[srcIndex][d]}
+                fill={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+                fill-opacity={$graphs[$activeGraphTab].sourceData[srcIndex].col
+                  .alpha}
               />
-            {/if}
-          {/each}
+
+              {#if $graphs[$activeGraphTab].params.showAxes}
+                <Axis
+                  {innerHeight}
+                  yoffset={d * (dayHeight + betweenHeight)}
+                  xoffset={15 * srcIndex}
+                  width={width - margin.left - margin.right - 15}
+                  scale={yScales[srcIndex][d]}
+                  position={srcIndex === 0 ? "left" : "right"}
+                  nticks={dayHeight / 30 + 1}
+                  colour={$graphs[$activeGraphTab].sourceData[srcIndex].col.hex}
+                />
+              {/if}
+            {/each}
+          {/if}
         {/each}
       {:else}
-        <text x="50%" y="50%" text-anchor="middle" fill="red"> </text>
+        <text x="50%" y="50%" text-anchor="middle" fill="red"
+          >Error: no data.
+        </text>
       {/if}
 
       <!-- axis stuff-->

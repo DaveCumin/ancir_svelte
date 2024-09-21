@@ -37,6 +37,12 @@
   onMount(async () => {
     await graphFilesLoaded;
     window.addEventListener("keydown", handleKeydown);
+
+    window.onerror = function (msg, url, line) {
+      console.log("THERE WAS AN ERROR. NEED TO HANDLE THIS BETTER. TODO_low");
+      return true;
+    };
+
     return () => {
       // Cleanup event listener when the component is destroyed
       window.removeEventListener("keydown", handleKeydown);
@@ -83,6 +89,7 @@
         { time: "time", values: "values" },
         {
           col: { hex: getRandomHexColour(), alpha: 0.5 },
+          show: true,
           onsets: [
             {
               type: "onset",

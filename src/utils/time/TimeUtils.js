@@ -62,7 +62,18 @@ export function guessDateofArray(dates) {
     //if there is only one return it
     if (guessedlistWorkAll.length == 1) {
       return guessedlistWorkAll[0];
-    }
+    } /*TODO_med: fix this..     
+    else{ //Work out the time differences between times with each guess and make a more educated choice
+      let diffs = new Array(guessedlistWorkAll.length);
+      for (let i = 0; i < guessedlistWorkAll.length; i++) {
+        diffs[i] = calculateTimeDifference(
+          dates[0],
+          dates[dates.length - 1],
+          guessedlistWorkAll[i]
+        );
+      }
+      guessedlist = guessedlistWorkAll[diffs.indexOf(min(diffs))];
+    }*/
 
     //TODO _low: reduce to only those that have non-negative differences in time (assume times are in order!)
     return guessedlist[0];

@@ -14,7 +14,7 @@ export function awdTocsv(resultsData) {
   );
 
   //get the steps this in in minutes * 4 (https://actimetrics.com/text-based-clocklab-data-format/)
-  const step = Number(resultsData[3][theKey]) / 4;
+  const step = Number(resultsData[2][theKey]) / 4;
 
   for (let i = 6; i < resultsData.length; i++) {
     dataOUT[i - 6] = {
