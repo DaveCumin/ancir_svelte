@@ -447,8 +447,10 @@
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
   //TODO_high: move this to the Onset.svelte file? or make for each onset
   function findOnOffsets(sourceIndex) {
-    //reset the chart data
-    $graphs[$activeGraphTab].chartData.onsets = [];
+    //reset the chart data if index = 0
+    if (sourceIndex == 0) {
+      $graphs[$activeGraphTab].chartData.onsets = [];
+    }
 
     //get the data
     const times = $graphs[$activeGraphTab].chartData.data[sourceIndex].time;
