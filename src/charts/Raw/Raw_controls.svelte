@@ -143,7 +143,11 @@
       on:click={(e) => {
         e.preventDefault();
         createnewDataForGraph(defaultchartvalues, defaultother);
-      }}>+</span
+      }}
+      use:tippytip={{
+        content: "Add data to graph",
+        theme: "Ancir",
+      }}>📊</span
     >
   </div>
   <!-- -->

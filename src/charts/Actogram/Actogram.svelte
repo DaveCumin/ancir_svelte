@@ -20,9 +20,23 @@
     calculateMedian,
     calculateMAD,
     linearRegression,
+    removeNaNs,
   } from "../../data/handleData";
   import { defaultChartData } from "../Actogram/Actogram_defaults.svelte";
   import About from "../../components/About.svelte";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
 
   let margin = { top: 50, bottom: 20, left: 80, right: 80 };
 
@@ -115,29 +129,14 @@
         }
 
         //Remove NaNs from all
-        //find where there are NaNs
-        let nans = [];
-        for (let i = 0; i < xVals.length; i++) {
-          if (isNaN(xVals[i]) || isNaN(yVals[i])) {
-            nans.push(i);
-          }
-        }
-        //remove the NaNs
-        xVals = xVals.filter((_, i) => !nans.includes(i));
-        yVals = yVals.filter((_, i) => !nans.includes(i));
+        [xVals, yVals] = removeNaNs([xVals, yVals]);
 
         //Add the offset
         xVals = xVals.map(
           (x) => Number(x) + Number(chartData.startOffsets[sourceIndex])
         );
 
-        //do the binning
-        console.log("xVals", xVals);
-        console.log("max xVals", max(xVals));
-        console.log("offset:", chartData.startOffsets[sourceIndex]);
-
         const binnedData = averageBinnedValues(xVals, yVals, binSizeHrs);
-        console.log("binnedData", binnedData);
         //set up the plot data for any new sources
         if (sourceIndex > 0) {
           chartData.data[sourceIndex] = {
@@ -227,14 +226,6 @@
         //Do stuff for time to get the offset
         if ($data[theDataIndex].data[plotTimeField].type == "time") {
           const tempDate = $data[theDataIndex].data[plotTimeField].data[0];
-
-          console.log("tempDate", tempDate);
-          console.log(
-            getISODate(
-              tempDate,
-              $data[theDataIndex].data[plotTimeField].timeFormat
-            )
-          );
 
           //initialise the start time if not yet set
           if (startTime === "") {
@@ -385,7 +376,7 @@
             i++
           ) {
             const x = chartData.data[srcIndex].time[i] - d * periodHrs;
-            const y = chartData.data[srcIndex].values[i] || 0; //Take care of NaN values TODO_MED: make a discontinuity, like https://observablehq.com/@d3/line-chart-missing-data
+            const y = chartData.data[srcIndex].values[i] || NaN; //Take care of NaN values TODO_MED: make a discontinuity, like https://observablehq.com/@d3/line-chart-missing-data
 
             const yout = yScale(y) + ydayoffset;
 
@@ -420,9 +411,9 @@
           actPaths[srcIndex][d] = actPaths[srcIndex][d] + moveToReturn + " Z";
         }
       }
-
       return actPaths;
     }
+    ``;
   }
 
   //-- LInear regression for the onsets
@@ -431,15 +422,31 @@
     let y = [];
     let x = [];
     for (let i = onsetsIN.filterStart - 1; i < onsetsIN.filterEnd; i++) {
+      const bmot = bestMatchTime[i];
+
       if (!excludedOnsets.includes(i)) {
-        x.push(i * $graphs[$activeGraphTab]?.params.periodHrs);
+        x.push(
+          Math.floor(
+            bestMatchTime[i] / $graphs[$activeGraphTab]?.params.periodHrs
+          ) * $graphs[$activeGraphTab]?.params.periodHrs
+        );
+
         y.push(
-          bestMatchTime.slice(i, i + 1) -
-            i * $graphs[$activeGraphTab]?.params.periodHrs
+          (bestMatchTime[i] - i * $graphs[$activeGraphTab]?.params.periodHrs) %
+            $graphs[$activeGraphTab]?.params.periodHrs
         );
       }
     }
-    return linearRegression(x, y);
+
+    //Remove any NaNs
+    [x, y] = removeNaNs([x, y]);
+
+    //Only do the regression if there are data
+    if (x.length) {
+      return linearRegression(x, y);
+    } else {
+      return { slope: NaN, intercept: NaN, rSquared: NaN, rmse: NaN };
+    }
   }
 
   //----------------------------------------------------------------------------------------------------
@@ -453,13 +460,21 @@
     }
 
     //get the data
-    const times = $graphs[$activeGraphTab].chartData.data[sourceIndex].time;
-    const values = $graphs[$activeGraphTab].chartData.data[sourceIndex].values;
+    var times = getDataFromSource(
+      sourceIndex,
+      $graphs[$activeGraphTab]?.sourceData[sourceIndex].chartvalues.time
+    );
+    var values = getDataFromSource(
+      sourceIndex,
+      $graphs[$activeGraphTab]?.sourceData[sourceIndex].chartvalues.values
+    );
+
+    //remove NaNs
+    [times, values] = removeNaNs([times, values]);
+
     const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
     const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
     const periodStep = Math.ceil(periodHrs / binSizeHrs);
-
-    const dbl = $graphs[$activeGraphTab].params.doublePlot;
 
     //loop over the onsets and calculate
     for (
@@ -493,24 +508,42 @@
       let bestMatchIndex = [];
       let bestMatchTime = [];
 
-      //TODO _high: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
-      //ALSO need to add in acrophase
+      //TODO_med: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
+      //TODO_med need to add in acrophase
+      //TODO_med allow for manual insertion of line/markers
 
-      for (let d = 0; d < aboveBelow.length / periodStep; d++) {
+      for (let d = 0; d < Math.ceil(max(times) / binSize / periodStep); d++) {
+        // Calculate the start and end of the current bin
+        const binStart = d * periodStep;
+        const binEnd = (d + 1) * periodStep;
+
+        // Find the indices in 'times' that fall within the current bin
+        const indicesInBin = times.reduce((acc, time, index) => {
+          if (time / binSize >= binStart && time / binSize < binEnd) {
+            acc.push(index);
+          }
+          return acc;
+        }, []);
+
+        // If there are no times in the current bin, skip the iteration
+        if (indicesInBin.length === 0) continue;
+
+        // Extract corresponding 'aboveBelow' values
+        const aboveBelowInBin = indicesInBin.map((index) => aboveBelow[index]);
+
         bestMatchIndex[d] =
           findBestMatchIndex(
-            aboveBelow
-              .slice(d * periodStep, (d + 1) * periodStep)
-              .concat(Array.from({ length: 5 * Mhrs }, () => -1)),
+            aboveBelowInBin.concat(Array.from({ length: 5 * Mhrs }, () => -1)),
             template
           ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
 
         bestMatchTime[d] =
-          $graphs[$activeGraphTab].chartData.data[sourceIndex].time[
-            bestMatchIndex[d] + d * periodStep
-          ];
+          times[indicesInBin[bestMatchIndex[d]]] + d * periodHrs;
       }
-
+      //remove the empty matches
+      bestMatchTime = bestMatchTime.filter(
+        (bm) => bm !== null && bm !== undefined
+      );
       //remove points beyond Median Absolute Deviations
       //First calculate the linear fit
       const linearFitb4MAD = doLinearRegressionOnsets(
@@ -850,54 +883,46 @@
       {#each $graphs[$activeGraphTab].chartData.onsets as onset, osIndex}
         {#if onset.show}
           {#each onset.onsetTimes as onsetT, d}
-            {#if d >= onset.filterStart - 1 && d <= onset.filterEnd - 1}
+            {#if d >= onset.filterStart - 1 && d <= onset.filterEnd - 1 && Number(onsetT)}
               <!-- only show those in the filter range-->
-              {#if onset.excludeOnsets.includes(d)}
-                <!-- show excluded without fill-->
-                <circle
-                  cx={xScale(
-                    onsetT - d * $graphs[$activeGraphTab].params.periodHrs
-                  )}
-                  cy={d * (dayHeight + betweenHeight) + dayHeight}
-                  r="4"
-                  fill={onset.col.hex}
-                  fill-opacity="0"
-                  stroke-width="0.5"
-                  stroke="black"
-                />
-              {:else}
-                <!-- show included with fill -->
-                <circle
-                  cx={xScale(
-                    onsetT - d * $graphs[$activeGraphTab].params.periodHrs
-                  )}
-                  cy={d * (dayHeight + betweenHeight) + dayHeight}
-                  r="4"
-                  fill={onset.col.hex}
-                  fill-opacity={onset.col.alpha}
-                  stroke-width="0.5"
-                  stroke="black"
-                />
-              {/if}
-            {/if}
-
-            {#if onset.showLine}
-              <line
-                x1={xScale(onset.lmFit.intercept)}
-                y1={0 * (dayHeight + betweenHeight) + dayHeight}
-                x2={xScale(
-                  onset.lmFit.intercept +
-                    (onset.onsetTimes.length - 1) *
-                      onset.lmFit.slope *
-                      $graphs[$activeGraphTab].params.periodHrs
-                )}
-                y2={(onset.onsetTimes.length - 1) *
+              <!-- show excluded without fill-->
+              <circle
+                cx={xScale(onsetT % $graphs[$activeGraphTab].params.periodHrs)}
+                cy={Math.floor(
+                  onsetT / $graphs[$activeGraphTab].params.periodHrs
+                ) *
                   (dayHeight + betweenHeight) +
                   dayHeight}
-                stroke={onset.col.hex}
+                r="4"
+                fill={onset.col.hex}
+                fill-opacity={onset.excludeOnsets.includes(d) ? "0" : "1"}
+                stroke-width="0.5"
+                stroke="black"
+                use:tippytip={{
+                  content: onsetT,
+                  theme: "Ancir",
+                }}
               />
             {/if}
           {/each}
+          {#if onset.showLine}
+            <line
+              x1={xScale(onset.lmFit.intercept)}
+              y1="0"
+              x2={xScale(
+                onset.lmFit.intercept +
+                  $graphs[$activeGraphTab].chartData?.data[0]?.scaleLimits
+                    .length *
+                    onset.lmFit.slope *
+                    $graphs[$activeGraphTab].params.periodHrs
+              )}
+              y2={$graphs[$activeGraphTab].chartData?.data[0]?.scaleLimits
+                .length *
+                (dayHeight + betweenHeight) +
+                dayHeight}
+              stroke={onset.col.hex}
+            />
+          {/if}
         {/if}
       {/each}
 
@@ -925,6 +950,10 @@
           width={xScale(an.lengthHrs)}
           fill={an.col.hex}
           fill-opacity={an.col.alpha}
+          use:tippytip={{
+            content: an.name,
+            theme: "Ancir",
+          }}
         />
       {/each}
     </g>

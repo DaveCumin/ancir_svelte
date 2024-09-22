@@ -1,11 +1,12 @@
 <script>
   import { menuModalType } from "../store";
   import Dialog from "./Dialog.svelte";
+  import { version } from "../../package.json";
 </script>
 
 {#if $menuModalType === "about"}
   <Dialog title="ABOUT AnCiR">
-    <h3>Analysis of Circadian Rhythms (AnCiR)</h3>
+    <h3>Analysis of Circadian Rhythms (AnCiR) v{version}</h3>
 
     <p>
       This is our 'AnCiR' to the need for a simple-to-use (GUI; no coding) tool

@@ -249,6 +249,35 @@ export function calculateMean(data) {
   return sum / data.length;
 }
 
+//Remove NaNs from all arrays where they occur in even one
+export function removeNaNs(arraysIN) {
+  // Ensure that arraysIN is an array of arrays
+  if (
+    !Array.isArray(arraysIN) ||
+    arraysIN.length === 0 ||
+    !arraysIN.every(Array.isArray)
+  ) {
+    throw new TypeError("Input must be an array of arrays.");
+  }
+
+  const arrays = arraysIN.map((array) => [...array]); // Clone input arrays
+  const nans = new Set();
+
+  // Identify indices where NaN appears in any array
+  arrays.forEach((array) => {
+    array.forEach((value, i) => {
+      if (isNaN(value)) {
+        nans.add(i);
+      }
+    });
+  });
+
+  // Filter out NaN indices from all arrays
+  const result = arrays.map((array) => array.filter((_, i) => !nans.has(i)));
+
+  return result;
+}
+
 //--------
 // This is linear regression
 export function linearRegression(x, y) {

@@ -10,7 +10,10 @@
     createnewDataForGraph,
   } from "../../data/handleData";
   import { getRandomHexColour } from "../AllCharts.js";
-  import { defaultchartvalues, defaultother } from "./Barplot_defaults.svelte";
+  import {
+    defaultchartvalues,
+    defaultother,
+  } from "./Barplot_defaults.hidesvelte";
 </script>
 
 {#if $activeGraphTab >= 0 && $graphs[$activeGraphTab].graph === "Barplot"}

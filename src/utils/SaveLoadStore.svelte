@@ -59,6 +59,7 @@
     fileInput.type = "file";
     fileInput.id = "fileInput";
     fileInput.style.display = "none";
+    fileInput.accept = ".ancir";
     document.body.appendChild(fileInput);
 
     fileInput.addEventListener("change", handleFileSelect);
@@ -80,7 +81,6 @@
       }
     }
   }
-
   function handleFileSelect(event) {
     const file = event.target.files[0];
 
@@ -94,6 +94,14 @@
 
       reader.readAsText(file);
     }
+  }
+</script>
+
+<script>
+  let sessionFileToImport;
+
+  $: if (sessionFileToImport) {
+    loadStoreData();
   }
 </script>
 

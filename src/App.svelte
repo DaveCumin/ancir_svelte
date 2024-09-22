@@ -40,6 +40,7 @@
 
     window.onerror = function (msg, url, line) {
       console.log("THERE WAS AN ERROR. NEED TO HANDLE THIS BETTER. TODO_low");
+      console.log(msg, url, line);
       return true;
     };
 
@@ -82,6 +83,27 @@
       $data = [...$data, newDataEntry];
       console.log($data);
       //----------------------------
+      //create new graph
+      makeNewChart("Raw");
+      addDataToGraph(
+        0,
+        { x: "any", y: "any" },
+        {
+          col: { hex: getRandomHexColour(), alpha: 0.5 },
+          size: 2,
+          strokeWidth: 1,
+          strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
+        }
+      );
+
+      makeNewChart("Periodogram");
+      addDataToGraph(
+        0,
+        { time: "any", values: "any" },
+        {
+          col: { hex: getRandomHexColour(), alpha: 0.5 },
+        }
+      );
       //make actogram
       makeNewChart("Actogram");
       addDataToGraph(
@@ -106,28 +128,6 @@
               showLine: true,
             },
           ],
-        }
-      );
-
-      //create new graph
-      makeNewChart("Raw");
-      addDataToGraph(
-        0,
-        { x: "any", y: "any" },
-        {
-          col: { hex: getRandomHexColour(), alpha: 0.5 },
-          size: 2,
-          strokeWidth: 1,
-          strokeCol: { hex: getRandomHexColour(), alpha: 0.9 },
-        }
-      );
-
-      makeNewChart("Periodogram");
-      addDataToGraph(
-        0,
-        { time: "any", values: "any" },
-        {
-          col: { hex: getRandomHexColour(), alpha: 0.5 },
         }
       );
 
