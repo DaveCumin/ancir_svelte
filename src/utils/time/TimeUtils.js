@@ -51,8 +51,19 @@ export function guessDateofArray(dates) {
 
     //Otherwise, choose the format that works for the most number of dates
     let validCount = new Array(guessedlist.length);
+    let datesToCheck = dates;
+    //subsample if there are more than 100k points, subsample to 5k
+    if (dates.length > 100000) {
+      const idx = createSequenceArray(
+        0,
+        dates.length - 1,
+        parseInt((dates.length - 1) / 5000)
+      );
+      datesToCheck = idx.map((i) => dates[i]);
+    }
+
     for (let i = 0; i < guessedlist.length; i++) {
-      validCount[i] = dates.filter(
+      validCount[i] = datesToCheck.filter(
         (date) =>
           DateTime.fromFormat(date, convertFormat(guessedlist[i])).invalid ===
           null
