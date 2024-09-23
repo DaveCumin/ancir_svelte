@@ -17,6 +17,12 @@
     // Update thedatetime
     thedatetime = DateTime.fromISO(event.target.value);
   }
+
+  //This is needed to make the picker have the correct time
+  $: inputDate = getInputDate(thedatetime);
+  function getInputDate(dateIN) {
+    return DateTime.fromISO(dateIN).toFormat("yyyy-LL-dd'T'HH:mm");
+  }
 </script>
 
 <div class="datetimeselect">
@@ -29,7 +35,7 @@
     bind:this={picker}
     class="selection"
     type="datetime-local"
-    bind:value={thedatetime}
+    value={inputDate}
     on:input={handleInput}
   />
   <!-- svelte-ignore a11y-click-events-have-key-events -->

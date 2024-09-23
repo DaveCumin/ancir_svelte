@@ -4,19 +4,19 @@
   import { data, menuModalType } from "../store";
   import Slider from "../utils/Slider.svelte";
   import { DateTime } from "luxon";
-  import { onMount } from "svelte";
+  import DateTimeSelect from "../utils/time/DateTimeSelect.svelte";
   import { generateData } from "./simulate";
 
   let Ndays = 28;
   let fs_min = 15;
-  let start = DateTime.now()
-    .set({
+  let start = DateTime.fromISO(
+    DateTime.now().set({
       hour: 0,
       minute: 0,
       second: 0,
       millisecond: 0,
     })
-    .toJSDate();
+  );
 
   let N_simulated = 2;
   let periods = [24, 25];
@@ -34,10 +34,12 @@
   }
 
   function handleGenerateData(Ndays, fs_min, start, periods, maxheights) {
+    console.log(start);
+    console.log(start.toJSDate());
     const newDataEntry = generateData(
       Ndays,
       fs_min,
-      start,
+      start.toJSDate(),
       periods,
       maxheights,
       $data.length
@@ -73,12 +75,14 @@
     </div>
     <div>
       <label for="val">Start time:</label>
-      <input
-        type="datetime-local"
-        name="start"
-        bind:value={start}
-        on:change={(value) => console.log(value)}
-      />
+      <div
+        style="
+      vertical-align: top;
+      float: right;
+  "
+      >
+        <DateTimeSelect label="" bind:thedatetime={start} />
+      </div>
     </div>
     <hr />
     <h2>Data:</h2>

@@ -1,4 +1,6 @@
 <script>
+  // @ts-nocheck
+
   import {
     dataIDsforTables,
     showalldata,
@@ -6,8 +8,20 @@
     data,
   } from "../store";
   import InPlaceEdit from "../utils/InPlaceEdit.svelte";
-  import { saveStoreData } from "../utils/SaveLoadStore.svelte";
   import { forceFormat } from "../utils/time/TimeUtils";
+  import tippy from "tippy.js"; //https://atomiks.github.io/tippyjs/v6/getting-started/
+
+  function tippytip(node, params) {
+    let tip = tippy(node, params);
+    return {
+      update: (newParams) => {
+        tip.setProps(newParams);
+      },
+      destroy: () => {
+        tip.destroy();
+      },
+    };
+  }
 
   // make a sequence of integers
   function range(from, to) {
@@ -182,9 +196,7 @@
             <span class="tabname">
               <InPlaceEdit
                 bind:value={$data[
-                  $data.findIndex(
-                    (d) => d.id === $dataIDsforTables[$activeTableTab]
-                  )
+                  $data.findIndex((d) => d.id === $dataIDsforTables[inx])
                 ].displayName}
               />
             </span>
@@ -232,7 +244,32 @@
       of {Nrows}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="savedata hoverbutton" on:click={() => saveData()}>💾</div>
+      <!-- Add some space between the buttons-->
+      <span
+        style="margin: 0px !important;background: var(--bg-color) !important;padding: 5px !important;"
+        class="addbutton hoverbutton"
+      ></span>
+
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div
+        class="hoverbutton"
+        style="float:right;"
+        on:click={() => saveData()}
+        use:tippytip={{
+          content:
+            "Save " +
+            $data[
+              $data.findIndex(
+                (d) => d.id === $dataIDsforTables[$activeTableTab]
+              )
+            ].displayName +
+            " as CSV",
+          theme: "Ancir",
+        }}
+      >
+        💾
+      </div>
     </div>
 
     <table>
