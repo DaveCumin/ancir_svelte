@@ -91,7 +91,7 @@
         //Remove the first skipLines lines of the file before parsing
         beforeFirstChunk: (chunk) => {
           const lines = chunk.split(/\r\n|\r|\n/); // Split the content into lines
-          console.log(lines);
+
           const firstLines = skipLines
             ? lines.splice(0, skipLines) // Remove the first N lines if there are skiplines
             : lines[0].split(/[,;\t]/); //else take a sample of the first line to check for filetype (Actiware, etc)
@@ -111,17 +111,14 @@
         },
         complete: function (results, file) {
           console.log("Parsing complete:", results, file);
-          console.log(results);
 
           //Deal with awd data
           if (file.name.toLowerCase().endsWith(".awd")) {
-            console.log("doAWDstuffhere");
             results.errors = [];
             //get more data to preview before continuing
             if (previewIN == skipLines + previewTableNrows + useHeaders) {
               parseFile(14);
             } else {
-              console.log("make data here");
               results.data = awdTocsv(results.data);
             }
           }
@@ -140,8 +137,6 @@
 
   //deal with the data - actiware, clocklab, etc
   function dealWithData(dataIN) {
-    console.log("DEALING WITH DATA...");
-    console.log(dataIN);
     //convert the data into an object of arrays
     tempData = convertArrayToObject(dataIN);
 
@@ -158,8 +153,6 @@
         ); // the replace convers the a.m. or p.m. to AM or PM so it can be a time;
       }
     }
-
-    console.log(tempData);
   }
 
   //Converts the array into an object - more like AnCir uses
@@ -214,7 +207,7 @@
   async function loadData() {
     console.log("loading...");
     await parseFile(0); //load all the data
-    console.log(tempData);
+
     //TODO_high: perorm the required manipulations
     doBasicFileImport(tempData, filesToImport[0].name); //LOAD THE DATA
     $menuModalType = ""; //close the dialog
@@ -238,19 +231,18 @@
     Object.keys(result).forEach((f, i) => {
       const valueKey = `imported_${i}`;
       //find the data type based on the first non-NaN element
-      const datum = getFirstValid(result[f]);
+      const datum = getFirstValid(result[f], 5);
       let type = "";
-      console.log(datum + " : " + guessDateofArray([datum]));
-      if (guessDateofArray([datum]) != -1) {
-        const timefmt = guessDateofArray([datum]);
-        console.log("guessedformat = " + timefmt);
+      const guessedFormat = guessDateofArray(result[f]);
+      if (guessedFormat != -1) {
+        const timefmt = guessedFormat;
         dataOUT.data[valueKey] = {
           name: f,
           type: "time",
           data: result[f],
           timeFormat: timefmt,
           timeData: forceFormat(result[f], timefmt),
-          recordPeriod: getPeriod(datum, timefmt),
+          recordPeriod: getPeriod(result[f], timefmt),
         };
       } else if (!isNaN(datum)) {
         dataOUT.data[valueKey] = {
@@ -266,7 +258,7 @@
         };
       }
     });
-    console.log(dataOUT);
+
     $data.push(dataOUT);
     $data = $data;
   }

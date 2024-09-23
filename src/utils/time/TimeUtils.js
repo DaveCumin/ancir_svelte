@@ -2,6 +2,8 @@
 import { DateTime } from "luxon";
 import { guessFormat } from "./guessTimeFormat";
 import { min, max } from "../MathsStats";
+import { createSequenceArray } from "../MathsStats";
+
 const decimalPlaces = 4;
 
 export function formatDate(dateIN) {
@@ -43,40 +45,28 @@ export function guessDateofArray(dates) {
   try {
     // get the guess of the first date
     let guessedlist = guessDateFormat(dates[0]);
-    //create a complete set of guesses
-    for (let i = 1; i < dates.length; i++) {
-      guessedlist = [
-        ...new Set([...guessedlist, ...guessDateFormat(dates[i])]),
-      ];
-    }
 
-    //Keep only those that work for all dates
-    const guessedlistWorkAll = guessedlist.filter((guessedFormat) =>
-      dates.every(
+    //If there is only one guess, then return it
+    if (guessedlist.length === 0) return guessedlist;
+
+    //Otherwise, choose the format that works for the most number of dates
+    let validCount = new Array(guessedlist.length);
+    for (let i = 0; i < guessedlist.length; i++) {
+      validCount[i] = dates.filter(
         (date) =>
-          DateTime.fromFormat(date, convertFormat(guessedFormat)).invalid ===
+          DateTime.fromFormat(date, convertFormat(guessedlist[i])).invalid ===
           null
-      )
+      ).length;
+    }
+    //get the index with the highest 'hit rate'
+    const maxIndex = validCount.reduce(
+      (maxIdx, currentVal, currentIndex, array) => {
+        return currentVal > array[maxIdx] ? currentIndex : maxIdx;
+      },
+      0
     );
-
-    //if there is only one return it
-    if (guessedlistWorkAll.length == 1) {
-      return guessedlistWorkAll[0];
-    } /*TODO_med: fix this..     
-    else{ //Work out the time differences between times with each guess and make a more educated choice
-      let diffs = new Array(guessedlistWorkAll.length);
-      for (let i = 0; i < guessedlistWorkAll.length; i++) {
-        diffs[i] = calculateTimeDifference(
-          dates[0],
-          dates[dates.length - 1],
-          guessedlistWorkAll[i]
-        );
-      }
-      guessedlist = guessedlistWorkAll[diffs.indexOf(min(diffs))];
-    }*/
-
-    //TODO _low: reduce to only those that have non-negative differences in time (assume times are in order!)
-    return guessedlist[0];
+    //return that one
+    return guessedlist[maxIndex];
   } catch (error) {
     return -1;
   }
@@ -108,8 +98,7 @@ export function getPeriod(timeData, timefmt) {
       convertFormat(timefmt)
     );
   }
-  console.log(min(diffs) + ", " + max(diffs));
-  console.log(diffs);
+
   return {
     minDiff: min(diffs),
     constant: min(diffs) === max(diffs),
