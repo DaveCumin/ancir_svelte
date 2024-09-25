@@ -14,6 +14,8 @@
   import { createSequenceArray, min, max } from "../../utils/MathsStats";
   import {
     getDataFromSource,
+    getRawData,
+    getFirstTime,
     getFieldName,
     averageBinnedValues,
     getDiffs,
@@ -77,13 +79,6 @@
           $graphs[$activeGraphTab].chartData.data[0]?.day.length - 1
         ];
 
-      makePlotData(
-        $graphs[$activeGraphTab].sourceData,
-        $graphs[$activeGraphTab].params.binSizeHrs,
-        $graphs[$activeGraphTab].params.periodHrs,
-        $graphs[$activeGraphTab].params.startTime
-      );
-
       totalHeight =
         margin.top +
         margin.bottom +
@@ -105,16 +100,13 @@
     $graphs[$activeGraphTab]?.params.periodHrs,
     $graphs[$activeGraphTab]?.params.startTime
   );
-
+  //TODO_med: this runs twice each time a change is made - need to stop it
   function makePlotData(sourceData, binSizeHrs, periodHrs, startTime) {
     if ($graphs[$activeGraphTab]?.graph === "Actogram") {
       //start with the default data
-      let chartData = defaultChartData;
-
+      let chartData = structuredClone(defaultChartData);
+      console.log("DEFAULT:", chartData);
       let xVals, yVals;
-
-      //update the offsets
-      chartData.startOffsets = updateOffsets(startTime, $activeGraphTab);
 
       //for each source data
       sourceData.forEach((plotData, sourceIndex) => {
@@ -131,12 +123,39 @@
         //Remove NaNs from all
         [xVals, yVals] = removeNaNs([xVals, yVals]);
 
-        //Add the offset
-        xVals = xVals.map(
-          (x) => Number(x) + Number(chartData.startOffsets[sourceIndex])
+        //work out the start offset
+        const firstDataTime = DateTime.fromISO(
+          getFirstTime(sourceIndex, plotData.chartvalues.time)
         );
 
-        const binnedData = averageBinnedValues(xVals, yVals, binSizeHrs);
+        //initialise the start time if not yet set
+        if (startTime === "") {
+          startTime = DateTime.fromISO(firstDataTime)
+            .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+            .toISO()
+            .slice(0, 16);
+          $graphs[$activeGraphTab].params.startTime =
+            DateTime.fromISO(startTime); // make sure it's always a DateTime object
+        }
+        const diffTime = firstDataTime.diff(
+          DateTime.fromISO(startTime),
+          "hours"
+        ).hours;
+        //record the offsets - where the data starts from wrt the start time
+        chartData.startOffsets[sourceIndex] = Number(diffTime);
+        //Add the offset
+        xVals = xVals.map(
+          (x) => Number(x) + chartData.startOffsets[sourceIndex]
+        );
+
+        //Make the binned data
+        const binnedData = averageBinnedValues(
+          xVals,
+          yVals,
+          binSizeHrs,
+          xVals[0] //start binning at the start time, not 0
+        );
+
         //set up the plot data for any new sources
         if (sourceIndex > 0) {
           chartData.data[sourceIndex] = {
@@ -150,47 +169,33 @@
         chartData.data[sourceIndex].time = binnedData.time;
         chartData.data[sourceIndex].values = binnedData.values;
 
-        //create the days and set up the limits (per day) - done here to avoid another loop in the plotting
-        let sameday = Math.floor(binnedData.time[0] / periodHrs);
+        //create array for the days and for thex ylimits (per day)
+        const daysArray = binnedData.time.map((x) => {
+          return Math.floor(x / periodHrs);
+        });
+        chartData.data[sourceIndex].day = daysArray;
+        console.log(chartData);
 
-        for (let i = 0; i < binnedData.time.length; i++) {
-          const currentDay = Math.floor(binnedData.time[i] / periodHrs);
+        const dayValueMap = {};
 
-          chartData.data[sourceIndex].day[i] = currentDay;
-
-          if (currentDay === sameday) {
-            const value = binnedData.values[i];
-
-            //If there are no scale limited then start with the current value
-            if (!chartData.data[sourceIndex].scaleLimits[currentDay]) {
-              chartData.data[sourceIndex].scaleLimits[currentDay] = {
-                min: value,
-                max: value,
-              };
-              //Otherwise, update the min and max values
-            } else {
-              chartData.data[sourceIndex].scaleLimits[currentDay].min =
-                Math.min(
-                  value,
-                  chartData.data[sourceIndex].scaleLimits[currentDay].min
-                );
-              chartData.data[sourceIndex].scaleLimits[currentDay].max =
-                Math.max(
-                  value,
-                  chartData.data[sourceIndex].scaleLimits[currentDay].max
-                );
-            }
-          } else {
-            sameday = currentDay;
-            chartData.data[sourceIndex].scaleLimits[sameday] = {
-              min: binnedData.values[i],
-              max: binnedData.values[i],
-            };
+        chartData.data[sourceIndex].day.forEach((day, index) => {
+          if (!dayValueMap[day]) {
+            dayValueMap[day] = [];
           }
-        }
+          dayValueMap[day].push(chartData.data[sourceIndex].values[index]);
+        });
+
+        // Step 2: Create scaleLimits array
+        const scaleLimits = Object.keys(dayValueMap).map((day) => {
+          const values = dayValueMap[day];
+          const min = Math.min(...values);
+          const max = Math.max(...values);
+          return { min: min, max: max };
+        });
+        chartData.data[sourceIndex].scaleLimits = scaleLimits;
       });
 
-      //now set the data
+      //now set the data (and create the actipaths)
       $graphs[$activeGraphTab].chartData = chartData;
 
       //do the onsets
@@ -198,64 +203,6 @@
         findOnOffsets(srcIndex);
       }
     }
-  }
-
-  function updateOffsets(startTime, activeGraphT) {
-    let startOffsets = [];
-    if (
-      $graphs[activeGraphT].graph === "Actogram" &&
-      $graphs[activeGraphT].sourceData.length > 0
-    ) {
-      //set up zeros to start with
-      startOffsets = Array.from(
-        { length: $graphs[activeGraphT].sourceData.length },
-        () => 0
-      );
-
-      for (
-        let sinx = 0;
-        sinx < $graphs[activeGraphT].sourceData.length;
-        sinx++
-      ) {
-        const plotTimeField =
-          $graphs[activeGraphT].sourceData[sinx].chartvalues.time.field;
-        const theDataIndex = $data.findIndex(
-          (d) => d.id === $graphs[activeGraphT].sourceData[sinx].tableID
-        );
-
-        //Do stuff for time to get the offset
-        if ($data[theDataIndex].data[plotTimeField].type == "time") {
-          const tempDate = $data[theDataIndex].data[plotTimeField].data[0];
-
-          //initialise the start time if not yet set
-          if (startTime === "") {
-            startTime = DateTime.fromISO(
-              getISODate(
-                tempDate,
-                $data[theDataIndex].data[plotTimeField].timeFormat
-              )
-            )
-              .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-              .toISO()
-              .slice(0, 16);
-            $graphs[$activeGraphTab].params.startTime =
-              DateTime.fromISO(startTime); // make sure it's always a DateTime object
-          }
-
-          startOffsets[sinx] = getstartTimeOffset(
-            startTime,
-            tempDate,
-            $data[theDataIndex].data[plotTimeField].timeFormat
-          );
-        }
-      }
-    } else {
-      //set the up empty startOffsets
-      startOffsets = Array.from({ length: 1 }, () => 0);
-    }
-    $graphs[$activeGraphTab].chartData.startOffsets = startOffsets;
-
-    return startOffsets;
   }
 
   //----------------------------------------------------------------------------------------------------
@@ -279,6 +226,7 @@
     binSizeHrs
   ) {
     if (chartData && $graphs[$activeGraphTab].graph === "Actogram") {
+      console.log("MAKING ACTIPATHS");
       const dayLength = Math.ceil(periodHrs / binSizeHrs);
 
       const srcLength = $graphs[$activeGraphTab].chartData.data.length;
@@ -294,129 +242,146 @@
       const halfbarwidthScaled = xScale(binSize / 2);
 
       //the paths (and yScales) will be an array of arrays, length [sources][days]
-      actPaths = [];
       yScales = []; //needed for the Axis on each day
+      //set up the actpath data
+      actPaths = []; // for the paths, themselves
 
       //for each source
       for (let srcIndex = 0; srcIndex < srcLength; srcIndex++) {
-        actPaths[srcIndex] = [];
+        var tempactPathDatax = [];
+        var tempactPathDatay = [];
+
+        //get the global min/max for the scales
+        const globalMin = min(
+          $graphs[$activeGraphTab].chartData.data[srcIndex].values
+        );
+        const globalMax = max(
+          $graphs[$activeGraphTab].chartData.data[srcIndex].values
+        );
+
+        // set up the start flag
+        var startFlag = true;
+        var thisDay = chartData.data[srcIndex].day[0];
+        //go through each point
+        for (let i = 0; i < chartData.data[srcIndex].day.length; i++) {
+          //get the day, time and value
+          const dayI = chartData.data[srcIndex].day[i];
+          const timeI = chartData.data[srcIndex].time[i];
+          const valueI = chartData.data[srcIndex].values[i];
+
+          //if the day is different from the previous day | NB, the binning will provide sequential days, so we can assume they are in order (eg [4,4,4,5,5,5,6,6,6...])
+          if (dayI !== thisDay || startFlag) {
+            startFlag = false; //lower the start flag
+            //initialise the temppathdata
+            tempactPathDatax[dayI] = [timeI];
+            tempactPathDatay[dayI] = [valueI];
+          } else {
+            // if it's the same day
+            //update the actpath data
+            tempactPathDatax[dayI].push(timeI);
+            tempactPathDatay[dayI].push(valueI);
+          }
+          //update thisDay
+          thisDay = dayI;
+        } // for each point (i)
+
+        //Now make the actigraphs
         yScales[srcIndex] = [];
-        const days =
-          $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits.length;
-
-        //default scale is the whole data
-        var yScale = scaleLinear()
-          .domain([
-            min($graphs[$activeGraphTab].chartData.data[srcIndex].values),
-            max($graphs[$activeGraphTab].chartData.data[srcIndex].values),
-          ])
-          .range([dayHeight, 0]);
-
-        //for each day
-        for (let d = 0; d < days; d++) {
-          actPaths[srcIndex][d] = "";
-          const ydayoffset = d * (dayHeight + betweenHeight);
-
-          //set up the yScale for each row, if ticked
+        actPaths[srcIndex] = [];
+        for (
+          let d = chartData.data[srcIndex].day[0];
+          d < tempactPathDatax.length;
+          d++
+        ) {
+          //Make the y-scales
           if ($graphs[$activeGraphTab].params.scaleAxes === "byPlot") {
-            let tempMin =
-              $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits[d]
-                .min;
-            let tempMax =
-              $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits[d]
-                .max;
+            //If we need a different y-scale for each row
+            var tempMin =
+              chartData.data[srcIndex].scaleLimits[
+                d - chartData.data[srcIndex].day[0]
+              ].min;
+            var tempMax =
+              chartData.data[srcIndex].scaleLimits[
+                d - chartData.data[srcIndex].day[0]
+              ].max;
             for (
-              let t = d;
-              t <
-              Math.min(
-                d + doublePlot,
-                $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits
-                  .length
-              );
-              t++
+              let dp = d;
+              dp <
+              min([
+                d + $graphs[$activeGraphTab].params.doublePlot,
+                chartData.data[srcIndex].scaleLimits.length,
+              ]);
+              dp++
             ) {
-              if (
-                $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits[t]
-                  .min < tempMin
-              ) {
-                tempMin =
-                  $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits[
-                    t
-                  ].min;
-              }
-              if (
-                $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits[t]
-                  .max > tempMax
-              ) {
-                tempMax =
-                  $graphs[$activeGraphTab].chartData.data[srcIndex].scaleLimits[
-                    t
-                  ].max;
-              }
+              tempMin = min([
+                tempMin,
+                chartData.data[srcIndex].scaleLimits[dp].min,
+              ]);
+              tempMax = max([
+                tempMax,
+                chartData.data[srcIndex].scaleLimits[dp].max,
+              ]);
             }
-            yScale = scaleLinear()
+
+            yScales[srcIndex][d] = scaleLinear()
               .domain([tempMin, tempMax])
               .range([dayHeight, 0]);
+          } else {
+            //if it's just the global y-scale
+            yScales[srcIndex][d] = scaleLinear()
+              .domain([globalMin, globalMax])
+              .range([dayHeight, 0]);
           }
-          yScales[srcIndex][d] = yScale;
-          // Set up the starting positions
-          const moveToStart = `M0,${
+
+          //get the y-offset and start the path
+          const ydayoffset = d * (dayHeight + betweenHeight);
+          actPaths[srcIndex][d] = `M0,${
             d * (dayHeight + betweenHeight) + dayHeight
           }`;
-          actPaths[srcIndex][d] = actPaths[srcIndex][d] + moveToStart + " ";
-
-          // for each point, make the path proper (NB, the for loop is faster than alternatives https://hackernoon.com/performance-tests-on-common-javascript-array-methods)
+          //make sure to double plot
           for (
-            let i = d * dayLength;
-            i <
-            Math.min(
-              chartData.data[srcIndex].time.length,
-              (d + doublePlot) * dayLength
-            );
-            i++
+            let dp = d;
+            dp <
+            min([
+              d + $graphs[$activeGraphTab].params.doublePlot,
+              tempactPathDatax.length,
+            ]);
+            dp++
           ) {
-            const x = chartData.data[srcIndex].time[i] - d * periodHrs;
-            const y = chartData.data[srcIndex].values[i] || NaN; //Take care of NaN values TODO_MED: make a discontinuity, like https://observablehq.com/@d3/line-chart-missing-data
+            //make the path from each point
+            for (let i = 0; i < tempactPathDatax[dp].length; i++) {
+              const x = xScale(tempactPathDatax[dp][i] - d * periodHrs);
+              const y =
+                ydayoffset + yScales[srcIndex][d](tempactPathDatay[dp][i]);
 
-            const yout = yScale(y) + ydayoffset;
-
-            const xout = xScale(x);
-
-            //make the path if the value is not null
-            const theNextPathPart = `${xout - halfbarwidthScaled},${
-              ydayoffset + dayHeight
-            }  ${xout - halfbarwidthScaled},${yout} ${
-              xout + halfbarwidthScaled
-            },${yout} ${xout + halfbarwidthScaled},${ydayoffset + dayHeight}`;
-
-            //add the path if it should be added
-            if (
-              xout != null &&
-              xout != undefined &&
-              !isNaN(xout) &&
-              yout != null &&
-              yout != undefined &&
-              !isNaN(yout)
-            ) {
-              actPaths[srcIndex][d] =
-                actPaths[srcIndex][d] + theNextPathPart + " ";
+              if (
+                x != null &&
+                x != undefined &&
+                !isNaN(x) &&
+                y != null &&
+                y != undefined &&
+                !isNaN(y)
+              ) {
+                actPaths[srcIndex][d] += ` ${x - halfbarwidthScaled},${
+                  ydayoffset + dayHeight
+                }  ${x - halfbarwidthScaled},${y} ${
+                  x + halfbarwidthScaled
+                },${y} ${x + halfbarwidthScaled},${ydayoffset + dayHeight} `;
+              }
             }
           }
-
-          //make the ending
-          const moveToReturn = `${xScale(periodHrs * doublePlot)},${
+          //end the path
+          actPaths[srcIndex][d] += `${xScale(periodHrs * doublePlot)},${
             d * (dayHeight + betweenHeight) + dayHeight
-          } 0,${d * (dayHeight + betweenHeight) + dayHeight}`;
-
-          actPaths[srcIndex][d] = actPaths[srcIndex][d] + moveToReturn + " Z";
+          } 0,${d * (dayHeight + betweenHeight) + dayHeight} Z`;
         }
-      }
-      return actPaths;
-    }
-    ``;
-  }
+      } //for each source
 
-  //-- LInear regression for the onsets
+      return actPaths;
+    } //check there is a graph
+  } //FUNCTION
+
+  //-- Linear regression for the onsets
   function doLinearRegressionOnsets(onsetsIN, excludedOnsets, bestMatchTime) {
     //set up for the linear regression
     let y = [];
@@ -441,6 +406,7 @@
     //Remove any NaNs
     [x, y] = removeNaNs([x, y]);
 
+    console.log("x", x, "y", y);
     //Only do the regression if there are data
     if (x.length) {
       return linearRegression(x, y);
@@ -452,43 +418,32 @@
   //----------------------------------------------------------------------------------------------------
   //Code to find the onsets and offsets
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
-  //TODO_high: move this to the Onset.svelte file? or make for each onset
   function findOnOffsets(sourceIndex) {
-    //reset the chart data if index = 0
-    if (sourceIndex == 0) {
-      $graphs[$activeGraphTab].chartData.onsets = [];
-    }
+    //reset the chart data
+    $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = [];
 
-    //get the data
-    var times = getDataFromSource(
-      sourceIndex,
-      $graphs[$activeGraphTab]?.sourceData[sourceIndex].chartvalues.time
-    );
-    var values = getDataFromSource(
-      sourceIndex,
-      $graphs[$activeGraphTab]?.sourceData[sourceIndex].chartvalues.values
-    );
+    //Make a map for each day - we can assume that there is some data for each bin [for now]
+    const dayGroups = new Map();
+    const chartData = $graphs[$activeGraphTab].chartData.data[sourceIndex];
 
-    //remove NaNs
-    [times, values] = removeNaNs([times, values]);
-
-    const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
-    const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
-    const periodStep = Math.ceil(periodHrs / binSizeHrs);
-
-    //loop over the onsets and calculate
+    //Do each onset
     for (
       let o = 0;
       o < $graphs[$activeGraphTab].sourceData[sourceIndex].onsets.length;
       o++
     ) {
-      //Set up the parameters
-      const centile =
-        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
-          .centileThresh;
+      //set up output
+      let bestMatchIndex = [];
+      let bestMatchTime = [];
+
+      //get constants that are reused
       const Nhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].N;
       const Mhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].M;
+      const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
+      const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
+      const periodStep = Math.ceil(periodHrs / binSizeHrs);
 
+      //Make a template
       const template = createTemplate(
         Nhrs,
         Mhrs,
@@ -496,50 +451,40 @@
         $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type
       );
 
-      //find the centile
-      const centileValue = findCentileValue(values, centile);
+      //Make a map for the calculations
+      for (let i = 0; i < chartData.time.length; i++) {
+        const day = Math.floor(
+          chartData.time[i] / $graphs[$activeGraphTab].params.periodHrs
+        );
+        if (!dayGroups.has(day)) {
+          dayGroups.set(day, { t: [], v: [] });
+        }
+        dayGroups.get(day).v.push(chartData.values[i]);
+        dayGroups.get(day).t.push(chartData.time[i]);
+      }
 
-      //conver the data to -1s and 1s
-      const aboveBelow = values.map((value) =>
-        value <= centileValue || isNaN(value) ? -1 : 1
-      );
+      //console.log(dayGroups);
+      //Loop over each day and find the best match onoffset
+      dayGroups.forEach((dayData, day) => {
+        //convert the data to -1s and 1s
+        const centileValue = findCentileValue(
+          dayData.v,
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+            .centileThresh
+        );
 
-      //get the best matching index for each day
-      let bestMatchIndex = [];
-      let bestMatchTime = [];
-
-      //TODO_med: consider not splitting by days - running correlation over the entire dataset and the choosing points which are above a threshold (95centile) [and not within C hrs of another point, in case there will be multiple values?].
-      //TODO_med need to add in acrophase
-      //TODO_med allow for manual insertion of line/markers
-
-      for (let d = 0; d < Math.ceil(max(times) / binSize / periodStep); d++) {
-        // Calculate the start and end of the current bin
-        const binStart = d * periodStep;
-        const binEnd = (d + 1) * periodStep;
-
-        // Find the indices in 'times' that fall within the current bin
-        const indicesInBin = times.reduce((acc, time, index) => {
-          if (time / binSize >= binStart && time / binSize < binEnd) {
-            acc.push(index);
-          }
-          return acc;
-        }, []);
-
-        // If there are no times in the current bin, skip the iteration
-        if (indicesInBin.length === 0) continue;
-
-        // Extract corresponding 'aboveBelow' values
-        const aboveBelowInBin = indicesInBin.map((index) => aboveBelow[index]);
-
-        bestMatchIndex[d] =
+        const aboveBelow = dayData.v.map((value) =>
+          value <= centileValue || isNaN(value) ? -1 : 1
+        );
+        bestMatchIndex[day] =
           findBestMatchIndex(
-            aboveBelowInBin.concat(Array.from({ length: 5 * Mhrs }, () => -1)),
+            aboveBelow.concat(Array.from({ length: 5 * Mhrs }, () => -1)),
             template
           ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
 
-        bestMatchTime[d] =
-          times[indicesInBin[bestMatchIndex[d]]] + d * periodHrs;
-      }
+        bestMatchTime[day] = dayData.t[bestMatchIndex[day]];
+      });
+
       //remove the empty matches
       bestMatchTime = bestMatchTime.filter(
         (bm) => bm !== null && bm !== undefined
@@ -583,32 +528,17 @@
         excludedOnsets = [];
       }
 
-      //calculate the points to plot
-      let xs = [];
-      let ys = [];
-
-      for (let d = 0; d < bestMatchTime.length; d++) {
-        xs[d] =
-          xScale(
-            bestMatchTime[d] - d * $graphs[$activeGraphTab].params.periodHrs
-          ) + margin.left;
-        ys[d] = d * (dayHeight + betweenHeight) + dayHeight + margin.top;
-      }
-
-      const median = calculateMedian(xs);
-
+      //redo the linear fit
       const linearFit = doLinearRegressionOnsets(
         $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
         excludedOnsets,
         bestMatchTime
       );
-      console.log(linearFit);
-      $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].lmFit =
+      $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].linearFit =
         linearFit;
 
-      //update for drawing
-      $graphs[$activeGraphTab].chartData.onsets = [
-        ...$graphs[$activeGraphTab].chartData.onsets,
+      $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = [
+        ...$graphs[$activeGraphTab].chartData.onsets[sourceIndex],
         {
           onsetTimes: bestMatchTime,
           excludeOnsets: excludedOnsets,
@@ -627,13 +557,12 @@
           filterEnd:
             $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
               .filterEnd,
-          median: median,
           lmFit: linearFit,
           showLine:
             $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].showLine,
         },
       ];
-    }
+    } //for each o
   }
 
   //create the template
@@ -837,6 +766,7 @@
       reportTime(ct);
     }}
   >
+    <!-- ACTIPATHS -->
     <g transform={`translate(${margin.left},${margin.top})`}>
       {#if actPaths.length > 0}
         {#each $graphs[$activeGraphTab].sourceData as src, srcIndex}
@@ -880,50 +810,55 @@
       />
 
       <!-- ONSETS -->
-      {#each $graphs[$activeGraphTab].chartData.onsets as onset, osIndex}
-        {#if onset.show}
-          {#each onset.onsetTimes as onsetT, d}
-            {#if d >= onset.filterStart - 1 && d <= onset.filterEnd - 1 && Number(onsetT)}
-              <!-- only show those in the filter range-->
-              <!-- show excluded without fill-->
-              <circle
-                cx={xScale(onsetT % $graphs[$activeGraphTab].params.periodHrs)}
-                cy={Math.floor(
-                  onsetT / $graphs[$activeGraphTab].params.periodHrs
-                ) *
+      {#each $graphs[$activeGraphTab].chartData.onsets as src, srcIndex}
+        {#each $graphs[$activeGraphTab].chartData?.onsets[srcIndex] as onset, osIndex}
+          {#if onset.show}
+            {#each onset.onsetTimes as onsetT, d}
+              {#if d >= onset.filterStart - 1 && d <= onset.filterEnd - 1 && Number(onsetT)}
+                <!-- only show those in the filter range-->
+                <!-- show excluded without fill-->
+                <circle
+                  cx={xScale(
+                    onsetT % $graphs[$activeGraphTab].params.periodHrs
+                  )}
+                  cy={Math.floor(
+                    onsetT / $graphs[$activeGraphTab].params.periodHrs
+                  ) *
+                    (dayHeight + betweenHeight) +
+                    dayHeight}
+                  r="4"
+                  fill={onset.col.hex}
+                  fill-opacity={onset.excludeOnsets.includes(d) ? "0" : "1"}
+                  stroke-width="0.5"
+                  stroke="black"
+                  use:tippytip={{
+                    content: onsetT,
+                    theme: "Ancir",
+                  }}
+                />
+              {/if}
+            {/each}
+            <!-- LINE -->
+            {#if onset.showLine}
+              <line
+                x1={xScale(onset.lmFit.intercept)}
+                y1={dayHeight}
+                x2={xScale(
+                  onset.lmFit.intercept +
+                    $graphs[$activeGraphTab].chartData?.data[0]?.scaleLimits
+                      .length *
+                      onset.lmFit.slope *
+                      $graphs[$activeGraphTab].params.periodHrs
+                )}
+                y2={$graphs[$activeGraphTab].chartData?.data[0]?.scaleLimits
+                  .length *
                   (dayHeight + betweenHeight) +
                   dayHeight}
-                r="4"
-                fill={onset.col.hex}
-                fill-opacity={onset.excludeOnsets.includes(d) ? "0" : "1"}
-                stroke-width="0.5"
-                stroke="black"
-                use:tippytip={{
-                  content: onsetT,
-                  theme: "Ancir",
-                }}
+                stroke={onset.col.hex}
               />
             {/if}
-          {/each}
-          {#if onset.showLine}
-            <line
-              x1={xScale(onset.lmFit.intercept)}
-              y1="0"
-              x2={xScale(
-                onset.lmFit.intercept +
-                  $graphs[$activeGraphTab].chartData?.data[0]?.scaleLimits
-                    .length *
-                    onset.lmFit.slope *
-                    $graphs[$activeGraphTab].params.periodHrs
-              )}
-              y2={$graphs[$activeGraphTab].chartData?.data[0]?.scaleLimits
-                .length *
-                (dayHeight + betweenHeight) +
-                dayHeight}
-              stroke={onset.col.hex}
-            />
           {/if}
-        {/if}
+        {/each}
       {/each}
 
       <!-- ANNOTATIONS -->

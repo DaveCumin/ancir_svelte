@@ -72,7 +72,7 @@
           e.preventDefault();
         }}
         >Est τ: {(
-          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].lmFit
+          $graphs[$activeGraphTab].chartData.onsets[sourceIndex][o].lmFit
             .slope *
             $graphs[$activeGraphTab].params.periodHrs +
           $graphs[$activeGraphTab].params.periodHrs
@@ -132,7 +132,7 @@
           on:click={(e) => {
             e.preventDefault();
           }}
-          >R-squared: {$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
+          >R-squared: {$graphs[$activeGraphTab].chartData.onsets[sourceIndex][
             o
           ].lmFit.rSquared.toFixed(2)}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -145,7 +145,7 @@
           on:click={(e) => {
             e.preventDefault();
           }}
-          >Error: {$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
+          >Error: {$graphs[$activeGraphTab].chartData.onsets[sourceIndex][
             o
           ].lmFit.rmse.toFixed(2)}
         </span>

@@ -10,6 +10,8 @@ import { componentMap } from "../components/ProcessStep.svelte";
 import { getRandomHexColour } from "../charts/AllCharts.js";
 import { get } from "svelte/store";
 import { min, max } from "../utils/MathsStats";
+import { getISODate } from "../utils/time/TimeUtils.js";
+import { bin } from "d3-array";
 
 //Get data from the data structure
 export function getDataFromTable(tableID, key) {
@@ -42,6 +44,21 @@ export function getRawData(sourceIndex, vals) {
   let rawData = getDataFromTable(tableID, vals.field);
   return rawData;
 }
+//get the timeFormat from graph source
+export function getFirstTime(sourceIndex, vals) {
+  const sourceData = get(graphs)[get(activeGraphTab)].sourceData[sourceIndex];
+  const tableID = sourceData.tableID;
+  const format =
+    get(data)[get(data).findIndex((d) => d.id === tableID)].data[vals.field]
+      .timeFormat;
+
+  const firstTime =
+    get(data)[get(data).findIndex((d) => d.id === tableID)].data[vals.field]
+      .data[0];
+
+  return getISODate(firstTime, format);
+}
+
 export function getDataFromSource(sourceIndex, vals) {
   //get the raw data
   let dataFromSource = getRawData(sourceIndex, vals);
@@ -155,7 +172,6 @@ export function addDataToGraph(
       ) {
         current[get(activeGraphTab)].sourceData[L][k].hex =
           getRandomHexColour();
-        console.log(current[get(activeGraphTab)].sourceData[L][k].hex);
       }
     });
 
@@ -163,9 +179,7 @@ export function addDataToGraph(
   });
   if (get(graphs)[get(activeGraphTab)].graph === "Raw") {
     addedNewChartData.set(true);
-    console.log("set sem");
   }
-  console.log(get(graphs));
 }
 
 export function deepCopy(obj) {
@@ -175,6 +189,7 @@ export function deepCopy(obj) {
 //Bin the data into binSize bins
 // xs and ys are the time and values for an actogram
 // binSize is the size of each bin, usually in Hrs
+// NOTE: this includes the lowest time value, not the highest
 export function averageBinnedValues(xs, ys, binSize, startAt = 0) {
   const minx = Number(startAt) + 1 ? startAt : min(xs);
   const maxx = max(xs);
@@ -192,13 +207,17 @@ export function averageBinnedValues(xs, ys, binSize, startAt = 0) {
 
   //put values in bins
   for (let i = 0; i < xs.length; i++) {
-    const binIndex = Math.floor((xs[i] - minx) / binSize);
+    const binIndex = min([Nbins - 1, Math.floor((xs[i] - minx) / binSize)]);
     if (Number(ys[i]) + 1 && Number(xs[i]) + 1) {
       //check that both x and y are numbers
       yout[binIndex] += ys[i];
       counts[binIndex]++;
     }
   }
+
+  //add the last value to the last bin (most binning won't do this)
+  yout[yout.length - 1] += ys[ys.length - 1];
+  counts[counts.length - 1]++;
 
   //get the average of the values
   const averageY = yout.map((sum, index) => {
