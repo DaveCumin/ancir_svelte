@@ -36,6 +36,7 @@
         sourceIndex: sourceIndex,
         o: o,
       };
+      document.body.style.cursor = "crosshair";
     }
     console.log($graphs[$activeGraphTab]);
   }
@@ -181,8 +182,8 @@
       </div>
       {#if $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type == "manual"}
         <div
-          class="deleteTable hoverbutton"
-          style="display: contents;"
+          class="hoverbutton"
+          style=" width: 1.1em; height: 1.1em;"
           on:click={(e) => {
             e.preventDefault();
             addingManualMarker(sourceIndex, o);

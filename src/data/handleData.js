@@ -350,6 +350,7 @@ export function addManualMarker(time) {
         sem.o
       ].onsetTimes.push(time);
       currentData[get(activeGraphTab)].semaphore = null;
+      document.body.style.cursor = "default";
       return currentData;
     });
   } else {

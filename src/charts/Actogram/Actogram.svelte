@@ -999,7 +999,7 @@
               {/if}
             {/each}
             <!-- LINE -->
-            {#if onset.showLine}
+            {#if onset.showLine & (onset.onsetTimes.length > 1)}
               <line
                 x1={xScale(onset.lmFit.intercept)}
                 y1={dayHeight}
