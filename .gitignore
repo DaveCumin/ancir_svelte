@@ -22,5 +22,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# The Tutorial folder
-./Tutorial
+# Don't upload the large movie files (in tutorial folder)
+*.mov
+*.mp4
+*.mp3
