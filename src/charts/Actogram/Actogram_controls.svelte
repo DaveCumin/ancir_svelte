@@ -77,7 +77,7 @@
       N: 3,
       lmFit: { slope: 0, intercept: 0, rSquared: 0 },
       col: { hex: getRandomHexColour(), alpha: 0.5 },
-      showLine: false,
+      showLine: true,
     };
   }
 

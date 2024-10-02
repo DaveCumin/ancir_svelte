@@ -19,16 +19,31 @@
   }
 
   export let sourceIndex = 0;
+  let addingMarker = false;
 
   function removeOnsetData(sourceIndex, o) {
     $graphs[$activeGraphTab].sourceData[sourceIndex].onsets.splice(o, 1);
+    $graphs[$activeGraphTab].chartData.onsets[sourceIndex].splice(o, 1);
     $graphs = $graphs;
+  }
+
+  function addingManualMarker(sourceIndex, o) {
+    if ($graphs[$activeGraphTab]?.semaphore?.text == "addingManualMarker") {
+      console.log("Already adding one; do nothing.");
+    } else {
+      $graphs[$activeGraphTab].semaphore = {
+        text: "addingManualMarker",
+        sourceIndex: sourceIndex,
+        o: o,
+      };
+    }
+    console.log($graphs[$activeGraphTab]);
   }
 </script>
 
 <!-- svelte-ignore a11y-missing-attribute -->
 <!-- svelte-ignore a11y-missing-attribute -->
-{#each $graphs[$activeGraphTab].sourceData[sourceIndex].onsets as _, o}
+{#each $graphs[$activeGraphTab].sourceData[sourceIndex]?.onsets as _, o}
   <div class="otherItemDetail">
     <div class="itemsliderContainer">
       <select
@@ -36,9 +51,21 @@
         style="float: none;"
         bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
           .type}
+        on:change={(e) => {
+          console.log("changed to: ", e.target.value);
+          console.log("onset number: ", o);
+          if (e.target.value == "manual") {
+            console.log("resetting onsetTimes");
+            //if it's changing to manual, reset the points
+            $graphs[$activeGraphTab].chartData.onsets[sourceIndex][
+              o
+            ].onsetTimes = [];
+          }
+        }}
       >
         <option value="onset">Onset</option>
         <option value="offset">Offset</option>
+        <option value="manual">Manual</option>
         <!-- <option value="acrophase">Acrophase</option>-->
       </select>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -78,18 +105,20 @@
           $graphs[$activeGraphTab].params.periodHrs
         ).toFixed(2)} hrs</span
       >
-      <div class="onsetRange">
-        <Sliderdouble
-          minValue="1"
-          maxValue={$graphs[$activeGraphTab].chartData.data[0].scaleLimits
-            .length}
-          step="1"
-          bind:min={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
-            .filterStart}
-          bind:max={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
-            .filterEnd}
-        />
-      </div>
+      {#if $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type != "manual"}
+        <div class="onsetRange">
+          <Sliderdouble
+            minValue="1"
+            maxValue={$graphs[$activeGraphTab].chartData.data[0].scaleLimits
+              .length}
+            step="1"
+            bind:min={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+              .filterStart}
+            bind:max={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+              .filterEnd}
+          />
+        </div>
+      {/if}
       <div class="colour">
         <input
           class="colourPicker"
@@ -150,60 +179,73 @@
           ].lmFit.rmse.toFixed(2)}
         </span>
       </div>
-      <details>
-        <summary>
-          <!-- svelte-ignore a11y-label-has-associated-control -->
-          <label>Advanced</label>
-        </summary>
-        <div style="padding:5px">
-          <Slider
-            min="0"
-            max="100"
-            step="1"
-            limits={[0, 100]}
-            label="Centile threshold: "
-            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
-              o
-            ].centileThresh}
-          />
+      {#if $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type == "manual"}
+        <div
+          class="deleteTable hoverbutton"
+          style="display: contents;"
+          on:click={(e) => {
+            e.preventDefault();
+            addingManualMarker(sourceIndex, o);
+          }}
+          use:tippytip={{
+            content: "Add marker",
+            theme: "Ancir",
+          }}
+        >
+          📍
         </div>
-        <div style="padding:5px">
-          <Slider
-            min="0"
-            max="10"
-            step="1"
-            limits={[0, 100]}
-            label="Template hours before: "
-            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
-              o
-            ].N}
-          />
-        </div>
-        <div style="padding:5px">
-          <Slider
-            min="0"
-            max="10"
-            step="1"
-            limits={[0, 100]}
-            label="Template hours after: "
-            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
-              o
-            ].M}
-          />
-        </div>
-        <div style="padding:5px">
-          <Slider
-            min="0"
-            max="10"
-            step="0.25"
-            limits={[0, 10]}
-            label="MAD threshold to exclude: "
-            bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex].onsets[
-              o
-            ].MAD}
-          />
-        </div>
-      </details>
+      {:else}
+        <details>
+          <summary>
+            <!-- svelte-ignore a11y-label-has-associated-control -->
+            <label>Advanced</label>
+          </summary>
+          <div style="padding:5px">
+            <Slider
+              min="0"
+              max="100"
+              step="1"
+              limits={[0, 100]}
+              label="Centile threshold: "
+              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                .onsets[o].centileThresh}
+            />
+          </div>
+          <div style="padding:5px">
+            <Slider
+              min="0"
+              max="10"
+              step="1"
+              limits={[0, 100]}
+              label="Template hours before: "
+              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                .onsets[o].N}
+            />
+          </div>
+          <div style="padding:5px">
+            <Slider
+              min="0"
+              max="10"
+              step="1"
+              limits={[0, 100]}
+              label="Template hours after: "
+              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                .onsets[o].M}
+            />
+          </div>
+          <div style="padding:5px">
+            <Slider
+              min="0"
+              max="10"
+              step="0.25"
+              limits={[0, 10]}
+              label="MAD threshold to exclude: "
+              bind:value={$graphs[$activeGraphTab].sourceData[sourceIndex]
+                .onsets[o].MAD}
+            />
+          </div>
+        </details>
+      {/if}
     </div>
   </div>
 {/each}

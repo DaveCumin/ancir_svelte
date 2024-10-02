@@ -4,6 +4,7 @@ import {
   activeGraphTab,
   contextMenu,
   addedNewChartData,
+  activeTableTab,
 } from "../store";
 import { componentMap } from "../components/ProcessStep.svelte";
 // @ts-ignore
@@ -11,7 +12,6 @@ import { getRandomHexColour } from "../charts/AllCharts.js";
 import { get } from "svelte/store";
 import { min, max } from "../utils/MathsStats";
 import { getISODate } from "../utils/time/TimeUtils.js";
-import { bin } from "d3-array";
 
 //Get data from the data structure
 export function getDataFromTable(tableID, key) {
@@ -338,4 +338,31 @@ export function linearRegression(x, y) {
   const rmse = Math.sqrt(sumSquaredErrors / n);
 
   return { slope, intercept, rSquared, rmse };
+}
+
+// add a manual marker/onset for actogram
+export function addManualMarker(time) {
+  console.log(time);
+  const sem = get(graphs)[get(activeGraphTab)]?.semaphore;
+  if (sem?.text == "addingManualMarker") {
+    graphs.update((currentData) => {
+      currentData[get(activeGraphTab)].chartData.onsets[sem.sourceIndex][
+        sem.o
+      ].onsetTimes.push(time);
+      currentData[get(activeGraphTab)].semaphore = null;
+      return currentData;
+    });
+  } else {
+    console.log("something wrong in addManualMarker");
+    console.log("time", time);
+    console.log("semaphore", sem);
+  }
+}
+export function removeMarker(srcIndex, osIndex, d) {
+  graphs.update((currentData) => {
+    currentData[get(activeGraphTab)].chartData.onsets[srcIndex][
+      osIndex
+    ].onsetTimes.splice(d, 1);
+    return currentData;
+  });
 }

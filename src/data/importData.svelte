@@ -343,7 +343,7 @@
         type="checkbox"
         label="headers"
         bind:checked={useHeaders}
-        on:change={() => parseFile(skipLines + previewTableNrows + useHeaders)}
+        on:change={(e) => parseFile(skipLines + previewTableNrows + useHeaders)}
       />
       <!-- svelte-ignore a11y-label-has-associated-control -->
       <label>Skip lines:</label><input

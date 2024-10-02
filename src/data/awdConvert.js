@@ -10,7 +10,7 @@ export function awdTocsv(resultsData) {
   //get the Start time
   const startTime = DateTime.fromFormat(
     resultsData[0][theKey] + " " + resultsData[1][theKey],
-    "dd-LL-yyyy HH:mm"
+    "dd-LL-yyyy HH:mm:ss"
   );
 
   //get the steps this in in minutes * 4 (https://actimetrics.com/text-based-clocklab-data-format/)
@@ -20,7 +20,7 @@ export function awdTocsv(resultsData) {
     dataOUT[i - 6] = {
       time: startTime
         .plus({ minutes: (i - 6) * step })
-        .toFormat("dd-LL-yyyy HH:mm"),
+        .toFormat("dd-LL-yyyy HH:mm:ss"),
       value: resultsData[i][theKey],
     };
   }

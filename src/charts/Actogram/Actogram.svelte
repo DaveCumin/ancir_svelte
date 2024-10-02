@@ -23,6 +23,9 @@
     calculateMAD,
     linearRegression,
     removeNaNs,
+    getFieldTypeFromGraph,
+    addManualMarker,
+    removeMarker,
   } from "../../data/handleData";
   import { defaultChartData } from "../Actogram/Actogram_defaults.svelte";
   import About from "../../components/About.svelte";
@@ -123,30 +126,57 @@
         //Remove NaNs from all
         [xVals, yVals] = removeNaNs([xVals, yVals]);
 
-        //work out the start offset
-        const firstDataTime = DateTime.fromISO(
-          getFirstTime(sourceIndex, plotData.chartvalues.time)
-        );
+        //if the type is time then calculate start time
+        if (
+          getFieldTypeFromGraph(
+            $graphs[$activeGraphTab].id,
+            sourceIndex,
+            "time"
+          ) === "time"
+        ) {
+          const firstDataTime = DateTime.fromISO(
+            getFirstTime(sourceIndex, plotData.chartvalues.time)
+          );
 
-        //initialise the start time if not yet set
-        if (startTime === "") {
-          startTime = DateTime.fromISO(firstDataTime)
-            .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-            .toISO()
-            .slice(0, 16);
-          $graphs[$activeGraphTab].params.startTime =
-            DateTime.fromISO(startTime); // make sure it's always a DateTime object
+          //initialise the start time if it's not set
+          if (startTime === "") {
+            startTime = DateTime.fromISO(firstDataTime)
+              .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+              .toISO()
+              .slice(0, 16);
+            $graphs[$activeGraphTab].params.startTime =
+              DateTime.fromISO(startTime); // make sure it's always a DateTime object
+          }
+          //get the offset from the time
+          const diffTime = firstDataTime.diff(
+            DateTime.fromISO(startTime),
+            "hours"
+          ).hours;
+          console.log("offset = ", diffTime);
+          //record the offsets - where the data starts from wrt the start time
+          chartData.startOffsets[sourceIndex] = Number(diffTime);
+          //Add the offset
+          xVals = xVals.map(
+            (x) => Number(x) + chartData.startOffsets[sourceIndex]
+          );
+        } else {
+          //otherwise make the start time 00 of today
+          if (startTime === "") {
+            startTime = DateTime.now()
+              .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+              .toISO()
+              .slice(0, 16);
+            $graphs[$activeGraphTab].params.startTime =
+              DateTime.fromISO(startTime);
+          }
+          //make the offset the first value
+          //record the offsets - where the data starts from wrt the start time
+          chartData.startOffsets[sourceIndex] = xVals[0];
+          //Add the offset
+          xVals = xVals.map(
+            (x) => Number(x) + chartData.startOffsets[sourceIndex]
+          );
         }
-        const diffTime = firstDataTime.diff(
-          DateTime.fromISO(startTime),
-          "hours"
-        ).hours;
-        //record the offsets - where the data starts from wrt the start time
-        chartData.startOffsets[sourceIndex] = Number(diffTime);
-        //Add the offset
-        xVals = xVals.map(
-          (x) => Number(x) + chartData.startOffsets[sourceIndex]
-        );
 
         //Make the binned data
         const binnedData = averageBinnedValues(
@@ -185,7 +215,7 @@
           dayValueMap[day].push(chartData.data[sourceIndex].values[index]);
         });
 
-        // Step 2: Create scaleLimits array
+        // create scaleLimits array
         const scaleLimits = Object.keys(dayValueMap).map((day) => {
           const values = dayValueMap[day];
           const min = Math.min(...values);
@@ -196,7 +226,7 @@
       });
 
       //now set the data (and create the actipaths)
-      $graphs[$activeGraphTab].chartData = chartData;
+      $graphs[$activeGraphTab].chartData.data = chartData.data;
 
       //do the onsets
       for (let srcIndex = 0; srcIndex < sourceData.length; srcIndex++) {
@@ -419,12 +449,16 @@
   //Code to find the onsets and offsets
   // This is based on the approach of Clocklab, per https://www.harvardapparatus.com/media/manuals/Product%20Manuals/ACT-500%20ClockLab%20Analysis%20Manual.pdf
   function findOnOffsets(sourceIndex) {
-    //reset the chart data
-    $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = [];
-
-    //Make a map for each day - we can assume that there is some data for each bin [for now]
-    const dayGroups = new Map();
-    const chartData = $graphs[$activeGraphTab].chartData.data[sourceIndex];
+    //reset the chart data if the first time
+    console.log("sourceIndex: ", sourceIndex);
+    console.log(
+      "onsets: ",
+      $graphs[$activeGraphTab].chartData?.onsets[sourceIndex]
+    );
+    if (!$graphs[$activeGraphTab].chartData?.onsets[sourceIndex]) {
+      console.log("clearing it");
+      $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = [];
+    }
 
     //Do each onset
     for (
@@ -432,114 +466,218 @@
       o < $graphs[$activeGraphTab].sourceData[sourceIndex].onsets.length;
       o++
     ) {
-      //set up output
-      let bestMatchIndex = [];
-      let bestMatchTime = [];
-
-      //get constants that are reused
-      const Nhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].N;
-      const Mhrs = $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].M;
-      const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
-      const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
-      const periodStep = Math.ceil(periodHrs / binSizeHrs);
-
-      //Make a template
-      const template = createTemplate(
-        Nhrs,
-        Mhrs,
-        binSizeHrs,
-        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type
-      );
-
-      //Make a map for the calculations
-      for (let i = 0; i < chartData.time.length; i++) {
-        const day = Math.floor(
-          chartData.time[i] / $graphs[$activeGraphTab].params.periodHrs
+      //Deal with the manual onsets
+      if (
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type ==
+        "manual"
+      ) {
+        console.log($graphs[$activeGraphTab].chartData.onsets[sourceIndex]);
+        console.log(
+          $graphs[$activeGraphTab].chartData.onsets[sourceIndex].length
         );
-        if (!dayGroups.has(day)) {
-          dayGroups.set(day, { t: [], v: [] });
+        //make placeholder data if there is none
+        if (
+          $graphs[$activeGraphTab].chartData.onsets[sourceIndex].length == 0
+        ) {
+          console.log("making dummy data");
+          $graphs[$activeGraphTab].chartData.onsets[sourceIndex][o] = {
+            onsetTimes: [],
+            col: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].col,
+            alpha:
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].alpha,
+            filterStart: NaN,
+            filterEnd: NaN,
+            lmFit: {
+              slope: NaN,
+              intercept: NaN,
+              rSquared: NaN,
+              rmse: NaN,
+            },
+            showLine:
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+                .showLine,
+          };
+        } else {
+          //do linear fit
+          var x = $graphs[$activeGraphTab].chartData.onsets[sourceIndex][
+            o
+          ].onsetTimes.map((t) => {
+            return (
+              Math.floor(t / $graphs[$activeGraphTab]?.params.periodHrs) *
+              $graphs[$activeGraphTab]?.params.periodHrs
+            );
+          });
+
+          var y = $graphs[$activeGraphTab].chartData.onsets[sourceIndex][
+            o
+          ].onsetTimes.map((t, i) => {
+            return (t - x[i]) % $graphs[$activeGraphTab]?.params.periodHrs;
+          });
+
+          //Remove any NaNs
+          [x, y] = removeNaNs([x, y]);
+
+          if (x.length) {
+            var linearFit = linearRegression(x, y);
+          } else {
+            var linearFit = {
+              slope: NaN,
+              intercept: NaN,
+              rSquared: NaN,
+              rmse: NaN,
+            };
+          }
+          console.log(
+            $graphs[$activeGraphTab].chartData.onsets[sourceIndex][o].onsetTimes
+          );
+          console.log("x", x, "y", y);
+          console.log(linearFit);
+
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].linearFit =
+            linearFit;
+
+          $graphs[$activeGraphTab].chartData.onsets[sourceIndex][o] = {
+            onsetTimes:
+              $graphs[$activeGraphTab].chartData.onsets[sourceIndex][o]
+                .onsetTimes,
+            excludeOnsets: [],
+            //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
+            //TODO _med: need to truncate the line also - as it can go off the chart.
+            //TODO _med: update logic so mad takes the line into account!
+            MAD: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD,
+            show: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+              .showOnsets,
+            col: $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].col,
+            alpha:
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].alpha,
+            filterStart:
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+                .filterStart,
+            filterEnd:
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+                .filterEnd,
+            lmFit: linearFit,
+            showLine:
+              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+                .showLine,
+          };
         }
-        dayGroups.get(day).v.push(chartData.values[i]);
-        dayGroups.get(day).t.push(chartData.time[i]);
-      }
-
-      //console.log(dayGroups);
-      //Loop over each day and find the best match onoffset
-      dayGroups.forEach((dayData, day) => {
-        //convert the data to -1s and 1s
-        const centileValue = findCentileValue(
-          dayData.v,
-          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
-            .centileThresh
-        );
-
-        const aboveBelow = dayData.v.map((value) =>
-          value <= centileValue || isNaN(value) ? -1 : 1
-        );
-        bestMatchIndex[day] =
-          findBestMatchIndex(
-            aboveBelow.concat(Array.from({ length: 5 * Mhrs }, () => -1)),
-            template
-          ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
-
-        bestMatchTime[day] = dayData.t[bestMatchIndex[day]];
-      });
-
-      //remove the empty matches
-      bestMatchTime = bestMatchTime.filter(
-        (bm) => bm !== null && bm !== undefined
-      );
-      //remove points beyond Median Absolute Deviations
-      //First calculate the linear fit
-      const linearFitb4MAD = doLinearRegressionOnsets(
-        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
-        [], //None excluded (keep them all)
-        bestMatchTime
-      );
-
-      //Now take this into account when calculating MAD
-      //TODO_med: Account for breaks across periods (discrete jumps but same period)
-      let excludedOnsets;
-      if ($graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD > 0) {
-        const N = bestMatchTime.length;
-        const bestMatchHrs = bestMatchTime.map(
-          (value, index) =>
-            value -
-            $graphs[$activeGraphTab]?.params.periodHrs * index -
-            (linearFitb4MAD.intercept + linearFitb4MAD.slope * index)
-        );
-
-        const medianBMT = calculateMedian(bestMatchHrs);
-        const madBMT = calculateMAD(
-          bestMatchHrs,
-          calculateMedian(bestMatchHrs)
-        );
-
-        excludedOnsets = bestMatchHrs
-          .map((value, index) => ({ value, index }))
-          .filter(
-            ({ value }) =>
-              Math.abs(value - medianBMT) >
-              $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD *
-                madBMT
-          )
-          .map(({ index }) => index);
+        // else if the onsets are not manual
       } else {
-        excludedOnsets = [];
-      }
+        //Make a map for each day - we can assume that there is some data for each bin [for now]
+        const dayGroups = new Map();
+        const chartData = $graphs[$activeGraphTab].chartData.data[sourceIndex];
 
-      //redo the linear fit
-      const linearFit = doLinearRegressionOnsets(
-        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
-        excludedOnsets,
-        bestMatchTime
-      );
-      $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].linearFit =
-        linearFit;
+        //set up output
+        let bestMatchIndex = [];
+        let bestMatchTime = [];
 
-      $graphs[$activeGraphTab].chartData.onsets[sourceIndex] = [
-        ...$graphs[$activeGraphTab].chartData.onsets[sourceIndex],
-        {
+        //get constants that are reused
+        const Nhrs =
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].N;
+        const Mhrs =
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].M;
+        const binSizeHrs = $graphs[$activeGraphTab].params.binSizeHrs;
+        const periodHrs = $graphs[$activeGraphTab].params.periodHrs;
+        const periodStep = Math.ceil(periodHrs / binSizeHrs);
+
+        //Make a template
+        const template = createTemplate(
+          Nhrs,
+          Mhrs,
+          binSizeHrs,
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].type
+        );
+
+        //Make a map for the calculations
+        for (let i = 0; i < chartData.time.length; i++) {
+          const day = Math.floor(
+            chartData.time[i] / $graphs[$activeGraphTab].params.periodHrs
+          );
+          if (!dayGroups.has(day)) {
+            dayGroups.set(day, { t: [], v: [] });
+          }
+          dayGroups.get(day).v.push(chartData.values[i]);
+          dayGroups.get(day).t.push(chartData.time[i]);
+        }
+
+        //console.log(dayGroups);
+        //Loop over each day and find the best match onoffset
+        dayGroups.forEach((dayData, day) => {
+          //convert the data to -1s and 1s
+          const centileValue = findCentileValue(
+            dayData.v,
+            $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o]
+              .centileThresh
+          );
+
+          const aboveBelow = dayData.v.map((value) =>
+            value <= centileValue || isNaN(value) ? -1 : 1
+          );
+          bestMatchIndex[day] =
+            findBestMatchIndex(
+              aboveBelow.concat(Array.from({ length: 5 * Mhrs }, () => -1)),
+              template
+            ) + Math.round(Nhrs / binSizeHrs); // add the Nhrs step to be the start of the jump
+
+          bestMatchTime[day] = dayData.t[bestMatchIndex[day]];
+        });
+
+        //remove the empty matches
+        bestMatchTime = bestMatchTime.filter(
+          (bm) => bm !== null && bm !== undefined
+        );
+        //remove points beyond Median Absolute Deviations
+        //First calculate the linear fit
+        const linearFitb4MAD = doLinearRegressionOnsets(
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
+          [], //None excluded (keep them all)
+          bestMatchTime
+        );
+
+        //Now take this into account when calculating MAD
+        //TODO_med: Account for breaks across periods (discrete jumps but same period)
+        let excludedOnsets;
+        if (
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD > 0
+        ) {
+          const N = bestMatchTime.length;
+          const bestMatchHrs = bestMatchTime.map(
+            (value, index) =>
+              value -
+              $graphs[$activeGraphTab]?.params.periodHrs * index -
+              (linearFitb4MAD.intercept + linearFitb4MAD.slope * index)
+          );
+
+          const medianBMT = calculateMedian(bestMatchHrs);
+          const madBMT = calculateMAD(
+            bestMatchHrs,
+            calculateMedian(bestMatchHrs)
+          );
+
+          excludedOnsets = bestMatchHrs
+            .map((value, index) => ({ value, index }))
+            .filter(
+              ({ value }) =>
+                Math.abs(value - medianBMT) >
+                $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].MAD *
+                  madBMT
+            )
+            .map(({ index }) => index);
+        } else {
+          excludedOnsets = [];
+        }
+
+        //redo the linear fit
+        const linearFit = doLinearRegressionOnsets(
+          $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o],
+          excludedOnsets,
+          bestMatchTime
+        );
+        $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].linearFit =
+          linearFit;
+
+        $graphs[$activeGraphTab].chartData.onsets[sourceIndex][o] = {
           onsetTimes: bestMatchTime,
           excludeOnsets: excludedOnsets,
           //TODO _med: redo the logic for these values - the lines don't look good at some periodHrs - when the data period is high or low (steep slope). Suggestion: pick a group of points to put the line through, rather than choosing the median value (?)
@@ -560,9 +698,9 @@
           lmFit: linearFit,
           showLine:
             $graphs[$activeGraphTab].sourceData[sourceIndex].onsets[o].showLine,
-        },
-      ];
-    } //for each o
+        };
+      } //for each o
+    }
   }
 
   //create the template
@@ -624,6 +762,11 @@
 
   //----------------------------------------------------------------------------------------------------
 
+  function chartClicked(e) {
+    if ($graphs[$activeGraphTab]?.semaphore?.text == "addingManualMarker") {
+      addManualMarker(mouseToPoint(e));
+    }
+  }
   function mouseToPoint(e) {
     if (
       e.offsetX < margin.left ||
@@ -759,6 +902,7 @@
     }}
     on:click={(e) => {
       e.preventDefault();
+      chartClicked(e);
     }}
     on:dblclick={(e) => {
       e.preventDefault();
@@ -831,9 +975,25 @@
                   fill-opacity={onset.excludeOnsets.includes(d) ? "0" : "1"}
                   stroke-width="0.5"
                   stroke="black"
-                  use:tippytip={{
-                    content: onsetT,
-                    theme: "Ancir",
+                  on:dblclick={(e) => {
+                    e.stopPropagation();
+                    console.log(
+                      "need to remove marker ",
+                      d,
+                      " of onset ",
+                      osIndex,
+                      " of src ",
+                      srcIndex
+                    );
+                    //only remove it for the manual one
+
+                    if (
+                      $graphs[$activeGraphTab].sourceData[srcIndex].onsets[
+                        osIndex
+                      ].type === "manual"
+                    ) {
+                      removeMarker(srcIndex, osIndex, d);
+                    }
                   }}
                 />
               {/if}
